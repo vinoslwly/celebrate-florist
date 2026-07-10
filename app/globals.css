@@ -8,8 +8,41 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-serif);
+
+  /*
+   * Named brand palette, ported 1:1 from the original prototype
+   * (tailwind.config.ts) so components can use the same class names
+   * (bg-pink-deep, from-peach, text-sage-deep, etc). This is the
+   * Landing Page's own brand palette — separate from the five
+   * Experience Themes (Bloom/Sky/Pure/Warm/Play), which stay
+   * independent per the Theme Independence principle.
+   */
+  --color-pink: #f8c8dc;
+  --color-pink-soft: #fbd5e3;
+  --color-pink-deep: #f0a8c7;
+  --color-peach: #ffd7c2;
+  --color-peach-soft: #ffe5d6;
+  --color-peach-deep: #ffb89a;
+  --color-cream: #fff4d6;
+  --color-cream-soft: #fff9e8;
+  --color-sage: #c9ddcc;
+  --color-sage-soft: #dce9db;
+  --color-sage-deep: #a8c7a6;
+  --color-warmwhite: #fffcf8;
+
+  /*
+   * Text-safe pink. `pink-deep` (#f0a8c7) is a decorative/background
+   * accent — as small text on a white/cream background it renders at
+   * ~1.9:1 contrast, well under WCAG AA's 4.5:1 minimum for text.
+   * `pink-ink` (~4.9:1) is the pink to reach for whenever pink is the
+   * *text* color (eyebrows, labels, step numbers) — found and fixed
+   * during the Sprint 01C accessibility review.
+   */
+  --color-pink-ink: #b8497a;
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,30 +82,39 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /*
+   * Brand palette restored from the original prototype's identity —
+   * warm pastel pink/peach/cream, not generic SaaS neutral. See
+   * Sprint 01C discussion: the product is an emotional gift for young
+   * gift-givers, not an enterprise tool, and the visual language
+   * needs to read that way.
+   */
+  --background: #fffcf8;
+  --foreground: #4a3428;
+  --card: #ffffff;
+  --card-foreground: #4a3428;
+  --popover: #ffffff;
+  --popover-foreground: #4a3428;
+  --primary: #f0a8c7;
+  --primary-foreground: #4a3428;
+  --secondary: #ffe5d6;
+  --secondary-foreground: #4a3428;
+  --muted: #fff9e8;
+  /* Darkened from #8a6f63 (~4.5:1, right at the WCAG AA floor) to a
+     safer ~7:1 during the Sprint 01C accessibility review. */
+  --muted-foreground: #6b5347;
+  --accent: #fbd5e3;
+  --accent-foreground: #4a3428;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: #f3dee6;
+  --input: #f3dee6;
+  --ring: #f0a8c7;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 1.25rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -126,5 +168,44 @@
   }
   html {
     @apply font-sans;
+  }
+  /*
+   * Smooth in-page navigation for navbar anchor links. Pure CSS — the
+   * browser's own compositor handles it, no JavaScript scroll library
+   * needed, so it costs nothing extra on low-end mobile devices.
+   * Skipped entirely when the visitor prefers reduced motion.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  /* Keeps the sticky navbar (h-16) from covering a section's heading when jumped to. */
+  section[id] {
+    scroll-margin-top: 4rem;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif tracking-tight;
+  }
+}
+
+@layer utilities {
+  .shadow-soft {
+    box-shadow:
+      0 4px 20px -2px rgba(240, 168, 199, 0.25),
+      0 2px 8px -2px rgba(0, 0, 0, 0.05);
+  }
+  .shadow-soft-lg {
+    box-shadow:
+      0 10px 40px -4px rgba(240, 168, 199, 0.35),
+      0 4px 16px -4px rgba(0, 0, 0, 0.08);
+  }
+  .shadow-soft-pink {
+    box-shadow: 0 8px 30px -6px rgba(240, 168, 199, 0.5);
   }
 }
