@@ -1,13 +1,13 @@
--- Sprint 03A — 015: Seed Admin Email Lock
+-- Sprint 03A — 015: Admin Email Setting Slot
 --
--- Celebrate follows a single-admin operational model. This setting is the
--- database-level source of truth for which email may access the Studio
--- admin surface. Sprint 04 auth middleware must reject any authenticated
--- user whose email does not match this value.
+-- Celebrate follows a single-admin operational model. The admin_email
+-- app_settings key is read by Sprint 04 auth middleware (server-side only).
 --
--- The corresponding Supabase Auth user (varrelakun@gmail.com) must exist
--- in auth.users before preview_links or admin audit_logs can be created.
+-- The real admin email must NEVER be committed to version control or exposed
+-- to the frontend. Set it in .env.local (gitignored):
+--   ADMIN_EMAIL=your-real-admin@email.com
+--
+-- Sprint 04 bootstrap will upsert app_settings.admin_email from that env var.
+-- Production databases already seeded manually retain their existing value.
 
-insert into public.app_settings (key, value)
-values ('admin_email', 'varrelakun@gmail.com')
-on conflict (key) do update set value = excluded.value;
+-- Intentionally no INSERT: email is deploy-time configuration, not migration data.
