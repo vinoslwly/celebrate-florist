@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Celebrate Florist
+
+Production rebuild of the Celebrate Florist experience. This repository
+contains the engineering foundation only — no product features yet.
+
+The single source of truth for product vision, PRD, design system, and all
+locked architectural decisions is the Notion workspace (Phase 0 → Phase 05).
+This README does not duplicate that documentation.
+
+## Status
+
+**Sprint 00 — Foundation Setup.** See the sprint report delivered alongside
+this repository for what is and isn't implemented yet.
+
+## Stack
+
+Next.js (App Router) · React · TypeScript (strict) · Tailwind CSS ·
+shadcn/ui · Framer Motion · Supabase · React Hook Form · Zod
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
+cp .env.example .env.local   # fill in real values
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script                    | Purpose                                               |
+| ------------------------- | ----------------------------------------------------- |
+| `npm run dev`             | Start the development server                          |
+| `npm run build`           | Production build                                      |
+| `npm run start`           | Start the production server (after `build`)           |
+| `npm run lint`            | ESLint                                                |
+| `npm run lint:fix`        | ESLint with autofix                                   |
+| `npm run typecheck`       | TypeScript strict type checking, no emit              |
+| `npm run format`          | Prettier — write                                      |
+| `npm run format:check`    | Prettier — check only (used in CI)                    |
+| `npm run verify:supabase` | Confirms the configured Supabase project is reachable |
 
-## Learn More
+## Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+See `.env.example` for the full list and classification (public / server-only
+/ secret). All environment access in application code goes through
+`config/env.ts` (public) and `config/env.server.ts` (server-only) — never
+`process.env` directly.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Folder Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Follows the Phase 05 Project Architecture & Engineering Standards Blueprint
+exactly. See that document for the rationale behind every directory.
 
-## Deploy on Vercel
+## Git Hooks
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Husky runs `lint-staged` (ESLint + Prettier on staged files) and a full
+`typecheck` before every commit. A commit is blocked if either fails.
