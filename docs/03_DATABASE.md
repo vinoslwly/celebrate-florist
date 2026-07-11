@@ -429,7 +429,21 @@ Recipients receive signed URLs minted server-side — never direct bucket access
 | 014 | `20260710210014_revoke_trigger_function_execute_from_public.sql` | Close trigger function EXECUTE               |
 | 015 | `20260710210015_seed_admin_email.sql`                            | Documents deploy-time config (no INSERT)     |
 
-**Status:** All 15 migrations applied locally and on remote Supabase (`celebrate-florist-prod`).
+**Status:** All 15 migration files in this repository are applied on remote Supabase (`celebrate-florist-prod`). Schema is in sync.
+
+### Repo vs Remote Migration History
+
+| Context                                 | Count          | Notes                                                                                 |
+| --------------------------------------- | -------------- | ------------------------------------------------------------------------------------- |
+| Repo `supabase/migrations/`             | **15 files**   | Source of truth for development and new environments                                  |
+| Remote `celebrate-florist-prod` history | **16 entries** | Sprint 03A live audit applied two `rls_auto_enable` revokes before repo consolidation |
+
+During the Sprint 03A security audit, remote received two discrete migrations:
+
+1. `revoke_rls_auto_enable_public_execute`
+2. `revoke_rls_auto_enable_execute_from_public`
+
+The repository consolidates both into a single file: `20260710210012_revoke_rls_auto_enable_execute_from_public.sql`. This is a **history-count discrepancy only** — effective schema and privileges are identical. Remote timestamps (`2026071015xxxx`) differ from repo filenames (`202607102100xx`) because files were re-timestamped when written to the repository.
 
 ---
 

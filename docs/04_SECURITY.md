@@ -118,7 +118,7 @@ Full policy matrix: [03_DATABASE.md#rls-summary](./03_DATABASE.md#rls-summary)
 
 ### Privilege Hardening (Post-Audit)
 
-Migrations 011–015 address findings from the Sprint 03A security audit:
+Migrations 011–015 (repo files) address findings from the Sprint 03A security audit. Remote history lists **16 entries** because two `rls_auto_enable` revokes were applied separately during the live audit before repo consolidation — see [03_DATABASE.md#repo-vs-remote-migration-history](./03_DATABASE.md#repo-vs-remote-migration-history).
 
 - Revoked `anon` DML grants on sensitive tables
 - Revoked PUBLIC EXECUTE on trigger functions and `rls_auto_enable()`

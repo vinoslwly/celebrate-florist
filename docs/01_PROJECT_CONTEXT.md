@@ -83,7 +83,7 @@ Full rationale: [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md)
 | Sprint 01  | Full landing page — hero, bouquet catalog, theme showcase, FAQ, WhatsApp CTAs, scroll animations                            |
 | Sprint 02  | Approved folder structure, Zod env validation, feature module scaffolding                                                   |
 | Sprint 02B | `proxy.ts` session refresh, CSP, security headers, Supabase image domains                                                   |
-| Sprint 03A | 15 database migrations, RLS, storage buckets, 5 seeded themes, privilege hardening                                          |
+| Sprint 03A | 15 migration files (remote history: 16 entries), RLS, storage buckets, 5 seeded themes, privilege hardening                 |
 
 ### Not Yet Built
 
@@ -206,7 +206,7 @@ celebrate-florist/
 ├── scripts/
 │   └── verify-supabase.ts      # Connectivity health check
 ├── supabase/
-│   └── migrations/             # 15 SQL migration files
+│   └── migrations/             # 15 SQL migration files (remote history: 16 entries)
 ├── types/
 │   └── theme.ts                # Theme type for landing page
 └── docs/                       # This documentation

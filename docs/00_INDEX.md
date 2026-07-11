@@ -26,15 +26,15 @@ Read these documents in order. Each file builds on the previous one.
 
 ## Current Project Status
 
-| Area                        | Status                                                                                                                                    |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Development phase**       | Foundation rebuild — database complete, application features not yet built                                                                |
-| **Current sprint**          | Sprint 06 — Studio Order Management & Experience Drafts ⏳ Next                                                                           |
-| **Latest completed sprint** | Sprint 05 — Studio Authentication                                                                                                         |
-| **Deployment**              | Vercel project linked (`.vercel/` present); landing page deployable; Studio auth page deployable; Experience routes not yet implemented   |
-| **Database**                | 15 migrations applied locally and on remote Supabase; 11 tables, 2 private storage buckets, 5 seeded themes                               |
-| **Security**                | Sprint 02B hardening complete (CSP, security headers, proxy session refresh); RLS and privilege hardening complete (migrations 011–015)   |
-| **Production readiness**    | **Partial** — schema and landing page are production-grade; Studio auth, Experience delivery, and privileged server paths are future work |
+| Area                        | Status                                                                                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Development phase**       | Foundation rebuild — database complete, application features not yet built                                                                                                     |
+| **Current sprint**          | Sprint 06 — Studio Order Management & Experience Drafts ⏳ Next                                                                                                                |
+| **Latest completed sprint** | Sprint 05 — Studio Authentication                                                                                                                                              |
+| **Deployment**              | Vercel project linked (`.vercel/` present); landing page deployable; Studio auth page deployable; Experience routes not yet implemented                                        |
+| **Database**                | 15 migration files in repo (remote history: 16 entries — [see note](./03_DATABASE.md#repo-vs-remote-migration-history)); 11 tables, 2 private storage buckets, 5 seeded themes |
+| **Security**                | Sprint 02B hardening complete (CSP, security headers, proxy session refresh); RLS and privilege hardening complete (migrations 011–015)                                        |
+| **Production readiness**    | **Partial** — schema and landing page are production-grade; Studio auth, Experience delivery, and privileged server paths are future work                                      |
 
 ### Sprint History
 

@@ -177,7 +177,9 @@ Apply via `apply_migration` tool on project `jobknyooffpouniyqpkp`.
 
 ### Current State
 
-All 15 migrations are applied on remote `celebrate-florist-prod`. Local and remote are in sync.
+All 15 migration files in `supabase/migrations/` are applied on remote `celebrate-florist-prod`. Schema is in sync.
+
+> **Note:** Remote Supabase migration history shows **16 entries** because the Sprint 03A audit applied two `rls_auto_enable` revokes separately; the repo consolidates them into file 012. See [03_DATABASE.md#repo-vs-remote-migration-history](./03_DATABASE.md#repo-vs-remote-migration-history).
 
 ---
 
