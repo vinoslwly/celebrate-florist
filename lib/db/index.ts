@@ -1,0 +1,21 @@
+export { mapSupabaseError } from "@/lib/errors/map-error";
+export type {
+  AnalyticsEvent,
+  AppSettingRow,
+  AuditActorType,
+  AuditLogRow,
+  DeviceType,
+  EventType,
+  ExperienceAnalyticsRow,
+  ExperiencePhotoRow,
+  ExperienceRow,
+  ExperienceSessionRow,
+  ExperienceStatus,
+  OrderRow,
+  OrderStatus,
+  PreviewLinkRow,
+  SecurityEventRow,
+  SecurityEventType,
+  TableName,
+  ThemeRow,
+} from "@/types/database";
