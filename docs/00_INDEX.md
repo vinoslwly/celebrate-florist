@@ -29,9 +29,9 @@ Read these documents in order. Each file builds on the previous one.
 | Area                        | Status                                                                                                                                    |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | **Development phase**       | Foundation rebuild — database complete, application features not yet built                                                                |
-| **Current sprint**          | Sprint 04 — Infrastructure Foundation ✅ Complete                                                                                         |
-| **Latest completed sprint** | Sprint 04 — Infrastructure Foundation                                                                                                     |
-| **Deployment**              | Vercel project linked (`.vercel/` present); landing page deployable; Studio and Experience routes not yet implemented                     |
+| **Current sprint**          | Sprint 06 — Studio Order Management & Experience Drafts ⏳ Next                                                                           |
+| **Latest completed sprint** | Sprint 05 — Studio Authentication                                                                                                         |
+| **Deployment**              | Vercel project linked (`.vercel/` present); landing page deployable; Studio auth page deployable; Experience routes not yet implemented   |
 | **Database**                | 15 migrations applied locally and on remote Supabase; 11 tables, 2 private storage buckets, 5 seeded themes                               |
 | **Security**                | Sprint 02B hardening complete (CSP, security headers, proxy session refresh); RLS and privilege hardening complete (migrations 011–015)   |
 | **Production readiness**    | **Partial** — schema and landing page are production-grade; Studio auth, Experience delivery, and privileged server paths are future work |
@@ -48,7 +48,8 @@ Read these documents in order. Each file builds on the previous one.
 | Sprint 03 — Database Design          | ✅ Approved | Schema design in Notion (not duplicated here)                                      |
 | Sprint 03A — Database Implementation | ✅ Complete | 15 SQL migrations, live audit, hardening                                           |
 | **Sprint 04**                        | ✅ Complete | Infrastructure foundation — env, clients, repos, errors, logging, actions, storage |
-| **Sprint 05**                        | ⏳ Next     | Studio auth pages, route protection, first domain features                         |
+| **Sprint 05**                        | ✅ Complete | Studio auth pages, route protection, login action                                  |
+| **Sprint 06**                        | ⏳ Next     | Studio order management and experience design tools                                |
 
 ---
 

@@ -381,6 +381,18 @@ import { HeroSection } from "@/features/landing/components/hero-section";
 
 ---
 
+## Technical Debt & Security Backlog
+
+The following items are low/medium-priority findings that do not block production but should be addressed in future sprints:
+
+| ID     | Priority | Area           | Description                                                                                                       | Resolution Plan                                                                                                                                                  |
+| ------ | -------- | -------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MED-01 | Medium   | Auth Logging   | `loginAction` logs the raw submitted email on credential failure. This can pollute logs with PII.                 | Update `securityLogger` in `features/studio/actions/auth.ts` to log only the email domain (e.g. `email.split("@")[1]`), rather than the full address.            |
+| LOW-01 | Low      | Open Redirect  | `loginAction` returns `redirectTo` from server (`/studio`), which the client follows without validation.          | When redirect paths become dynamic, ensure client or server validates that `redirectTo` is a relative path or trusted origin to prevent open redirects.          |
+| LOW-02 | Low      | Barrel Clarity | `lib/auth/index.ts` exports `isAdminEmailMatch` without a `server-only` guard, mixing with `server-only` exports. | Separate Edge-safe pure functions into an explicit `lib/auth/edge.ts` or similar barrel to prevent accidental `server-only` build failures on client components. |
+
+---
+
 ## Common Issues
 
 | Issue                        | Solution                                                        |

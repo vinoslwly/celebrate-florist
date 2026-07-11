@@ -1,5 +1,7 @@
 import "server-only";
 
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+
 import { requireAdminUser } from "@/lib/actions/auth";
 import { actionFailure, actionSuccess } from "@/lib/actions/response";
 import { toApplicationError, getLogMessage } from "@/lib/errors";
@@ -34,6 +36,10 @@ export async function withActionHandler<T>(
     const data = await fn();
     return actionSuccess(data);
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
     const appError = toApplicationError(error);
 
     if (logErrors && appError.statusCode >= 500) {

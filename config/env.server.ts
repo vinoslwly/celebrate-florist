@@ -12,6 +12,10 @@ import { z } from "zod";
  * the feature that needs them runs — callers must validate at use-time
  * (see createAdminClient).
  *
+ * ADMIN_EMAIL is also required at deploy time for proxy.ts (Edge runtime).
+ * If missing there, Studio route protection fails closed — every session
+ * is treated as non-admin. Set the same value in Vercel env for all targets.
+ *
  * Optional secrets resolve to `undefined` when missing or blank — never to
  * an empty string. Direct property access therefore cannot silently produce
  * an invalid SDK credential; use has*() guards or get*() accessors.

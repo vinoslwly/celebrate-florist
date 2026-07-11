@@ -3,29 +3,34 @@ import type { NextRequest } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
 
+import { isAdminEmailMatch } from "@/lib/auth/admin-email";
+
 import { env } from "@/config/env";
 
+import { STUDIO_ROUTES } from "@/features/studio/config/routes";
+
 /**
- * Runs only on routes that can plausibly need a session — see `matcher`
- * below. Named `proxy` (not `middleware`) per Next.js 16's renamed file
- * convention — same runtime behavior, new name.
+ * Returns the configured admin email for Edge/proxy, or null when unset.
+ * Fail-closed: a missing ADMIN_EMAIL treats every authenticated user as
+ * non-admin — Studio stays locked until deploy env is configured.
  *
- * Today this does exactly one thing: refresh the Supabase session cookie
- * before it expires. `lib/supabase/server.ts` cannot write cookies from a
- * Server Component — this is the one place in the request lifecycle that
- * can, which is why `@supabase/ssr`'s own docs require this file to exist
- * even before any login page does. Skipping it now would mean the first
- * real auth sprint has to debug silently-expiring sessions instead of
- * building features.
+ * Must be set in the deployment platform for Edge/proxy (e.g. Vercel env
+ * vars for Production and Preview). Cannot use config/env.server.ts here
+ * because proxy runs on the Edge runtime (server-only guard).
+ */
+function getProxyAdminEmail(): string | null {
+  const value = process.env.ADMIN_EMAIL?.trim();
+  return value && value.length > 0 ? value : null;
+}
+
+/**
+ * Session refresh and Studio route protection.
  *
- * There is no route protection yet — Celebrate has no authenticated
- * routes to protect (Studio Dashboard auth is a future sprint). When it
- * arrives, add the redirect-if-unauthenticated check after
- * `supabase.auth.getUser()` below; do not build it speculatively now.
+ * Landing pages under (public) are excluded from the matcher — they stay
+ * cacheable and never pay for an Auth round trip.
  *
- * Rate limiting has the same shape: this is the correct place to add it
- * later (e.g. before the session refresh, keyed on `request.ip` / a
- * header), but no limits are defined yet, so none are implemented here.
+ * Rate limiting extension point (future sprint): insert IP/email throttle
+ * at the start of the Studio branch below, before session checks.
  */
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -51,30 +56,43 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // getUser() (not getSession()) because it revalidates against the
-  // Supabase Auth server instead of trusting an unverified local cookie —
-  // the one call in this file that must not be "optimized" away.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  if (
+    pathname === STUDIO_ROUTES.home ||
+    pathname.startsWith(`${STUDIO_ROUTES.home}/`)
+  ) {
+    const isLoginPage = pathname === STUDIO_ROUTES.login;
+    const adminEmail = getProxyAdminEmail();
+
+    if (!user) {
+      if (!isLoginPage) {
+        return NextResponse.redirect(new URL(STUDIO_ROUTES.login, request.url));
+      }
+      return response;
+    }
+
+    const isAdmin =
+      adminEmail !== null && isAdminEmailMatch(user.email ?? "", adminEmail);
+
+    if (!isAdmin) {
+      await supabase.auth.signOut();
+      // No query params — client always shows the same generic login error.
+      return NextResponse.redirect(new URL(STUDIO_ROUTES.login, request.url));
+    }
+
+    if (isLoginPage) {
+      return NextResponse.redirect(new URL(STUDIO_ROUTES.home, request.url));
+    }
+  }
 
   return response;
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Opt-in, not opt-out. Only routes from the approved Phase 05
-     * folder structure that can ever carry a session are listed —
-     * (studio) and (experience). (public) marketing pages are never
-     * matched, by omission, so they stay fully edge-cacheable and
-     * never pay for a Supabase Auth round trip they have no use for.
-     *
-     * Neither route exists yet, so this currently matches nothing —
-     * that is correct, not a bug. It starts working the moment Sprint
-     * adds app/(studio)/studio/ or app/(experience)/e/[token]/; no
-     * change needed here when that happens, only when a *new* route
-     * group is added that also needs a session.
-     */
-    "/studio/:path*",
-    "/e/:path*",
-  ],
+  matcher: ["/studio", "/studio/:path*", "/e/:path*"],
 };

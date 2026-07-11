@@ -14,3 +14,7 @@ export {
   uuidSchema,
   type PaginationInput,
 } from "@/schemas/common";
+export {
+  studioLoginSchema,
+  type StudioLoginInput,
+} from "@/schemas/studio-auth";

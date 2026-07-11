@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isAdminEmailMatch } from "@/lib/auth/admin-email";
 import { ForbiddenError, UnauthorizedError } from "@/lib/errors";
 import { securityLogger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase/server";
@@ -45,7 +46,7 @@ export async function requireSessionUser(): Promise<User> {
  * as case-sensitive but founders may vary casing when signing up.
  */
 export function isAdminEmail(email: string): boolean {
-  return email.toLowerCase() === serverEnv.ADMIN_EMAIL.toLowerCase();
+  return isAdminEmailMatch(email, serverEnv.ADMIN_EMAIL);
 }
 
 /**
