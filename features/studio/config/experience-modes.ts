@@ -19,7 +19,7 @@ export const EXPERIENCE_MODES: ExperienceModeConfig[] = [
     value: "connection",
     label: "Connection",
     description: "Couple quiz — max 6 multiple-choice questions.",
-    editorSprint: "Sprint 08",
+    editorSprint: null,
   },
   {
     value: "memories",

@@ -1,0 +1,201 @@
+"use client";
+
+import { useState } from "react";
+
+import { useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+import {
+  generateMemoryCodeAction,
+  setMemoryCodeAction,
+} from "@/features/studio/actions/memory-code";
+import { isPlaceholderMemoryKeyHash } from "@/features/studio/config/memory-code-sentinel";
+
+type MemoryCodePanelProps = {
+  orderId: string;
+  experienceId: string;
+  memoryKeyHash: string;
+  /** Admin reference from order notes — Studio-only, not the security hash. */
+  adminMemoryCodeReference: string | null;
+  disabled?: boolean;
+};
+
+export function MemoryCodePanel({
+  orderId,
+  experienceId,
+  memoryKeyHash,
+  adminMemoryCodeReference,
+  disabled = false,
+}: MemoryCodePanelProps) {
+  const router = useRouter();
+  const [memoryCode, setMemoryCode] = useState("");
+  const [busy, setBusy] = useState<"save" | "generate" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const memoryCodeSet = !isPlaceholderMemoryKeyHash(memoryKeyHash);
+  const displayedCode = adminMemoryCodeReference;
+
+  const inputClass =
+    "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50";
+
+  async function handleSave() {
+    if (!memoryCode.trim()) {
+      setError("Enter a Memory Code or use Generate.");
+      return;
+    }
+
+    setBusy("save");
+    setError(null);
+    setMessage(null);
+
+    const result = await setMemoryCodeAction({
+      orderId,
+      experienceId,
+      memoryCode,
+    });
+
+    setBusy(null);
+
+    if (!result.ok) {
+      setError(result.error.message);
+      return;
+    }
+
+    setMemoryCode("");
+    setMessage("Memory Code saved.");
+    router.refresh();
+  }
+
+  async function handleGenerate() {
+    setBusy("generate");
+    setError(null);
+    setMessage(null);
+
+    const result = await generateMemoryCodeAction({
+      orderId,
+      experienceId,
+    });
+
+    setBusy(null);
+
+    if (!result.ok) {
+      setError(result.error.message);
+      return;
+    }
+
+    setMemoryCode("");
+    setMessage("Memory Code generated and saved.");
+    router.refresh();
+  }
+
+  return (
+    <section className="rounded-2xl border border-border bg-card p-6 space-y-4">
+      <div>
+        <h2 className="text-sm font-semibold">Memory Code</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Private key for the recipient after the 24-hour grace period. Required
+          before publish. Saved here for admin reference during busy days.
+        </p>
+      </div>
+
+      <p className="text-sm">
+        Status:{" "}
+        <span
+          className={
+            memoryCodeSet ? "font-medium text-emerald-600" : "text-destructive"
+          }
+        >
+          {memoryCodeSet ? "Set ✓" : "Not set"}
+        </span>
+      </p>
+
+      {error ? (
+        <div
+          role="alert"
+          className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
+          {error}
+        </div>
+      ) : null}
+
+      {message ? (
+        <div className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground">
+          {message}
+        </div>
+      ) : null}
+
+      {displayedCode ? (
+        <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-4 space-y-2">
+          <p className="text-sm font-medium">
+            Current Memory Code (admin reference)
+          </p>
+          <p className="font-mono text-2xl tracking-widest">{displayedCode}</p>
+          <p className="text-xs text-muted-foreground">
+            Studio-only note on this order. Share separately from the QR link.
+          </p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void navigator.clipboard.writeText(displayedCode)}
+          >
+            Copy code
+          </Button>
+        </div>
+      ) : memoryCodeSet ? (
+        <p className="text-sm text-muted-foreground">
+          Code is set but not recorded in admin notes. Generate or save again to
+          store a reference you can view later.
+        </p>
+      ) : null}
+
+      {!disabled ? (
+        <>
+          <div className="space-y-2">
+            <label htmlFor="memoryCode" className="text-sm font-medium">
+              {memoryCodeSet
+                ? "Set a new Memory Code"
+                : "Enter Memory Code manually"}
+            </label>
+            <input
+              id="memoryCode"
+              type="text"
+              autoComplete="off"
+              value={memoryCode}
+              onChange={(event) =>
+                setMemoryCode(event.target.value.toUpperCase())
+              }
+              placeholder="e.g. ABCD-EFGH"
+              className={inputClass}
+              disabled={busy !== null}
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Button
+              type="button"
+              onClick={() => void handleGenerate()}
+              disabled={busy !== null}
+            >
+              {busy === "generate" ? "Generating…" : "Generate code"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void handleSave()}
+              disabled={busy !== null || !memoryCode.trim()}
+            >
+              {busy === "save" ? "Saving…" : "Save code"}
+            </Button>
+          </div>
+        </>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Published — Memory Code cannot be changed. Use the reference above
+          when sharing with the recipient.
+        </p>
+      )}
+    </section>
+  );
+}

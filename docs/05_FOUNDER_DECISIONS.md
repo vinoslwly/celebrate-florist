@@ -187,6 +187,14 @@ Each decision includes the **what**, the **why**, and where it is **enforced** i
 | **Why**      | Operational insight without dashboard complexity. Founder and marketing do not need engineering-grade funnel analytics.                                    |
 | **Enforced** | `experience_analytics` records coarse events only. Mode-specific micro-events in prior docs are **withdrawn** unless added later as Future Idea.           |
 
+### Sprint 08 — OD-1 Analytics (Locked)
+
+|              |                                                                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | **No migration 020.** Do **not** add `experience_completed` to `analytics_event`. Continue recording `experience_opened` on granted recipient access. Segment by mode via JOIN on `experiences.experience_mode` at query time. |
+| **Why**      | Coarse business insight without enum migration. Mode is already stored on `experiences`; duplicating it on analytics rows adds schema churn with no V2 benefit.                                                                |
+| **Enforced** | `features/analytics/services/record-analytics.service.ts`; recipient page `app/(experience)/e/[token]/page.tsx`. Dashboard queries join `experience_analytics` → `experiences`.                                                |
+
 ### Connection Quiz Limits
 
 |              |                                                                                     |

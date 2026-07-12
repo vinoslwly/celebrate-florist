@@ -7,7 +7,32 @@ import { isAdminEmailMatch } from "@/lib/auth/admin-email";
 
 import { env } from "@/config/env";
 
+import {
+  PROXY_MAX_REQUESTS_PER_WINDOW,
+  PROXY_RATE_LIMIT_WINDOW_MS,
+} from "@/features/access/config/constants";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
+
+const experienceRouteHits = new Map<
+  string,
+  { count: number; resetAt: number }
+>();
+
+function isExperienceRouteRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = experienceRouteHits.get(ip);
+
+  if (!entry || now >= entry.resetAt) {
+    experienceRouteHits.set(ip, {
+      count: 1,
+      resetAt: now + PROXY_RATE_LIMIT_WINDOW_MS,
+    });
+    return false;
+  }
+
+  entry.count += 1;
+  return entry.count > PROXY_MAX_REQUESTS_PER_WINDOW;
+}
 
 /**
  * Returns the configured admin email for Edge/proxy, or null when unset.
@@ -61,6 +86,17 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith("/e/")) {
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      request.headers.get("x-real-ip") ??
+      "unknown";
+
+    if (isExperienceRouteRateLimited(ip)) {
+      return new NextResponse("Too many requests", { status: 429 });
+    }
+  }
 
   if (
     pathname === STUDIO_ROUTES.home ||

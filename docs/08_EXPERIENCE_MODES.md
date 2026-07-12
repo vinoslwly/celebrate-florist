@@ -157,7 +157,7 @@ Add a **personal couple quiz** — "How well do you know me?" — that turns rea
 - Close friends with inside jokes
 - Premium bouquet tier buyers
 
-### User Journey (Planned)
+### User Journey (**Already Implemented** — Sprint 08)
 
 ```mermaid
 flowchart LR
@@ -168,9 +168,9 @@ flowchart LR
     E --> F[Photobooth]
 ```
 
-Recipient answers **multiple-choice (A/B/C) questions, maximum 6**, authored by admin. Score displayed with personalized message tier (e.g. "You know them 80%!").
+Recipient answers **multiple-choice (A/B/C) questions, maximum 6**, authored by admin. Score displayed with personalized message tier (e.g. "You know them 80%!"). Buyer preview shows questions and score band messages **without** correct answers (OD-2).
 
-### Templates (Founder Decision — Planned Sprint 08)
+### Templates (Founder Decision — **Already Implemented** Sprint 08)
 
 **New Connection** offers starter templates — admin edits, does not start from blank:
 
@@ -203,7 +203,7 @@ Playfulness, validation, competitive warmth. "Let me prove I pay attention."
 - Audio/video question prompts (Future Idea)
 - Leaderboard for group events (Future Idea — conflicts with privacy model; needs founder review)
 
-### Admin Configuration (Planned)
+### Admin Configuration (**Already Implemented** — Sprint 08)
 
 Everything in Moments, plus:
 
@@ -214,19 +214,20 @@ Everything in Moments, plus:
 | Quiz title                                   | Optional custom heading — stored as `experiences.quiz_title` |
 | Template                                     | Optional: Anniversary, Graduation, Birthday, Proposal        |
 
-### Analytics (Simple Business Level Only)
+### Analytics (Simple Business Level Only — OD-1 Locked)
 
-| Event                | Purpose      |
-| -------------------- | ------------ |
-| `experience_opened`  | Engagement   |
-| Experience completed | Funnel end   |
-| Mode = connection    | Segmentation |
+| Event               | Purpose      | Status                                                                                                                                        |
+| ------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `experience_opened` | Engagement   | **Already Implemented** — recorded on granted recipient access                                                                                |
+| Mode = connection   | Segmentation | **Already Implemented** — derive via `experiences.experience_mode` JOIN at query time; **no** `experience_completed` event (no migration 020) |
+
+No per-section micro-analytics in V2.
 
 ### Security Considerations
 
-- Quiz answers are recipient input — validate length, sanitize display
-- Correct answers must not leak before submission (server delivers questions without answers; grade server-side)
-- Rate-limit answer submissions per session
+- Quiz answers are recipient input — validate length, sanitize display (**Already Implemented** — Zod schemas)
+- Correct answers must not leak before submission (**Already Implemented** — `RecipientQuizView` / `PreviewQuizView` strip `correct_option_index`; grading server-side only)
+- Rate-limit answer submissions per session — **Deferred** (see MED-05 in [06_DEVELOPMENT_GUIDE.md](./06_DEVELOPMENT_GUIDE.md))
 - No PII required from recipient (no accounts)
 
 ---

@@ -46,7 +46,7 @@ Three guiding principles (from implementation):
 flowchart TD
     T["Threat"]
     H["HTTP Headers<br/>CSP, HSTS, Referrer-Policy"]
-    P["proxy.ts<br/>Session refresh, future rate limit"]
+    P["proxy.ts<br/>Session refresh, /e/* rate limit (Sprint 07)"]
     A["Application Gate<br/>Access Code, ADMIN_EMAIL"]
     R["RLS<br/>Defense in depth"]
     D["Database Constraints<br/>Immutability, CHECK"]
@@ -68,7 +68,7 @@ flowchart TD
 | Session      | Cookie managed by `@supabase/ssr`                |
 | Refresh      | `proxy.ts` calls `auth.getUser()` on `/studio/*` |
 
-**Status:** Infrastructure ready; login UI and email gate not yet implemented (Sprint 04).
+**Status:** Implemented — Studio login at `/studio/login`, email gate via `ADMIN_EMAIL` and `proxy.ts` (Sprint 05).
 
 ### Recipients (Experience)
 
@@ -141,7 +141,7 @@ The Memory Code is the recipient's private key to their gift experience.
 | UI            | Never displayed after initial admin setup                                     |
 | Rate limiting | `access_attempts` table tracks failed attempts per `(experience_id, ip_hash)` |
 
-### Experience Access Flow (Founder Decision — Planned Sprint 07)
+### Experience Access Flow (Founder Decision — Sprint 07)
 
 Memory Code must **not** interrupt the first emotional experience.
 
@@ -153,7 +153,7 @@ Memory Code must **not** interrupt the first emotional experience.
 
 **Purpose:** Better first emotional moment; supports device changes; low friction at delivery; security after the emotional window.
 
-**Status:** Product rule locked in Sprint 05.5. Application logic and any schema extensions — **Planned Sprint 07**. No implementation in Sprint 05.5 or Sprint 06.
+**Status:** Implemented in Sprint 07 — `features/access/services/` (grace, trusted session, Memory Code verify, access gate); trust cookie via `/e/[token]/trust` route handler.
 
 ```mermaid
 sequenceDiagram
@@ -212,7 +212,7 @@ sequenceDiagram
     end
 ```
 
-**Status:** Schema ready for sessions and attempts; grace-period logic **Planned Sprint 07**.
+**Status:** Implemented in Sprint 07 — `verify-memory-code.service.ts`, `trusted-session.service.ts`, `experience_sessions` + `access_attempts`.
 
 ---
 
@@ -223,12 +223,12 @@ sequenceDiagram
 - Data: `access_attempts` table
 - Query index: `(experience_id, ip_hash, attempted_at)`
 - Logic: Count failed attempts in last hour per experience + IP hash
-- Enforcement: Application layer (Server Action) — not yet implemented
+- Enforcement: Application layer (Server Action) — implemented in `features/access/services/memory-code-rate-limit.service.ts`
 - Events: `rate_limit_triggered`, `memory_key_exhausted` in `security_events`
 
-### Future: proxy.ts Rate Limiting
+### proxy.ts Rate Limiting (Sprint 07)
 
-`proxy.ts` comments note this is the correct place for IP-based throttling on `/e/*` routes. Not implemented yet — no limits defined.
+Basic IP throttle on `/e/*` routes — extension point in `proxy.ts` (120 requests/minute per IP). Memory Code attempt limits remain application-layer via `access_attempts`.
 
 ---
 
@@ -371,30 +371,30 @@ Built dynamically in `next.config.ts` via `buildContentSecurityPolicy()`.
 
 ## Known Accepted Risks
 
-| Risk                                                 | Mitigation                | Accepted because                                     |
-| ---------------------------------------------------- | ------------------------- | ---------------------------------------------------- |
-| `'unsafe-inline'` in CSP `style-src`                 | Radix requirement         | No alternative without ejecting Radix                |
-| `experience_token` in URL                            | Access Code gate required | QR codes need shareable URLs; code protects content  |
-| Single admin model                                   | Email verification        | Founder decision — no multi-admin needed             |
-| No automated security scanning                       | Manual audit completed    | Early stage; add CI security checks in future        |
-| Git history contains admin email in commit `452ba69` | Private repo              | Acceptable for private repo; rewrite if going public |
-| `SUPABASE_SERVICE_ROLE_KEY` optional in env schema   | Tighten when Studio ships | Prevents build failure during landing-only phase     |
+| Risk                                                 | Mitigation                                   | Accepted because                                                            |
+| ---------------------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------- |
+| `'unsafe-inline'` in CSP `style-src`                 | Radix requirement                            | No alternative without ejecting Radix                                       |
+| `experience_token` in URL                            | Access Code gate required                    | QR codes need shareable URLs; code protects content                         |
+| Single admin model                                   | Email verification                           | Founder decision — no multi-admin needed                                    |
+| No automated security scanning                       | Manual audit completed                       | Early stage; add CI security checks in future                               |
+| Git history contains admin email in commit `452ba69` | Private repo                                 | Acceptable for private repo; rewrite if going public                        |
+| `SUPABASE_SERVICE_ROLE_KEY` optional in env schema   | Required at runtime for recipient/preview/QR | Build passes without it; privileged routes throw `ConfigError` when missing |
 
 ---
 
 ## Future Security Improvements
 
-| Item                                                             | Priority          |
-| ---------------------------------------------------------------- | ----------------- |
-| Wire `ADMIN_EMAIL` into `env.server.ts` with required validation | Sprint 04         |
-| Implement Access Code rate limiting in Server Actions            | Experience sprint |
-| Add `IP_HASH_PEPPER` to env schema                               | Experience sprint |
-| proxy.ts rate limiting on `/e/*`                                 | Experience sprint |
-| 90-day `security_events` cleanup job                             | Post-launch       |
-| Supabase Auth MFA for admin                                      | Post-launch       |
-| CI security scanning (dependency audit)                          | Post-launch       |
-| CSP nonce for inline scripts (if Radix allows)                   | Investigate       |
-| Signed URL expiry tuning for memory photos                       | Experience sprint |
+| Item                                                             | Priority                                           |
+| ---------------------------------------------------------------- | -------------------------------------------------- |
+| Wire `ADMIN_EMAIL` into `env.server.ts` with required validation | Sprint 04                                          |
+| Implement Access Code rate limiting in Server Actions            | ✅ Sprint 07 — `memory-code-rate-limit.service.ts` |
+| Add `IP_HASH_PEPPER` to env schema                               | Post-V2 backlog                                    |
+| proxy.ts rate limiting on `/e/*`                                 | ✅ Sprint 07 — basic IP throttle in `proxy.ts`     |
+| 90-day `security_events` cleanup job                             | Post-launch                                        |
+| Supabase Auth MFA for admin                                      | Post-launch                                        |
+| CI security scanning (dependency audit)                          | Post-launch                                        |
+| CSP nonce for inline scripts (if Radix allows)                   | Investigate                                        |
+| Signed URL expiry tuning for memory photos                       | Experience sprint                                  |
 
 ---
 

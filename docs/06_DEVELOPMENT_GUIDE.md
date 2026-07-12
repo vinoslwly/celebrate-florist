@@ -280,16 +280,86 @@ Vercel — project linked (`.vercel/` directory present).
 
 ### Environment Variables (Vercel Dashboard)
 
-Set the same variables as `.env.local`:
+Set the same variables as `.env.local`. For Sprint 07 Moments E2E, **all variables below are required** in Production (and Preview if testing recipient/preview flows).
 
 | Variable                        | Environment                                    |
 | ------------------------------- | ---------------------------------------------- |
 | `NEXT_PUBLIC_SUPABASE_URL`      | Production, Preview                            |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Production, Preview                            |
 | `NEXT_PUBLIC_APP_URL`           | Production (real domain), Preview (Vercel URL) |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Production only (when Studio ships)            |
-| `MEMORY_KEY_PEPPER`             | Production only (when Experience ships)        |
-| `ADMIN_EMAIL`                   | Production only (when Studio ships)            |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Production, Preview (recipient/preview/QR)     |
+| `MEMORY_KEY_PEPPER`             | Production, Preview (Memory Code save/verify)  |
+| `ADMIN_EMAIL`                   | Production, Preview, **Edge** (proxy.ts gate)  |
+
+### Sprint 07 Deployment Readiness Checklist
+
+Required environment variables and failure modes:
+
+| Variable                        | Required where                 | What breaks if missing                                                                           |
+| ------------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Client + server                | App cannot connect to Supabase                                                                   |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client + server                | Auth and Studio client fail                                                                      |
+| `NEXT_PUBLIC_APP_URL`           | Server (publish, QR)           | Recipient/preview URLs and QR codes point to wrong host                                          |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server (`createAdminClient`)   | `/preview/[token]`, `/e/[token]`, QR download API, analytics, trust route — `ConfigError` or 404 |
+| `MEMORY_KEY_PEPPER`             | Server (hash/verify)           | Memory Code save in Studio and post-grace recipient verify fail with `ConfigError`               |
+| `ADMIN_EMAIL`                   | Server + **Edge** (`proxy.ts`) | Studio: non-admin lockout or open redirect loop; must match Supabase Auth admin email            |
+
+**Edge note:** `ADMIN_EMAIL` must be set in Vercel env for Production **and** Preview — `proxy.ts` runs on Edge and cannot read `env.server.ts`.
+
+### Grace Period — Engineering Verification (Sprint 07)
+
+**Code-verified (this remediation pass):**
+
+| Check                                         | Evidence                                                                             |
+| --------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Grace window = `first_opened_at + 24h`        | `grace-period.service.ts` — no `grace_expires_at` column                             |
+| Pre-first-open treated as in-grace            | `isWithinGracePeriod(null) === true`                                                 |
+| Trust cookie only via route handler           | `app/(experience)/e/[token]/trust/route.ts`                                          |
+| Post-grace requires Memory Code on new device | `evaluateAccessGate` → `memory_code_required` when not in grace and no valid session |
+| Trusted session validation                    | `isTrustedSessionValid` + HttpOnly `cf_experience_session` cookie                    |
+| `first_opened_at` set once on granted access  | `experiences.repository.ts` — `.is("first_opened_at", null)` guard                   |
+
+**Manually verified (founder session, local dev):**
+
+| Check                                              | Status                             |
+| -------------------------------------------------- | ---------------------------------- |
+| First recipient open within grace (no Memory Code) | ✅ Confirmed after trust-route fix |
+| Publish → QR → recipient link                      | ✅ Confirmed                       |
+
+**NOT verified locally (requires production-like multi-device test):**
+
+| Check                                        | Why not verified                                                                | How to verify in production                                                                                |
+| -------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Trusted device post-grace — no code          | Requires 24h elapsed or DB `first_opened_at` backdate + existing session cookie | Open on Device A during grace; wait 24h; reopen Device A — should skip Memory Code                         |
+| Post-grace new device — Memory Code required | Same — need grace expiry on a published experience                              | After grace expiry, open on Device B without cookie — should show Memory Code gate; correct code → trusted |
+
+Do not fabricate multi-device grace evidence. Schedule the above as a **post-deploy smoke test** before first real bouquet delivery.
+
+### Sprint 08 — Connection Verification (Phase 7)
+
+**Code-verified:**
+
+| Check                                                      | Evidence                                                                 |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Buyer preview loads quiz for `connection` mode only        | `fetch-buyer-preview.service.ts`                                         |
+| Preview DTO excludes `correct_option_index`                | `fetch-preview-quiz.service.ts` → `PreviewQuizView`                      |
+| Recipient DTO excludes `correct_option_index`              | `fetch-recipient-quiz.service.ts` → `RecipientQuizView`                  |
+| Grading is server-side only; answers not persisted         | `submit-quiz-answers.service.ts`, `grade-quiz-answers.service.ts` (OD-5) |
+| Connection publish requires 1–6 questions + ≥ 1 score band | `publish-validation.service.ts`                                          |
+| Mode change deletes quiz rows when leaving Connection      | `change-experience-mode.service.ts`                                      |
+| Analytics uses `experience_opened` only (OD-1)             | `app/(experience)/e/[token]/page.tsx`; no migration 020 in repo          |
+| Memories/Treasures publish still blocked                   | `publish-validation.service.ts`                                          |
+
+**NOT verified locally (manual E2E required):**
+
+| Check                                                             | Status                          |
+| ----------------------------------------------------------------- | ------------------------------- |
+| Full Connection publish → preview → approve → recipient quiz flow | NOT VERIFIED                    |
+| Buyer preview score band messages visible in browser              | NOT VERIFIED                    |
+| Quiz one-submit-per-session UX in browser                         | NOT VERIFIED                    |
+| Moments regression after Connection changes                       | NOT VERIFIED (code review only) |
+| Studio QR download for Connection order                           | NOT VERIFIED                    |
+| Multi-device grace / Memory Code regression with Connection       | NOT VERIFIED                    |
 
 ### Deploy Commands
 
@@ -303,7 +373,9 @@ vercel --prod   # Production deploy
 
 ### What Is Deployable Today
 
-The landing page (`(public)` route group) deploys successfully. It requires only the three `NEXT_PUBLIC_*` variables.
+- **Landing page** (`(public)`) — requires only the three `NEXT_PUBLIC_*` variables.
+- **Moments E2E (Sprint 07)** — Studio, buyer preview, recipient `/e/[token]`, QR download — requires **all variables** in the deployment checklist above.
+- **Connection E2E (Sprint 08)** — Same env requirements as Moments; adds quiz builder, Connection publish validation, buyer preview quiz panel, recipient quiz grading.
 
 ---
 
@@ -383,6 +455,49 @@ import { HeroSection } from "@/features/landing/components/hero-section";
 7. **Update docs** when changing schema, security, or business rules.
 8. **Run lint + typecheck** before committing.
 9. **Don't speculate** — build only what the current sprint requires.
+10. **Log deferred issues** — any bug, debt, UX limitation, scalability concern, or security hardening opportunity discovered **outside** the current phase scope must be added to the backlog below (unique ID, priority, deferral reason, revisit sprint). Known issues must not live only in phase reports. **Backlog maintenance is part of Definition of Done.**
+11. **Verify privilege matrix after every migration that creates a new table.** See [Migration Privilege Checklist](#migration-privilege-checklist) below.
+
+---
+
+## Migration Privilege Checklist
+
+**Lesson learned — Sprint 08 hotfix (MED-06):** Migration 017 omitted `service_role` SELECT on quiz tables. Buyer preview and recipient grading use `createAdminClient()` (service_role), so any new table accessed server-side via admin client must explicitly grant SELECT to `service_role`.
+
+After every `CREATE TABLE`, verify the following matrix before applying to remote:
+
+| Role                             | anon                                                                   | authenticated                              | service_role                                                      |
+| -------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------- |
+| Table-level SELECT               | ❌ Revoked (Gift domain) or ✅ Granted (public ref data like `themes`) | ✅ only the operations the Studio UI needs | ✅ SELECT at minimum for any table read via `createAdminClient()` |
+| Table-level INSERT/UPDATE/DELETE | ❌ Revoked                                                             | ✅ only if Studio writes it                | ✅ full access (service_role bypasses RLS)                        |
+| RLS enabled                      | ✅ Required on every new table                                         | —                                          | — (service_role bypasses RLS)                                     |
+
+### Per-path verification questions
+
+For every new table, ask:
+
+1. **Studio path** — Is this table written/read by the admin via `createClient()` (authenticated RLS)? → ensure `authenticated` grants match.
+2. **Recipient path** — Is this table read by recipient services via `createAdminClient()` (service_role)? → ensure `service_role` has SELECT.
+3. **Preview path** — Is this table read by buyer preview via `createAdminClient()`? → same as above.
+4. **Admin/service path** — Is this table written by server-side services (analytics, access, sessions)? → ensure `service_role` has INSERT.
+5. **anon boundary** — Does anon have SELECT or DML? → It must not (Gift domain). Only `themes` is the exception.
+
+### Known table → required service_role operations
+
+| Table                         | service_role needs     | Reason                                        |
+| ----------------------------- | ---------------------- | --------------------------------------------- |
+| `orders`                      | SELECT, INSERT, UPDATE | Publish, preview, QR workflows                |
+| `experiences`                 | SELECT, INSERT, UPDATE | Recipient gate, publish lock                  |
+| `experience_photos`           | SELECT                 | Recipient + preview signed URLs               |
+| `experience_quiz_questions`   | **SELECT**             | Recipient grading, buyer preview (hotfix 018) |
+| `experience_quiz_score_bands` | **SELECT**             | Recipient grading, buyer preview (hotfix 018) |
+| `preview_links`               | SELECT, INSERT, UPDATE | Preview token lookup                          |
+| `experience_sessions`         | SELECT, INSERT, UPDATE | Trusted device session writes                 |
+| `access_attempts`             | SELECT, INSERT         | Rate limiting                                 |
+| `experience_analytics`        | SELECT, INSERT         | Event recording                               |
+| `security_events`             | SELECT, INSERT         | Audit trail                                   |
+| `audit_logs`                  | SELECT, INSERT         | Audit trail                                   |
+| Future mode tables (018, 019) | **SELECT at minimum**  | Same pattern as quiz tables                   |
 
 ---
 
@@ -390,11 +505,25 @@ import { HeroSection } from "@/features/landing/components/hero-section";
 
 The following items are low/medium-priority findings that do not block production but should be addressed in future sprints:
 
-| ID     | Priority | Area           | Description                                                                                                       | Resolution Plan                                                                                                                                                  |
-| ------ | -------- | -------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MED-01 | Medium   | Auth Logging   | `loginAction` logs the raw submitted email on credential failure. This can pollute logs with PII.                 | Update `securityLogger` in `features/studio/actions/auth.ts` to log only the email domain (e.g. `email.split("@")[1]`), rather than the full address.            |
-| LOW-01 | Low      | Open Redirect  | `loginAction` returns `redirectTo` from server (`/studio`), which the client follows without validation.          | When redirect paths become dynamic, ensure client or server validates that `redirectTo` is a relative path or trusted origin to prevent open redirects.          |
-| LOW-02 | Low      | Barrel Clarity | `lib/auth/index.ts` exports `isAdminEmailMatch` without a `server-only` guard, mixing with `server-only` exports. | Separate Edge-safe pure functions into an explicit `lib/auth/edge.ts` or similar barrel to prevent accidental `server-only` build failures on client components. |
+| ID     | Priority | Area                | Description                                                                                                                                                                                                                                                                                                       | Resolution Plan                                                                                                                                                                                                                                              |
+| ------ | -------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MED-01 | Medium   | Auth Logging        | `loginAction` logs the raw submitted email on credential failure. This can pollute logs with PII.                                                                                                                                                                                                                 | Update `securityLogger` in `features/studio/actions/auth.ts` to log only the email domain (e.g. `email.split("@")[1]`), rather than the full address.                                                                                                        |
+| LOW-01 | Low      | Open Redirect       | `loginAction` returns `redirectTo` from server (`/studio`), which the client follows without validation.                                                                                                                                                                                                          | When redirect paths become dynamic, ensure client or server validates that `redirectTo` is a relative path or trusted origin to prevent open redirects.                                                                                                      |
+| LOW-02 | Low      | Barrel Clarity      | `lib/auth/index.ts` exports `isAdminEmailMatch` without a `server-only` guard, mixing with `server-only` exports.                                                                                                                                                                                                 | Separate Edge-safe pure functions into an explicit `lib/auth/edge.ts` or similar barrel to prevent accidental `server-only` build failures on client components.                                                                                             |
+| MED-02 | Medium   | Quiz Data           | `ExperienceQuizRepository.replaceAllForExperience()` uses delete-then-insert, consistent with `experience_photos`. Not atomic — a failed insert after delete may leave empty quiz data.                                                                                                                           | Acceptable for current MVP. Future: Postgres RPC in a dedicated migration when stronger multi-table consistency is required. See also `lib/actions/transaction.ts`.                                                                                          |
+| MED-03 | Medium   | Studio UX           | Server-rendered publish checklist can become temporarily stale after changing experience mode until the page refreshes.                                                                                                                                                                                           | Acceptable for Sprint 08 — does not affect publish correctness. UX improvement only; defer post–Sprint 08.                                                                                                                                                   |
+| MED-04 | Medium   | Publish Logic       | `isPremiumMode()` still treats every non-`moments` mode as premium. Publish validation uses explicit mode switching, so this is not a production bug today.                                                                                                                                                       | Re-evaluate after Sprint 08 when Memories/Treasures implementation begins. Refactor only if a later phase requires it.                                                                                                                                       |
+| MED-05 | Medium   | Quiz Security       | `submitQuizAnswersAction` has no per-session submit rate limit. A motivated actor could brute-force correct answers (max 3⁶ = 729 combinations for 6 MCQ questions). Access gate limits unauthenticated abuse but not repeated submits after access.                                                              | Defer to post–Sprint 08 hardening. Add server-side attempt cap or exponential backoff in a future security sprint; revisit Sprint 09 or dedicated hardening pass.                                                                                            |
+| MED-06 | Medium   | Database            | Migration 017 omitted `service_role` SELECT grants on `experience_quiz_questions` and `experience_quiz_score_bands`. Connection buyer preview and recipient quiz grading failed with permission denied (surfaced as misleading 404).                                                                              | **Fixed** — hotfix migration `20260713020000_experience_quiz_service_role_grants.sql` applied. Pattern: any new Gift-domain table read via `createAdminClient()` must grant SELECT to `service_role`.                                                        |
+| LOW-03 | Low      | Quiz UX             | One-submit-per-session uses `sessionStorage` only (OD-5). Clearing storage or a new tab allows another graded attempt on the same device.                                                                                                                                                                         | Accepted for V2 per OD-5. Revisit only if founder requires stricter anti-retake semantics (would need server state — conflicts with OD-5).                                                                                                                   |
+| LOW-04 | Low      | Buyer Preview       | Connection buyer preview renders quiz section even when zero questions are saved (draft state). Empty-state copy added in Phase 7; publish still blocked server-side.                                                                                                                                             | UX polish only. Optional: hide quiz section entirely until ≥ 1 question — defer post–Sprint 08 if founder prefers.                                                                                                                                           |
+| LOW-05 | Low      | Analytics           | `experience_opened` is inserted on every granted recipient page load — no deduplication vs `first_opened_at`. Coarse open counts may over-count returning recipients/trusted devices.                                                                                                                             | Acceptable for V2 coarse analytics (OD-1). Revisit Sprint 10 dashboard / analytics polish if unique-open metrics are required.                                                                                                                               |
+| LOW-06 | Low      | Quiz Repo           | `QuizQuestionsRepository` exposes `replaceAllForExperience()` on both the questions repo **and** the aggregate `ExperienceQuizRepository`. The aggregate wraps the sub-repos correctly, but the direct method on `QuizQuestionsRepository` is redundant and may be called independently, bypassing bands cleanup. | No production bug today (only aggregate is called externally). Remove `replaceAllForExperience` from the sub-repos in a future refactor, leaving only the aggregate-level method. Revisit Sprint 09A when Memories repo follows the same pattern.            |
+| LOW-07 | Low      | Preview Security    | `fetch-preview-quiz.service.ts` does NOT check `experience.status === "published"` before returning quiz data. Only `previewLink.experience_id` presence gates the call. A draft experience with an active preview link would expose quiz structure to the buyer before publish.                                  | Intended behavior for buyer preview (admin sends preview before publish). Safety is answer-exclusion only, not status gating. Low risk: only studio admin controls preview links. Document as accepted V2 behavior; revisit if preview access model changes. |
+| LOW-08 | Low      | Schema Consistency  | `experience_quiz_score_bands` table has no `created_at` column, unlike `experience_quiz_questions`. Minor inconsistency in migration 017.                                                                                                                                                                         | No functional impact — bands are replaced atomically and have no independent ordering by time. Add `created_at` to `experience_quiz_score_bands` in migration 018 or a dedicated schema cleanup migration if the inconsistency causes issues in Sprint 09A.  |
+| LOW-09 | Low      | Error Observability | `/preview/[token]` and `/e/[token]` pages catch all non-`ConfigError` failures with `notFound()` — infrastructure errors (e.g. Postgres `42501` permission denied) appear as generic 404, slowing diagnosis. Discovered during Sprint 08 hotfix (MED-06).                                                         | Intentional production behavior (no error detail leak to users). Improve server-side logging or distinguish `NotFoundError` vs other `ApplicationError` in page catch blocks during next observability pass. Revisit Sprint 09 or dedicated ops hardening.   |
+| LOW-10 | Low      | Security Config     | `IP_HASH_PEPPER` referenced in security design (`04_SECURITY.md`) but not yet in `config/env.ts` / `.env.example`. Rate-limit hashing uses placeholder or is incomplete.                                                                                                                                          | Post-V2 hardening. Add to env schema when full IP-hash rate limiting is implemented. Revisit Sprint 09 security pass or before high-volume launch.                                                                                                           |
+| LOW-11 | Low      | QA / Testing        | No automated E2E test suite for publish → preview → recipient flows. Sprint 08 Phase 8 marked 4 manual acceptance items NOT VERIFIED by automation.                                                                                                                                                               | Manual smoke test required before first live Connection delivery (P1 operational). Add Playwright or similar in Sprint 10 polish or when test ROI justifies setup.                                                                                           |
 
 ---
 

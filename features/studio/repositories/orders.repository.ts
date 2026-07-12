@@ -123,4 +123,31 @@ export class OrdersRepository extends Repository {
     this.assertNoError(error);
     return (data ?? []) as OrderWithExperience[];
   }
+
+  async updateStatus(id: string, status: OrderStatus): Promise<OrderRow> {
+    const { data, error } = await this.client
+      .from("orders")
+      .update({ status })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    this.assertNoError(error);
+    return data as OrderRow;
+  }
+
+  async updateAdminNotes(
+    id: string,
+    adminNotes: string | null,
+  ): Promise<OrderRow> {
+    const { data, error } = await this.client
+      .from("orders")
+      .update({ admin_notes: adminNotes })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    this.assertNoError(error);
+    return data as OrderRow;
+  }
 }

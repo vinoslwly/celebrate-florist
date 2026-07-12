@@ -42,6 +42,7 @@ export type UpdateExperienceDraftInput = z.infer<
 >;
 
 export const changeExperienceModeSchema = z.object({
+  orderId: uuidSchema,
   experienceId: uuidSchema,
   experienceMode: experienceModeSchema,
 });

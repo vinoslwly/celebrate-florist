@@ -124,12 +124,12 @@ Order detail shows **order status** as the primary badge. Experience publish sta
 
 ### Mode panel behavior
 
-| Mode         | Sprint 06–07 panel            | Sprint when live editor ships               |
-| ------------ | ----------------------------- | ------------------------------------------- |
-| `moments`    | Full core editing only        | Sprint 07 (publish E2E)                     |
-| `connection` | **Coming in Sprint 08** stub  | Sprint 08 — quiz builder + inline templates |
-| `memories`   | **Coming in Sprint 09A** stub | Sprint 09A — match pair editor              |
-| `treasures`  | **Coming in Sprint 09B** stub | Sprint 09B — envelope sequencer             |
+| Mode         | Sprint 06–07 panel                         | Sprint when live editor ships   |
+| ------------ | ------------------------------------------ | ------------------------------- |
+| `moments`    | Full core editing only                     | Sprint 07 (publish E2E)         |
+| `connection` | **Live** — quiz builder + inline templates | Sprint 08 ✅                    |
+| `memories`   | **Coming in Sprint 09A** stub              | Sprint 09A — match pair editor  |
+| `treasures`  | **Coming in Sprint 09B** stub              | Sprint 09B — envelope sequencer |
 
 **Founder decision (final):** Premium modes **may be selected** at order creation in Sprint 06–07. Admin completes full **Core Experience** (letter, photos, theme, Memory Code). Premium panel shows stub until that sprint's editor ships. **Do not block** premium order creation.
 
@@ -191,7 +191,7 @@ Single form at `/studio/orders/new` (or modal — implementation choice).
 
 ---
 
-## Publish & Preview (Sprint 07+)
+## Publish & Preview (Sprint 07)
 
 ### Preview (default path)
 
@@ -218,9 +218,9 @@ Single form at `/studio/orders/new` (or modal — implementation choice).
 
 No separate "Generate QR" admin step.
 
-### Pre-publish checklist (Planned — Sprint 07)
+### Pre-publish checklist
 
-Visual checklist before Publish button enables — green/red per requirement (letter, Memory Code, mode-specific rules, buyer approval unless skipped).
+Visual checklist before Publish button enables — green/red per requirement (letter, Memory Code, mode-specific rules, buyer approval unless skipped). Implemented in `publish-checklist.tsx`.
 
 ---
 
@@ -250,18 +250,18 @@ When admin changes `experience_mode` on a draft:
 
 Approved improvements — **not Sprint 06 scope** unless explicitly pulled in.
 
-| Item                                          | Priority    | Notes                                                |
-| --------------------------------------------- | ----------- | ---------------------------------------------------- |
-| **Auto-save draft**                           | High        | Reduce data loss; debounced save on editor fields    |
-| **Unsaved changes warning**                   | High        | Before navigating away from `/studio/orders/[id]`    |
-| **Desktop-first, tablet support**             | Medium      | Layout breakpoints; touch-friendly targets on tablet |
-| Collapsed order status groups in UI           | Medium      | 4 visible groups mapping to 7 DB statuses            |
-| Copy preview link + WhatsApp message template | Medium      | Sprint 07 preview flow                               |
-| Visual photo slot grid (Memories/Treasures)   | Medium      | Sprint 09A/09B                                       |
-| Inline templates ("Start from Anniversary")   | Medium      | Sprint 08 — not a Templates nav page                 |
-| Order search by receiver name                 | Medium      | Volume growth                                        |
-| Duplicate order (repeat buyers)               | Future Idea |                                                      |
-| `buyer_whatsapp` → Open WhatsApp link         | Future Idea |                                                      |
+| Item                                          | Priority    | Notes                                                                                     |
+| --------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------- |
+| **Auto-save draft**                           | High        | Reduce data loss; debounced save on editor fields                                         |
+| **Unsaved changes warning**                   | High        | Before navigating away from `/studio/orders/[id]`                                         |
+| **Desktop-first, tablet support**             | Medium      | Layout breakpoints; touch-friendly targets on tablet                                      |
+| Collapsed order status groups in UI           | Medium      | 4 visible groups mapping to 7 DB statuses                                                 |
+| Copy preview link + WhatsApp message template | Medium      | **Copy button shipped**; WhatsApp template text shown after Send Preview (session-scoped) |
+| Visual photo slot grid (Memories/Treasures)   | Medium      | Sprint 09A/09B                                                                            |
+| Inline templates ("Start from Anniversary")   | Medium      | Sprint 08 — not a Templates nav page                                                      |
+| Order search by receiver name                 | Medium      | Volume growth                                                                             |
+| Duplicate order (repeat buyers)               | Future Idea |                                                                                           |
+| `buyer_whatsapp` → Open WhatsApp link         | Future Idea |                                                                                           |
 
 ---
 
@@ -287,7 +287,8 @@ Approved improvements — **not Sprint 06 scope** unless explicitly pulled in.
 - [x] Create order: single form; atomic order + experience creation (RPC or compensating delete)
 - [x] Bootstrap draft values for required `experiences` columns on create
 - [x] Unified Order Editor shell with core sections
-- [x] Photos section: **shell only** (no upload — Sprint 07)
+- [x] Photos section: live upload (6 slots, WebP pipeline)
+- [x] Publish workflow: checklist, preview, skip override, publish + QR download
 - [x] Premium mode panels: "Coming in Sprint X" stubs
 - [x] Dashboard: action queue (not analytics)
 - [x] Mode change: confirmation dialog; column update (child delete when 017–019 exist)

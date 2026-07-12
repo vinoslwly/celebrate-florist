@@ -6,7 +6,7 @@
 
 ## Overview
 
-Celebrate Florist uses **Supabase PostgreSQL** with 11 tables, 4 enum types, 2 private storage buckets, and 20 RLS policies. The schema was designed in Sprint 03 and implemented in Sprint 03A (15 migration files).
+Celebrate Florist uses **Supabase PostgreSQL** with 13 tables, 4 enum types, 2 private storage buckets, and 26 RLS policies. The schema was designed in Sprint 03 and implemented in Sprint 03A (15 migration files), extended through Sprint 08 (migration 017).
 
 **Supabase project:** `celebrate-florist-prod` (`jobknyooffpouniyqpkp`, `ap-southeast-1`)
 
@@ -18,6 +18,8 @@ erDiagram
     themes ||--o{ experiences : "theme_id (snapshot)"
     orders ||--|| experiences : "1:1 order_id"
     experiences ||--o{ experience_photos : "max 6"
+    experiences ||--o{ experience_quiz_questions : "connection max 6"
+    experiences ||--o{ experience_quiz_score_bands : "connection min 1"
     experiences ||--o{ preview_links : "preview workflow"
     experiences ||--o{ experience_sessions : "trusted devices"
     experiences ||--o{ access_attempts : "rate limiting"
@@ -211,6 +213,51 @@ stateDiagram-v2
 
 ---
 
+### `experience_quiz_questions`
+
+**Purpose:** Connection mode — multiple-choice quiz questions (max 6 per experience).
+
+| Column                 | Type        | Notes                                     |
+| ---------------------- | ----------- | ----------------------------------------- |
+| `id`                   | uuid PK     |                                           |
+| `experience_id`        | uuid FK     | ON DELETE CASCADE                         |
+| `sort_order`           | integer     | 1–6                                       |
+| `prompt`               | text        | Question text                             |
+| `options`              | jsonb       | Array of A/B/C choice strings (auxiliary) |
+| `correct_option_index` | integer     | 0-based index into `options`              |
+| `created_at`           | timestamptz | No `updated_at` — immutable after publish |
+
+**Business rules:**
+
+- `sort_order` between 1 and 6 (CHECK)
+- UNIQUE `(experience_id, sort_order)`
+- `options` must be JSON array (CHECK)
+- `correct_option_index >= 0` — upper bound validated in application layer
+- Connection mode only — no rows on other modes at publish
+- No update RLS policy — draft edits use delete + insert
+
+---
+
+### `experience_quiz_score_bands`
+
+**Purpose:** Connection mode — score band messages shown after quiz grading.
+
+| Column          | Type    | Notes                               |
+| --------------- | ------- | ----------------------------------- |
+| `id`            | uuid PK |                                     |
+| `experience_id` | uuid FK | ON DELETE CASCADE                   |
+| `min_percent`   | integer | 0–100                               |
+| `max_percent`   | integer | 0–100, `min_percent <= max_percent` |
+| `message`       | text    | Shown to recipient for this band    |
+
+**Business rules:**
+
+- At least 1 band required at publish (application layer)
+- Overlapping bands not allowed (application layer — OD-3)
+- No update RLS policy
+
+---
+
 ### `preview_links`
 
 **Purpose:** Admin-controlled buyer approval workflow. Separate token from experience link.
@@ -362,19 +409,21 @@ stateDiagram-v2
 
 ## RLS Summary
 
-| Table                  | anon        | authenticated          | service_role |
-| ---------------------- | ----------- | ---------------------- | ------------ |
-| `themes`               | SELECT      | SELECT, INSERT, UPDATE | Bypasses RLS |
-| `orders`               | ❌ none     | SELECT, INSERT, UPDATE | Bypasses RLS |
-| `experiences`          | ❌ **none** | SELECT, INSERT, UPDATE | Bypasses RLS |
-| `experience_photos`    | ❌ **none** | SELECT, INSERT, DELETE | Bypasses RLS |
-| `preview_links`        | ❌ **none** | SELECT, INSERT, UPDATE | Bypasses RLS |
-| `experience_sessions`  | ❌ none     | ❌ none                | Bypasses RLS |
-| `access_attempts`      | ❌ none     | ❌ none                | Bypasses RLS |
-| `experience_analytics` | ❌ none     | SELECT                 | Bypasses RLS |
-| `audit_logs`           | ❌ none     | SELECT                 | Bypasses RLS |
-| `security_events`      | ❌ none     | SELECT                 | Bypasses RLS |
-| `app_settings`         | ❌ none     | SELECT, UPDATE         | Bypasses RLS |
+| Table                         | anon        | authenticated          | service_role |
+| ----------------------------- | ----------- | ---------------------- | ------------ |
+| `themes`                      | SELECT      | SELECT, INSERT, UPDATE | Bypasses RLS |
+| `orders`                      | ❌ none     | SELECT, INSERT, UPDATE | Bypasses RLS |
+| `experiences`                 | ❌ **none** | SELECT, INSERT, UPDATE | Bypasses RLS |
+| `experience_photos`           | ❌ **none** | SELECT, INSERT, DELETE | Bypasses RLS |
+| `experience_quiz_questions`   | ❌ **none** | SELECT, INSERT, DELETE | Bypasses RLS |
+| `experience_quiz_score_bands` | ❌ **none** | SELECT, INSERT, DELETE | Bypasses RLS |
+| `preview_links`               | ❌ **none** | SELECT, INSERT, UPDATE | Bypasses RLS |
+| `experience_sessions`         | ❌ none     | ❌ none                | Bypasses RLS |
+| `access_attempts`             | ❌ none     | ❌ none                | Bypasses RLS |
+| `experience_analytics`        | ❌ none     | SELECT                 | Bypasses RLS |
+| `audit_logs`                  | ❌ none     | SELECT                 | Bypasses RLS |
+| `security_events`             | ❌ none     | SELECT                 | Bypasses RLS |
+| `app_settings`                | ❌ none     | SELECT, UPDATE         | Bypasses RLS |
 
 **Core principle:** `anon` has **zero policies** on Gift domain tables. Recipient access is entirely server-mediated via `service_role`. See [04_SECURITY.md](./04_SECURITY.md).
 
@@ -415,33 +464,35 @@ Recipients receive signed URLs minted server-side — never direct bucket access
 
 ## Migration History
 
-| #   | File                                                             | Purpose                                            |
-| --- | ---------------------------------------------------------------- | -------------------------------------------------- |
-| 001 | `20260710210001_extensions.sql`                                  | `pgcrypto`, `pg_trgm`                              |
-| 002 | `20260710210002_enums.sql`                                       | 4 enum types                                       |
-| 003 | `20260710210003_tables.sql`                                      | 11 tables                                          |
-| 004 | `20260710210004_constraints.sql`                                 | FK, UNIQUE, CHECK constraints                      |
-| 005 | `20260710210005_indexes.sql`                                     | 16 performance indexes + partial unique            |
-| 006 | `20260710210006_functions.sql`                                   | 3 functions + sequence                             |
-| 007 | `20260710210007_triggers.sql`                                    | updated_at, order_number, audit immutability       |
-| 008 | `20260710210008_rls.sql`                                         | 20 RLS policies                                    |
-| 009 | `20260710210009_storage.sql`                                     | 2 private buckets + policies                       |
-| 010 | `20260710210010_seed.sql`                                        | 5 themes                                           |
-| 011 | `20260710210011_harden_function_search_path.sql`                 | Pin `search_path` on functions                     |
-| 012 | `20260710210012_revoke_rls_auto_enable_execute_from_public.sql`  | Close platform function RPC                        |
-| 013 | `20260710210013_fix_missing_base_table_grants.sql`               | Revoke anon DML on sensitive tables                |
-| 014 | `20260710210014_revoke_trigger_function_execute_from_public.sql` | Close trigger function EXECUTE                     |
-| 015 | `20260710210015_seed_admin_email.sql`                            | Documents deploy-time config (no INSERT)           |
-| 016 | `20260712160000_experience_mode.sql`                             | `experience_mode`, `quiz_title`, atomic create RPC |
+| #   | File                                                             | Purpose                                                           |
+| --- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 001 | `20260710210001_extensions.sql`                                  | `pgcrypto`, `pg_trgm`                                             |
+| 002 | `20260710210002_enums.sql`                                       | 4 enum types                                                      |
+| 003 | `20260710210003_tables.sql`                                      | 11 tables                                                         |
+| 004 | `20260710210004_constraints.sql`                                 | FK, UNIQUE, CHECK constraints                                     |
+| 005 | `20260710210005_indexes.sql`                                     | 16 performance indexes + partial unique                           |
+| 006 | `20260710210006_functions.sql`                                   | 3 functions + sequence                                            |
+| 007 | `20260710210007_triggers.sql`                                    | updated_at, order_number, audit immutability                      |
+| 008 | `20260710210008_rls.sql`                                         | 20 RLS policies                                                   |
+| 009 | `20260710210009_storage.sql`                                     | 2 private buckets + policies                                      |
+| 010 | `20260710210010_seed.sql`                                        | 5 themes                                                          |
+| 011 | `20260710210011_harden_function_search_path.sql`                 | Pin `search_path` on functions                                    |
+| 012 | `20260710210012_revoke_rls_auto_enable_execute_from_public.sql`  | Close platform function RPC                                       |
+| 013 | `20260710210013_fix_missing_base_table_grants.sql`               | Revoke anon DML on sensitive tables                               |
+| 014 | `20260710210014_revoke_trigger_function_execute_from_public.sql` | Close trigger function EXECUTE                                    |
+| 015 | `20260710210015_seed_admin_email.sql`                            | Documents deploy-time config (no INSERT)                          |
+| 016 | `20260712160000_experience_mode.sql`                             | `experience_mode`, `quiz_title`, atomic create RPC                |
+| 017 | `20260712200000_experience_quiz.sql`                             | `experience_quiz_questions`, `experience_quiz_score_bands` + RLS  |
+| 018 | `20260713020000_experience_quiz_service_role_grants.sql`         | Hotfix — `service_role` SELECT on quiz tables (Migration 017 gap) |
 
-**Status:** All 16 migration files in this repository are applied on remote Supabase (`celebrate-florist-prod`). Schema is in sync.
+**Status:** All **18** migration files in this repository are applied on remote Supabase (`celebrate-florist-prod`). Schema is in sync. Remote migration history shows **19 entries** (Sprint 03A audit split + `experience_quiz` + service_role grants hotfix).
 
 ### Repo vs Remote Migration History
 
-| Context                                 | Count          | Notes                                                                                 |
-| --------------------------------------- | -------------- | ------------------------------------------------------------------------------------- |
-| Repo `supabase/migrations/`             | **16 files**   | Source of truth for development and new environments                                  |
-| Remote `celebrate-florist-prod` history | **16 entries** | Sprint 03A live audit applied two `rls_auto_enable` revokes before repo consolidation |
+| Context                                 | Count          | Notes                                                                                                           |
+| --------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------- |
+| Repo `supabase/migrations/`             | **18 files**   | Source of truth for development and new environments                                                            |
+| Remote `celebrate-florist-prod` history | **19 entries** | Includes `experience_quiz` (017) + service_role grants hotfix (018); Sprint 03A `rls_auto_enable` history split |
 
 During the Sprint 03A security audit, remote received two discrete migrations:
 
@@ -468,7 +519,7 @@ Post-implementation security audit findings addressed:
 
 ## V2 Schema (Sprint 06+)
 
-> Design locked in [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md). Migrations 017–019 remain planned.
+> Design locked in [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md). Migrations 018–019 remain planned.
 
 ### Migration 016 (Sprint 06) — Implemented
 
@@ -481,11 +532,18 @@ Post-implementation security audit findings addressed:
 
 **Sync rule:** Copy `experience_mode` from order to experience at creation. Do **not** sync back to `orders` on subsequent edits.
 
-### Migrations 017–019 (Sprint 08–09)
+### Migration 017 (Sprint 08) — Implemented
+
+| Table / Column                | Change                                                           |
+| ----------------------------- | ---------------------------------------------------------------- |
+| `experience_quiz_questions`   | Connection MCQ questions — `options` JSONB, max 6 per experience |
+| `experience_quiz_score_bands` | Score band messages — `min_percent`/`max_percent`/`message`      |
+| RLS + privileges              | `anon` zero; `authenticated` SELECT/INSERT/DELETE; **no UPDATE** |
+
+### Migrations 018–019 (Sprint 09A–09B) — Planned
 
 | Migration | Tables                                                       |
 | --------- | ------------------------------------------------------------ |
-| 017       | `experience_quiz_questions`, `experience_quiz_score_bands`   |
 | 018       | `experience_match_pairs`; `experiences.final_unlock_message` |
 | 019       | `experience_envelopes`                                       |
 

@@ -53,27 +53,33 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
     setIsLoading(true);
     setError(null);
 
-    const result = await createOrderAction({
-      experienceMode,
-      senderName,
-      receiverName,
-      themeId: selectedTheme.id,
-      eventType,
-      buyerWhatsapp: buyerWhatsapp || undefined,
-      adminNotes: adminNotes || undefined,
-      scheduledDeliveryAt: scheduledDeliveryAt
-        ? new Date(scheduledDeliveryAt).toISOString()
-        : undefined,
-    });
+    try {
+      const result = await createOrderAction({
+        experienceMode,
+        senderName,
+        receiverName,
+        themeId: selectedTheme.id,
+        eventType,
+        buyerWhatsapp: buyerWhatsapp || undefined,
+        adminNotes: adminNotes || undefined,
+        scheduledDeliveryAt: scheduledDeliveryAt
+          ? new Date(scheduledDeliveryAt).toISOString()
+          : undefined,
+      });
 
-    if (!result.ok) {
-      setError(result.error.message);
+      if (!result.ok) {
+        setError(result.error.message);
+        return;
+      }
+
+      await router.push(STUDIO_ROUTES.orderDetail(result.data.orderId));
+    } catch {
+      setError(
+        "Could not create the order. Check your connection and try again.",
+      );
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    router.push(STUDIO_ROUTES.orderDetail(result.data.orderId));
-    router.refresh();
   }
 
   const inputClass =

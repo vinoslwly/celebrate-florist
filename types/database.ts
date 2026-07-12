@@ -106,6 +106,26 @@ export type ExperiencePhotoRow = {
   created_at: string;
 };
 
+/** Connection mode — multiple-choice question (options JSONB: A/B/C strings). */
+export type QuizQuestionRow = {
+  id: string;
+  experience_id: string;
+  sort_order: number;
+  prompt: string;
+  options: string[];
+  correct_option_index: number;
+  created_at: string;
+};
+
+/** Connection mode — score band message shown after quiz grading. */
+export type QuizScoreBandRow = {
+  id: string;
+  experience_id: string;
+  min_percent: number;
+  max_percent: number;
+  message: string;
+};
+
 export type PreviewLinkRow = {
   id: string;
   experience_id: string;
@@ -178,6 +198,8 @@ export type TableName =
   | "orders"
   | "experiences"
   | "experience_photos"
+  | "experience_quiz_questions"
+  | "experience_quiz_score_bands"
   | "preview_links"
   | "experience_sessions"
   | "access_attempts"

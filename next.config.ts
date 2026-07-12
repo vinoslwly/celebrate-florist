@@ -68,6 +68,15 @@ const nextConfig: NextConfig = {
   // Removes the "X-Powered-By: Next.js" response header.
   poweredByHeader: false,
 
+  // Photo upload sends raw files via Server Action before server-side WebP
+  // compression. Default Next.js limit is 1 MB — raised to match studio schema
+  // (max 10 MB per photo).
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "12mb",
+    },
+  },
+
   images: {
     /*
      * `next/image` rejects any external domain by default. Allow-listed

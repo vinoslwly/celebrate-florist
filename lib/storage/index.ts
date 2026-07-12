@@ -13,6 +13,8 @@ export {
   type ImagePipelineInput,
   type ImagePipelineOutput,
 } from "@/lib/storage/image-pipeline";
+export { generateQrPngBuffer } from "@/lib/storage/qr";
+export { uploadStorageObject } from "@/lib/storage/upload";
 export {
   buildExperiencePhotoPath,
   buildExperienceQrPath,

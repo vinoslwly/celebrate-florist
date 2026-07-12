@@ -500,7 +500,9 @@ features/<domain>/
 | `features/themes/`  | ✅ 5 theme configs + aggregator                           |
 | `features/studio/`  | ✅ Auth (login, logout, proxy gate); 📋 orders Sprint 06+ |
 
-**Scaffolded (planned):** `experience`, `access`, `preview`, `photobooth`, `analytics`, `quiz`, `match`, `treasures`
+**Scaffolded (planned):** `match`, `treasures`
+
+**Implemented (Sprint 07–08):** `experience`, `access`, `preview`, `photobooth`, `analytics`, `quiz`
 
 ---
 

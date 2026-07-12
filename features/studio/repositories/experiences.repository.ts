@@ -40,6 +40,75 @@ export class ExperiencesRepository extends Repository {
     return data as ExperienceRow | null;
   }
 
+  async findByToken(token: string): Promise<ExperienceRow | null> {
+    const { data, error } = await this.client
+      .from("experiences")
+      .select("*")
+      .eq("experience_token", token)
+      .maybeSingle();
+
+    this.assertNoError(error);
+    return data as ExperienceRow | null;
+  }
+
+  async recordFirstOpened(id: string): Promise<ExperienceRow> {
+    const now = new Date().toISOString();
+
+    const { data, error } = await this.client
+      .from("experiences")
+      .update({
+        first_opened_at: now,
+        is_opened: true,
+        last_accessed_at: now,
+      })
+      .eq("id", id)
+      .is("first_opened_at", null)
+      .select("*")
+      .maybeSingle();
+
+    this.assertNoError(error);
+
+    if (data) {
+      return data as ExperienceRow;
+    }
+
+    const { data: touched, error: touchError } = await this.client
+      .from("experiences")
+      .update({ last_accessed_at: now })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    this.assertNoError(touchError);
+    return touched as ExperienceRow;
+  }
+
+  async publishExperience(
+    id: string,
+    params: {
+      qrStoragePath: string;
+      contentLockedAt: string;
+      publishedAt: string;
+    },
+  ): Promise<ExperienceRow> {
+    const { data, error } = await this.client
+      .from("experiences")
+      .update({
+        status: "published",
+        qr_storage_path: params.qrStoragePath,
+        content_locked_at: params.contentLockedAt,
+        published_at: params.publishedAt,
+      })
+      .eq("id", id)
+      .eq("status", "draft")
+      .is("content_locked_at", null)
+      .select("*")
+      .single();
+
+    this.assertNoError(error);
+    return data as ExperienceRow;
+  }
+
   async updateDraft(
     id: string,
     params: UpdateExperienceDraftParams,
@@ -76,6 +145,23 @@ export class ExperiencesRepository extends Repository {
     const { data, error } = await this.client
       .from("experiences")
       .update({ experience_mode: experienceMode })
+      .eq("id", id)
+      .eq("status", "draft")
+      .is("content_locked_at", null)
+      .select("*")
+      .single();
+
+    this.assertNoError(error);
+    return data as ExperienceRow;
+  }
+
+  async updateMemoryKeyHash(
+    id: string,
+    memoryKeyHash: string,
+  ): Promise<ExperienceRow> {
+    const { data, error } = await this.client
+      .from("experiences")
+      .update({ memory_key_hash: memoryKeyHash })
       .eq("id", id)
       .eq("status", "draft")
       .is("content_locked_at", null)

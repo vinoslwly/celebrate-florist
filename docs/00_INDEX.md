@@ -35,7 +35,7 @@ Sprint 05.5 is **closed**. All documentation in this package is the **official b
 | Studio Design Review       | ✅ Closed — [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                                                                                          |
 | Sprint 06 Readiness Review | ✅ Closed — **READY WITH MINOR NOTES**; notes are engineering checklist only ([11](./11_IMPLEMENTATION_ROADMAP_V2.md#sprint-06-implementation-checklist)) |
 
-**Sprint 06 is complete.** Sprint 07 (Moments E2E + Memory Code) is cleared to begin per [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md).
+**Sprint 08 is complete.** Sprint 09A (Memories) is next per [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md).
 
 ## ✅ Sprint 06 — CLOSED (Studio Foundation + Mode Schema)
 
@@ -45,7 +45,15 @@ Sprint 06 is **closed**. Order-centric Studio foundation, Migration 016, and uni
 | --------------------------- | ------------------------------ |
 | Sprint 06 Acceptance Review | ✅ Closed — **FULLY ACCEPTED** |
 
-**Sprint 07 is cleared to begin.** Read [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md#sprint-07--moments-experience-end-to-end--memory-code) before implementation.
+## ✅ Sprint 08 — CLOSED (Connection Experience)
+
+Sprint 08 is **closed**. Connection quiz, templates, recipient grading, buyer preview, and `service_role` hotfix are implemented and accepted.
+
+| Review                   | Status                                                                              |
+| ------------------------ | ----------------------------------------------------------------------------------- |
+| Sprint 08 Phase 8 Review | ✅ Closed — **CONDITIONALLY ACCEPTED** (P1 smoke test satisfied in founder session) |
+
+**Sprint 09A (Memories)** begins per [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md).
 
 ---
 
@@ -87,16 +95,16 @@ Read these documents in order. Each file builds on the previous one.
 
 ## Current Project Status
 
-| Area                        | Status                                                                                                                                                 |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Development phase**       | Sprint 07 ready — Sprint 06 complete; Moments E2E + Memory Code next                                                                                   |
-| **Current sprint**          | **Sprint 07 — Moments Experience End-to-End + Memory Code** 🚀 Active (per [Roadmap V2](./11_IMPLEMENTATION_ROADMAP_V2.md))                            |
-| **Latest completed sprint** | **Sprint 06** — Studio Foundation + Mode Schema (Migration 016, order CRUD, unified editor) · Sprint 05.5 — Product Revision V2 closed                 |
-| **Deployment**              | Vercel project linked; landing page deployable; Studio auth + order tools deployable; recipient Experience routes not yet implemented                  |
-| **Database**                | 16 migration files in repo applied on remote; 11 tables + `experience_mode` / `quiz_title` (016); mode child tables **Planned** (017–019)              |
-| **Security**                | Sprint 02B hardening complete; RLS and privilege hardening complete (migrations 011–015)                                                               |
-| **Product**                 | **V2:** Four experience modes (Moments, Connection, Memories, Treasures) — [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)                    |
-| **Production readiness**    | **Partial** — schema, landing page, and Studio order foundation production-grade; recipient Experience delivery is Planned per Roadmap V2 (Sprint 07+) |
+| Area                        | Status                                                                                                                                                                  |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Development phase**       | **Sprint 08 closed** — Connection E2E + buyer preview + hotfix verified; Sprint 09A (Memories) is next                                                                  |
+| **Current sprint**          | **Sprint 09A — Memories Experience** 📋 Not started                                                                                                                     |
+| **Latest completed sprint** | **Sprint 08** — Connection quiz + templates + buyer preview + service_role hotfix · Sprint 07 — Moments E2E, Memory Code, publish/preview/QR                            |
+| **Deployment**              | Vercel project linked; Studio + recipient `/e/[token]` + buyer `/preview/[token]` routes deployable                                                                     |
+| **Database**                | **18** migration files in repo; **017 + hotfix 018** applied on remote (`celebrate-florist-prod`); 13 tables; Connection quiz tables live; 019 **planned** (Sprint 09A) |
+| **Security**                | Sprint 02B hardening complete; RLS and privilege hardening complete (migrations 011–015)                                                                                |
+| **Product**                 | **V2:** Four experience modes — **Moments + Connection** production-ready (Studio publish, preview, QR, recipient quiz); Memories/Treasures Sprint 09A–09B              |
+| **Production readiness**    | **Partial** — Moments + Connection sellable; Memories/Treasures deferred to Sprint 09A–09B                                                                              |
 
 ### Sprint History
 
@@ -113,9 +121,9 @@ Read these documents in order. Each file builds on the previous one.
 | Sprint 05 — Studio Authentication     | ✅ Complete   | Studio auth pages, route protection, login action                                             |
 | **Sprint 05.5 — Product Revision V2** | ✅ **Closed** | Docs 07–12; all reviews closed; **official implementation baseline**                          |
 | **Sprint 06**                         | ✅ **Closed** | Studio orders + mode schema + migration 016 ([Roadmap V2](./11_IMPLEMENTATION_ROADMAP_V2.md)) |
-| **Sprint 07**                         | 🚀 **Active** | Moments E2E + Memory Code grace period + trusted devices                                      |
-| **Sprint 08**                         | 📋 Planned    | Connection quiz + templates                                                                   |
-| **Sprint 09A**                        | 📋 Planned    | Memories match game                                                                           |
+| **Sprint 07**                         | ✅ **Closed** | Moments E2E + Memory Code grace period + trusted devices + publish/preview/QR                 |
+| **Sprint 08**                         | ✅ **Closed** | Connection quiz + templates — Phases 1–8 complete; hotfix `service_role` grants applied       |
+| **Sprint 09A**                        | 📋 **Next**   | Memories match game                                                                           |
 | **Sprint 09B**                        | 📋 Planned    | Treasures envelopes (max 6)                                                                   |
 
 ---
@@ -126,7 +134,7 @@ Every AI assistant working on this repository **MUST**:
 
 1. **Read this file first**, then follow the reading order above.
 2. **Read the Product Revision V2 package (docs 07–12) before Sprint 07 code** — especially [12_STUDIO_UX.md](./12_STUDIO_UX.md) for Studio work.
-3. **Follow [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)** for sprint scope — Sprint 06 is closed; Sprint 07 is active.
+3. **Follow [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)** for sprint scope — Sprint 08 is closed; Sprint 09A is next.
 4. **Never modify architecture** without explicit founder approval.
 5. **Respect [Founder Decisions](./05_FOUNDER_DECISIONS.md)** — they override convenience.
 6. **Never over-engineer** — prefer the simplest correct solution.
@@ -137,14 +145,14 @@ Every AI assistant working on this repository **MUST**:
 
 ### What Exists Today (Code Reality)
 
-| Layer            | Implemented                                                                 | Not Yet Implemented                                                                            |
-| ---------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Routes           | `app/(public)/` landing; `app/(studio)/` login, dashboard, orders CRUD      | `app/(experience)/` recipient routes (`/e/[token]`)                                            |
-| Features (code)  | `features/landing/`, `features/themes/`, `features/studio/` (auth + orders) | `features/experience/`, `features/access/`, mode features (quiz, match, envelopes)             |
-| Supabase clients | `lib/supabase/client.ts`, `server.ts`, `admin.ts`                           | —                                                                                              |
-| Auth             | Session helpers, action wrappers, Studio login/logout, `proxy.ts` gate      | Memory Code grace period + recipient flow (**Planned Sprint 07**)                              |
-| Database         | Full V1 schema + Migration 016 (`experience_mode`, `quiz_title`) on remote  | Mode child tables 017–019 ([Planned](./10_DATABASE_REVISION_PLAN.md))                          |
-| Product          | V2 four-mode platform — Studio foundation shipped                           | Recipient delivery, publish, preview ([Planned Sprint 07+](./11_IMPLEMENTATION_ROADMAP_V2.md)) |
+| Layer            | Implemented                                                                                                                                                                                       | Not Yet Implemented                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Routes           | `app/(public)/` landing; `app/(studio)/` login, dashboard, orders CRUD; `app/(experience)/e/[token]`; `app/(preview)/preview/[token]`                                                             | Premium mode recipient UI (Memories/Treasures)                        |
+| Features (code)  | `features/landing/`, `features/themes/`, `features/studio/`, `features/experience/`, `features/access/`, `features/preview/`, `features/photobooth/`, `features/analytics/`, **`features/quiz/`** | Mode features (`match`, `treasures`)                                  |
+| Supabase clients | `lib/supabase/client.ts`, `server.ts`, `admin.ts`                                                                                                                                                 | —                                                                     |
+| Auth             | Session helpers, Studio login/logout, `proxy.ts` gate, Memory Code grace/trusted devices, recipient access gate                                                                                   | —                                                                     |
+| Database         | Full V1 schema + Migration 016 (`experience_mode`, `quiz_title`) + **017** (quiz tables) on remote                                                                                                | Mode child tables 018–019 ([Planned](./10_DATABASE_REVISION_PLAN.md)) |
+| Product          | V2 four-mode platform — **Moments + Connection E2E shipped** (Studio publish, preview, QR, recipient quiz)                                                                                        | Memories/Treasures publish + recipient UI (Sprint 09A–09B)            |
 
 ---
 

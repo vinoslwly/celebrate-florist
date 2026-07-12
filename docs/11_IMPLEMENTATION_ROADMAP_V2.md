@@ -157,19 +157,29 @@ order-creation service → server actions → Studio shell →
 
 **Goal:** Full recipient flow for **Moments** mode. Implements **Memory Code grace period (24h)**, trusted devices, Access Code flow (engineering term) for post-grace new devices.
 
+> **Status:** **Complete** — all Sprint 07 deliverables implemented per checklist below. Sprint 08 cleared to begin.
+
+### Founder Decisions (Sprint 07 Kickoff — Locked)
+
+| #   | Decision                                        | Ruling                                                                                                                                                         |
+| --- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Migration 020** (`experience_completed` enum) | **No** — no new migrations in Sprint 07 unless unavoidable. Derive completion from existing analytics where needed.                                            |
+| 2   | **Photo upload pipeline**                       | **Yes** — implement production image processing (resize/compress/WebP per architecture) in Sprint 07. No asset reprocessing later.                             |
+| 3   | **Premium mode publish**                        | **Block** — Connection, Memories, Treasures publish **blocked** with clear Studio message (Sprint 08–09B). **Moments only** for full publish E2E in Sprint 07. |
+
 ### Planned Deliverables
 
 | Area                   | Work                                                                                         |
 | ---------------------- | -------------------------------------------------------------------------------------------- |
 | `features/access/`     | Memory Code verification, **24-hour grace period**, trusted device sessions                  |
-| `features/experience/` | Recipient shell, themed letter, gallery                                                      |
+| `features/experience/` | Recipient shell, themed letter, gallery (Moments)                                            |
 | `features/photobooth/` | Browser-only photobooth component                                                            |
 | `features/preview/`    | Buyer preview link flow                                                                      |
 | Studio                 | **Unified publish** — lock + QR in one action; buyer approval default; Skip Preview override |
-| Studio                 | Preview link flow; pre-publish checklist                                                     |
-| Storage                | Photo upload pipeline (admin → `experience-photos`)                                          |
-| Analytics              | Coarse events: experience opened, completed (enum extension if needed), mode                 |
-| Database               | **No grace-period migration** — computed from `first_opened_at + 24h` in services            |
+| Studio                 | Preview link flow; pre-publish checklist; live photo upload (6 slots)                        |
+| Storage                | Photo upload pipeline with **image processing** (admin → `experience-photos`)                |
+| Analytics              | Coarse events: `experience_opened` (+ existing events); mode from `experience_mode`          |
+| Database               | **No new migrations** — grace from `first_opened_at + 24h` in services                       |
 | Proxy                  | Rate limiting extension point on `/e/*` (basic)                                              |
 
 ### Memory Code Product Rules (Founder Decision)
@@ -183,29 +193,231 @@ order-creation service → server actions → Studio shell →
 ### Deployable Outcome
 
 - **Moments** bouquets sold end-to-end with grace-period first experience
-- Connection/Memories/Treasures orders in Studio — recipient UI deferred to Sprint 08–09B
+- Connection/Memories/Treasures orders in Studio — core editing only; **publish blocked** until Sprint 08–09B; recipient interactive UI deferred
 
 ### Not in Scope
 
 - Quiz, match, envelope recipient UI
 - Connection templates (Sprint 08)
+- Migrations 017–020
+- Premium mode publish (Connection, Memories, Treasures)
+
+### Sprint 07 Implementation Checklist
+
+> **Engineering contract** for Sprint 07. Locked at founder kickoff. Not a product spec change — implements [12_STUDIO_UX.md](./12_STUDIO_UX.md), [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md), [02_ARCHITECTURE.md](./02_ARCHITECTURE.md), and founder decisions in [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md).
+
+#### Engineering principles (mandatory)
+
+- Feature-first architecture; repositories in `features/<domain>/repositories/`
+- UI → Server Action → Service → Repository → Supabase
+- Business logic in **services only**; thin actions; Zod validation
+- No `server-only` leak to Client Components
+- Preserve Sprint 06 security hardening (bootstrap sentinel, order scoping, env abstraction)
+- Stop and request founder decision if implementation would change locked product or database design
+
+#### Module dependency graph
+
+```mermaid
+flowchart TB
+    subgraph Sprint06["Sprint 06 (locked baseline)"]
+        S06[Orders + Experiences + Editor shell]
+        S06S[memory-code-sentinel + RPC 016]
+    end
+
+    subgraph PhaseA["Phase A — Access foundation"]
+        ACC[features/access services]
+        ACC --> GATE[access-gate orchestration]
+    end
+
+    subgraph PhaseB["Phase B — Studio content"]
+        IMG[image pipeline + photo upload]
+        IMG --> PHOTOS[experience_photos DB + storage]
+    end
+
+    subgraph PhaseC["Phase C — Studio workflow"]
+        PREV[preview service]
+        PUBV[publish-validation — Moments only]
+        PUB[publish + QR service]
+        PUBV --> PUB
+        PREV --> PUBV
+    end
+
+    subgraph PhaseD["Phase D — Recipient + preview routes"]
+        EXP[features/experience shell]
+        PRV[features/preview buyer view]
+        PB[features/photobooth]
+        GATE --> EXP
+        PHOTOS --> EXP
+        EXP --> PB
+    end
+
+    subgraph PhaseE["Phase E — Observability + hardening"]
+        ANA[coarse analytics]
+        PROXY[proxy /e/* rate-limit hook]
+    end
+
+    S06 --> ACC
+    S06S --> ACC
+    S06 --> IMG
+    PHOTOS --> PUBV
+    ACC --> EXP
+    PUB --> EXP
+    EXP --> ANA
+    ACC --> PROXY
+```
+
+#### Recommended implementation order
+
+```
+1. lib/storage image pipeline (resize/compress/WebP) — unblocks upload
+2. features/access/ — grace, trusted session, Memory Code verify, access-gate
+3. features/studio/ — photo repos/services/actions; replace photos shell UI
+4. features/studio/ — publish-validation (Moments only), preview, publish+QR services
+5. features/studio/ — action bar, checklist, preview panel, skip-preview, QR download
+6. app/(experience)/e/[token] — recipient shell (Moments: letter + gallery)
+7. features/photobooth/ — client-only component composed into experience
+8. app/(preview)/preview/[token] — buyer preview + approve
+9. features/analytics/ — coarse event recording
+10. proxy.ts — basic /e/* rate-limit extension for Memory Code attempts
+11. docs/03_DATABASE.md — update only if implementation discovers doc drift (no new migration expected)
+```
+
+#### Deliverables checklist
+
+| #                                      | Deliverable                                                                                     | Location / notes                                 |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| **A — Access & security**              |
+| A1                                     | Grace period service (`first_opened_at + 24h`)                                                  | `features/access/services/`                      |
+| A2                                     | Trusted device session (cookie + `experience_sessions`)                                         | `features/access/services/`                      |
+| A3                                     | Memory Code verification (reject bootstrap sentinel)                                            | `features/access/services/` + Sprint 06 sentinel |
+| A4                                     | Access-gate orchestration (grace → trusted → code form)                                         | `features/access/services/`                      |
+| A5                                     | `access_attempts` logging + basic rate limit                                                    | `features/access/repositories/` + service        |
+| A6                                     | Access repositories (`sessions`, `attempts`)                                                    | `features/access/repositories/`                  |
+| A7                                     | Thin access actions (verify Memory Code)                                                        | `features/access/actions/`                       |
+| **B — Image pipeline & photos**        |
+| B1                                     | Production image pipeline (resize/compress/WebP)                                                | `lib/storage/image-pipeline.ts`                  |
+| B2                                     | Experience photos repository                                                                    | `features/studio/repositories/`                  |
+| B3                                     | Upload + delete photo services (max 6, immutable replace)                                       | `features/studio/services/`                      |
+| B4                                     | Photo upload/delete server actions                                                              | `features/studio/actions/`                       |
+| B5                                     | Live photo upload UI (replaces Sprint 06 shell)                                                 | `features/studio/components/`                    |
+| **C — Studio publish workflow**        |
+| C1                                     | Publish validation service — **Moments passable**; premium modes **blocked** with clear message | `features/studio/services/`                      |
+| C2                                     | Send preview service (`preview_links`, order → `preview_sent`)                                  | `features/preview/` + studio                     |
+| C3                                     | Skip preview override service                                                                   | `features/studio/services/`                      |
+| C4                                     | Publish service (lock, `published`, QR → `experience-qr`)                                       | `features/studio/services/`                      |
+| C5                                     | Preview links repository                                                                        | `features/preview/repositories/`                 |
+| C6                                     | Extend experiences/orders repos for publish + status transitions                                | `features/studio/repositories/`                  |
+| C7                                     | Pre-publish checklist UI (green/red)                                                            | `features/studio/components/`                    |
+| C8                                     | Action bar: Save draft · Send preview · Publish                                                 | `order-editor-form` or sibling                   |
+| C9                                     | Preview link copy panel (+ WhatsApp template per UX backlog)                                    | `features/studio/components/`                    |
+| C10                                    | Skip preview confirmation dialog                                                                | `features/studio/components/`                    |
+| C11                                    | Post-publish QR download panel                                                                  | `features/studio/components/`                    |
+| C12                                    | Publish/preview/skip server actions                                                             | `features/studio/actions/`                       |
+| **D — Recipient experience (Moments)** |
+| D1                                     | Route `app/(experience)/e/[token]`                                                              | `(experience)` route group + layout              |
+| D2                                     | Experience shell + mode routing (Moments core only)                                             | `features/experience/`                           |
+| D3                                     | Memory Code gate UI (post-grace new devices)                                                    | `features/experience/components/`                |
+| D4                                     | Themed greeting letter                                                                          | `features/experience/components/`                |
+| D5                                     | Photo gallery (signed URLs, max 6)                                                              | `features/experience/components/`                |
+| D6                                     | First-open + grace start (`first_opened_at`)                                                    | `features/experience/services/`                  |
+| D7                                     | Post-gate recipient fetch via `service_role`                                                    | `features/experience/services/`                  |
+| **E — Buyer preview**                  |
+| E1                                     | Route `app/(preview)/preview/[token]`                                                           | Separate from `/e/[token]`                       |
+| E2                                     | Buyer preview shell (core content only)                                                         | `features/preview/components/`                   |
+| E3                                     | Buyer approve action → order `approved`                                                         | `features/preview/actions/`                      |
+| **F — Photobooth**                     |
+| F1                                     | Browser-only photobooth component                                                               | `features/photobooth/components/`                |
+| F2                                     | No server storage — client-only per founder rule                                                | —                                                |
+| **G — Analytics & proxy**              |
+| G1                                     | Coarse `experience_opened` recording                                                            | `features/analytics/`                            |
+| G2                                     | Mode segmentation from `experience_mode` (no new enum migration)                                | Application layer                                |
+| G3                                     | Basic `/e/*` rate-limit hook in `proxy.ts`                                                      | Extension point only                             |
+| **H — Schemas & types**                |
+| H1                                     | Zod schemas for upload, preview, publish, access inputs                                         | `schemas/`                                       |
+| H2                                     | Types aligned with existing tables (no invented columns)                                        | `types/database.ts` if needed                    |
+
+#### Acceptance criteria
+
+| #   | Criterion                                                                                              | Verification                                       |
+| --- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| 1   | **Moments E2E** — create → upload photos → set Memory Code → preview → approve → publish → QR download | Manual Studio flow                                 |
+| 2   | Recipient opens `/e/[token]` — first access within grace: letter **without** Memory Code               | Manual recipient test                              |
+| 3   | Trusted device registered during grace; post-grace trusted device: no code                             | Multi-device / cookie test                         |
+| 4   | Post-grace **new** device: Memory Code required; success → trusted                                     | Manual recipient test                              |
+| 5   | Bootstrap sentinel **never** passes verification or publish checklist                                  | Security regression                                |
+| 6   | Letter + gallery + photobooth work for published Moments                                               | Recipient UI test                                  |
+| 7   | Buyer preview at `/preview/[token]` isolated from recipient token                                      | Token separation test                              |
+| 8   | Skip preview override works with explicit admin confirmation                                           | Studio test                                        |
+| 9   | **Premium modes blocked** at publish with clear Sprint 08–09B message                                  | Studio test (connection/memories/treasures orders) |
+| 10  | `content_locked_at` prevents post-publish edits                                                        | Service + UI test                                  |
+| 11  | Photos: max 6, processed assets in `experience-photos`, immutable replace                              | Upload test                                        |
+| 12  | `experience_opened` analytics recorded; no migration 020                                               | DB / log check                                     |
+| 13  | Architecture: no business logic in actions/repos; no server-only client leak                           | Code review                                        |
+| 14  | `npm run typecheck` + `npm run lint` + `npm run build` pass                                            | CI local                                           |
+
+#### Explicit out of scope (Sprint 07)
+
+| Item                                                       | Deferred to                               |
+| ---------------------------------------------------------- | ----------------------------------------- |
+| Migration 017–020 (incl. `experience_completed` enum)      | Sprint 08+ / never unless founder reopens |
+| Quiz builder, recipient quiz UI, Connection templates      | Sprint 08                                 |
+| Match pair editor, recipient match game                    | Sprint 09A                                |
+| Envelope sequencer, recipient envelope UI                  | Sprint 09B                                |
+| Premium mode **publish** (Connection, Memories, Treasures) | Sprint 08–09B                             |
+| Premium mode **recipient interactive** UI                  | Sprint 08–09B                             |
+| Studio analytics dashboard / charts / funnel               | Sprint 10                                 |
+| Full `IP_HASH_PEPPER` rate limiting                        | Post-V2 backlog                           |
+| `grace_expires_at` column                                  | Never (founder locked)                    |
+| Photobooth server storage                                  | Never (founder locked)                    |
+| Auto-save, unsaved-changes warning                         | UX backlog                                |
+| Letter-open animation, ambient music, TTS                  | Future Ideas                              |
+| Fifth experience mode                                      | Founder gate                              |
+| Product / architecture / database redesign                 | Never without founder reopen              |
+
+#### Sprint 06 dependencies (must remain intact)
+
+| Dependency                                       | Required for                                           |
+| ------------------------------------------------ | ------------------------------------------------------ |
+| Migration 016 + RPC atomic create                | Publish on existing order/experience                   |
+| Unified Order Editor shell                       | Extend with photos + action bar                        |
+| `memory-code-sentinel` + `hashMemoryCode` guards | Access verify + publish checklist                      |
+| `updateExperienceDraft` order scoping            | Continued draft edits pre-publish                      |
+| Studio auth + `proxy.ts` Studio gate             | All admin workflows                                    |
+| Existing RLS (anon zero on Gift domain)          | All recipient/preview reads via service_role post-gate |
+
+**Sprint 07 closed** — implementation complete. Acceptance: typecheck, lint, build pass; no migration 020.
 
 ---
 
 ## Sprint 08 — Connection Experience (Quiz + Templates)
 
+> **Status:** **Complete** — all Sprint 08 deliverables implemented; Phase 8 acceptance + hotfix verified; Sprint 09A cleared to begin.
+
 **Goal:** Ship **Connection** premium mode — couple quiz (max 6 multiple choice) with **starter templates**.
 
 ### Planned Deliverables
 
-| Area               | Work                                                                                     |
-| ------------------ | ---------------------------------------------------------------------------------------- |
-| Migration 017      | `experience_quiz_questions` (options JSONB) + score bands + RLS (no UPDATE post-publish) |
-| Studio             | Quiz builder UI; **templates:** Anniversary, Graduation, Birthday, Proposal              |
-| `features/quiz/`   | Recipient quiz UI (A/B/C, max 6 questions)                                               |
-| Server Actions     | Save quiz config (admin), submit answers (recipient, post-auth)                          |
-| Analytics          | Coarse: opened, completed, mode                                                          |
-| Publish validation | Connection: 1–6 questions, ≥ 1 score band required                                       |
+| Area               | Work                                                                                           |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| Migration 017      | `experience_quiz_questions` (options JSONB) + score bands + RLS (no UPDATE post-publish)       |
+| Studio             | Quiz builder UI; **templates:** Anniversary, Graduation, Birthday, Proposal                    |
+| `features/quiz/`   | Recipient quiz UI (A/B/C, max 6 questions)                                                     |
+| Server Actions     | Save quiz config (admin), submit answers (recipient, post-auth)                                |
+| Analytics          | OD-1: `experience_opened` only; mode via `experiences.experience_mode` JOIN (no migration 020) |
+| Publish validation | Connection: 1–6 questions, ≥ 1 score band required                                             |
+
+### Sprint 08 Implementation Checklist
+
+| Phase | Scope                                                                   | Status |
+| ----- | ----------------------------------------------------------------------- | ------ |
+| 1     | Migration 017 — quiz tables + RLS                                       | ✅     |
+| 2     | Types, Zod schemas, quiz repositories                                   | ✅     |
+| 3     | Quiz services, templates, grading, admin actions                        | ✅     |
+| 4     | Studio Quiz Builder UI (replaces Connection stub)                       | ✅     |
+| 5     | Publish validation + mode-change cleanup                                | ✅     |
+| 6     | Recipient UI, mode registry, buyer preview quiz component               | ✅     |
+| 7     | Buyer preview integration, OD-1 docs, regression verification, doc sync | ✅     |
+| 8     | QA closure + final Sprint 08 acceptance + service_role hotfix           | ✅     |
 
 ### Deployable Outcome
 
@@ -342,7 +554,7 @@ order-creation service → server actions → Studio shell →
 
 - [ ] Read [00_INDEX.md](./00_INDEX.md) current sprint scope
 - [ ] Confirm sprint matches this roadmap (or document deviation)
-- [x] For Sprint 06 Studio: follow [12_STUDIO_UX.md](./12_STUDIO_UX.md) and [implementation checklist](./11_IMPLEMENTATION_ROADMAP_V2.md#sprint-06-implementation-checklist) — **Sprint 06 closed**
+- [ ] For Sprint 07: follow [Sprint 07 Implementation Checklist](./11_IMPLEMENTATION_ROADMAP_V2.md#sprint-07-implementation-checklist) — **approved; implementation cleared**
 - [ ] Approve any new founder decisions in `05_FOUNDER_DECISIONS.md`
 - [ ] Approve migration files before apply to production
 

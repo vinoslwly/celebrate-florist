@@ -3,30 +3,51 @@
 import { useState } from "react";
 
 import type { ExperienceMode, ExperienceRow, OrderRow } from "@/types/database";
+import type { ExperiencePhotoRow } from "@/types/database";
 
 import { Button } from "@/components/ui/button";
+import { QuizBuilderPanel } from "@/features/quiz/components/quiz-builder-panel";
+import type { ExperienceQuiz } from "@/features/quiz/types";
 import {
   changeExperienceModeAction,
   updateExperienceDraftAction,
 } from "@/features/studio/actions/orders";
 import { ExperienceModeBadge } from "@/features/studio/components/experience-mode-badge";
+import { MemoryCodePanel } from "@/features/studio/components/memory-code-panel";
 import { ModePanelStub } from "@/features/studio/components/mode-panel-stub";
-import { PhotosShell } from "@/features/studio/components/photos-shell";
+import { OrderActionBar } from "@/features/studio/components/order-action-bar";
+import { PhotosUploadPanel } from "@/features/studio/components/photos-upload-panel";
+import { PublishChecklist } from "@/features/studio/components/publish-checklist";
 import { EXPERIENCE_MODES } from "@/features/studio/config/experience-modes";
-import { isPlaceholderMemoryKeyHash } from "@/features/studio/config/memory-code-sentinel";
+import type { PublishChecklistItem } from "@/features/studio/config/publish-checklist";
 
 type OrderEditorFormProps = {
   order: OrderRow;
   experience: ExperienceRow;
+  photos: ExperiencePhotoRow[];
+  initialQuiz: ExperienceQuiz;
+  checklistItems: PublishChecklistItem[];
+  canPublish: boolean;
+  adminMemoryCodeReference: string | null;
+  publishedRecipientUrl: string | null;
+  qrDownloadUrl: string | null;
 };
 
-export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
+export function OrderEditorForm({
+  order,
+  experience,
+  photos,
+  initialQuiz,
+  checklistItems,
+  canPublish,
+  adminMemoryCodeReference,
+  publishedRecipientUrl,
+  qrDownloadUrl,
+}: OrderEditorFormProps) {
   const [greetingName, setGreetingName] = useState(experience.greeting_name);
   const [closingName, setClosingName] = useState(experience.closing_name);
   const [letterContent, setLetterContent] = useState(experience.letter_content);
   const [letterClosing, setLetterClosing] = useState(experience.letter_closing);
-  const [quizTitle, setQuizTitle] = useState(experience.quiz_title ?? "");
-  const [memoryCode, setMemoryCode] = useState("");
   const [experienceMode, setExperienceMode] = useState<ExperienceMode>(
     experience.experience_mode,
   );
@@ -35,7 +56,8 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const memoryCodeSet = !isPlaceholderMemoryKeyHash(experience.memory_key_hash);
+  const isPublished = experience.status === "published";
+  const isLocked = Boolean(experience.content_locked_at);
 
   const inputClass =
     "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50";
@@ -52,8 +74,6 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
       closingName,
       letterContent,
       letterClosing,
-      quizTitle: quizTitle || null,
-      memoryCode: memoryCode || undefined,
     });
 
     setIsSaving(false);
@@ -64,9 +84,6 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
     }
 
     setMessage("Draft saved.");
-    if (memoryCode) {
-      setMemoryCode("");
-    }
   }
 
   function requestModeChange(mode: ExperienceMode) {
@@ -81,6 +98,7 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
     setError(null);
 
     const result = await changeExperienceModeAction({
+      orderId: order.id,
       experienceId: experience.id,
       experienceMode: pendingMode,
     });
@@ -151,7 +169,7 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
               value={greetingName}
               onChange={(e) => setGreetingName(e.target.value)}
               className={inputClass}
-              disabled={isSaving}
+              disabled={isSaving || isLocked}
             />
           </div>
           <div className="space-y-2">
@@ -163,7 +181,7 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
               value={closingName}
               onChange={(e) => setClosingName(e.target.value)}
               className={inputClass}
-              disabled={isSaving}
+              disabled={isSaving || isLocked}
             />
           </div>
         </div>
@@ -192,47 +210,58 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
             disabled={isSaving}
           />
         </div>
-        {experienceMode === "connection" ? (
-          <div className="space-y-2">
-            <label htmlFor="quizTitle" className="text-sm font-medium">
-              Quiz title (optional)
-            </label>
-            <input
-              id="quizTitle"
-              value={quizTitle}
-              onChange={(e) => setQuizTitle(e.target.value)}
-              className={inputClass}
-              disabled={isSaving}
-            />
-          </div>
-        ) : null}
       </section>
 
-      <PhotosShell />
+      <PhotosUploadPanel
+        orderId={order.id}
+        experienceId={experience.id}
+        initialPhotos={photos}
+        disabled={isLocked}
+      />
 
-      <ModePanelStub mode={experienceMode} />
+      {experienceMode === "connection" ? (
+        <QuizBuilderPanel
+          key={[
+            experience.id,
+            experience.quiz_title ?? "",
+            ...initialQuiz.questions.map((question) => question.id),
+            ...initialQuiz.bands.map((band) => band.id),
+          ].join(":")}
+          orderId={order.id}
+          experienceId={experience.id}
+          initialQuiz={initialQuiz}
+          initialQuizTitle={experience.quiz_title ?? ""}
+          letterDraft={{
+            greetingName,
+            closingName,
+            letterContent,
+            letterClosing,
+          }}
+          disabled={isLocked}
+        />
+      ) : (
+        <ModePanelStub mode={experienceMode} />
+      )}
 
-      <section className="rounded-2xl border border-border bg-card p-6 space-y-4">
-        <h2 className="text-sm font-semibold">Memory Code</h2>
-        <p className="text-sm text-muted-foreground">
-          Status: {memoryCodeSet ? "Set ✓" : "Not set — enter a code below"}
-        </p>
-        <div className="space-y-2">
-          <label htmlFor="memoryCode" className="text-sm font-medium">
-            {memoryCodeSet ? "Update Memory Code" : "Set Memory Code"}
-          </label>
-          <input
-            id="memoryCode"
-            type="password"
-            autoComplete="new-password"
-            value={memoryCode}
-            onChange={(e) => setMemoryCode(e.target.value)}
-            placeholder="Enter Memory Code for recipient"
-            className={inputClass}
-            disabled={isSaving}
-          />
-        </div>
-      </section>
+      <MemoryCodePanel
+        orderId={order.id}
+        experienceId={experience.id}
+        memoryKeyHash={experience.memory_key_hash}
+        adminMemoryCodeReference={adminMemoryCodeReference}
+        disabled={isLocked}
+      />
+
+      <PublishChecklist items={checklistItems} />
+
+      <OrderActionBar
+        orderId={order.id}
+        experienceId={experience.id}
+        canPublish={canPublish}
+        isPublished={isPublished}
+        buyerWhatsapp={order.buyer_whatsapp}
+        publishedRecipientUrl={publishedRecipientUrl}
+        qrDownloadUrl={qrDownloadUrl}
+      />
 
       <section className="rounded-2xl border border-border bg-card p-6 space-y-3">
         <h2 className="text-sm font-semibold">Change mode (draft only)</h2>
@@ -258,15 +287,16 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
         <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4">
           <p className="text-sm font-medium">Change mode to {pendingMode}?</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Incompatible premium configuration will be removed when child tables
-            exist (Sprint 08+). Continue?
+            {experienceMode === "connection" && pendingMode !== "connection"
+              ? "Saved quiz questions, score bands, and quiz title will be permanently removed."
+              : "Incompatible premium configuration will be removed when changing mode."}
           </p>
           <div className="mt-3 flex gap-2">
             <Button
               type="button"
               size="sm"
               onClick={confirmModeChange}
-              disabled={isSaving}
+              disabled={isSaving || isLocked}
             >
               Confirm
             </Button>
@@ -275,7 +305,7 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
               size="sm"
               variant="outline"
               onClick={() => setPendingMode(null)}
-              disabled={isSaving}
+              disabled={isSaving || isLocked}
             >
               Cancel
             </Button>
@@ -284,7 +314,11 @@ export function OrderEditorForm({ order, experience }: OrderEditorFormProps) {
       ) : null}
 
       <div className="flex gap-3">
-        <Button type="button" onClick={handleSaveDraft} disabled={isSaving}>
+        <Button
+          type="button"
+          onClick={handleSaveDraft}
+          disabled={isSaving || isLocked}
+        >
           {isSaving ? "Saving…" : "Save draft"}
         </Button>
       </div>
