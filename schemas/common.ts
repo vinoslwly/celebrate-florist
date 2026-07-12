@@ -29,6 +29,24 @@ export const nonEmptyStringSchema = z
   .trim()
   .min(1, "Must not be empty");
 
+/** Person names on orders and experiences — bouquet labels and letter headers. */
+export const personNameSchema = nonEmptyStringSchema.max(
+  100,
+  "Must be 100 characters or fewer",
+);
+
+/** Main letter body — personal message content. */
+export const letterContentSchema = nonEmptyStringSchema.max(
+  10_000,
+  "Must be 10,000 characters or fewer",
+);
+
+/** Letter closing line — short sign-off. */
+export const letterClosingSchema = nonEmptyStringSchema.max(
+  500,
+  "Must be 500 characters or fewer",
+);
+
 export const orderStatusSchema = z.enum([
   "draft",
   "designing",

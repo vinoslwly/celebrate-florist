@@ -20,25 +20,25 @@ Three guiding principles (from implementation):
 
 ### Assets to Protect
 
-| Asset             | Sensitivity | Storage                                                 |
-| ----------------- | ----------- | ------------------------------------------------------- |
-| Personal letters  | High        | `experiences.letter_content`                            |
-| Memory photos     | High        | `experience-photos` bucket                              |
-| Access Code       | Critical    | `experiences.memory_key_hash` (hashed only)             |
-| Experience tokens | High        | URL path `/e/[token]`                                   |
-| Preview tokens    | Medium      | URL path for buyer approval                             |
-| Admin credentials | Critical    | Supabase Auth                                           |
-| Order PII         | Medium      | `orders.sender_name`, `receiver_name`, `buyer_whatsapp` |
+| Asset             | Sensitivity | Storage                                                                     |
+| ----------------- | ----------- | --------------------------------------------------------------------------- |
+| Personal letters  | High        | `experiences.letter_content`                                                |
+| Memory photos     | High        | `experience-photos` bucket                                                  |
+| Access Code       | Critical    | `experiences.memory_key_hash` (hashed only) — product term: **Memory Code** |
+| Experience tokens | High        | URL path `/e/[token]`                                                       |
+| Preview tokens    | Medium      | URL path for buyer approval                                                 |
+| Admin credentials | Critical    | Supabase Auth                                                               |
+| Order PII         | Medium      | `orders.sender_name`, `receiver_name`, `buyer_whatsapp`                     |
 
 ### Threat Actors
 
-| Actor                       | Capability                  | Primary risk                            |
-| --------------------------- | --------------------------- | --------------------------------------- |
-| **Unauthenticated visitor** | Public internet access      | Token guessing, Access Code brute force |
-| **Recipient (legitimate)**  | Has QR link                 | Should only see their experience        |
-| **Recipient (shared link)** | Has URL but not Access Code | Must be blocked without code            |
-| **Malicious admin**         | Compromised admin account   | Data exfiltration, content tampering    |
-| **Automated scanner**       | Bots, crawlers              | Discovery of experience URLs            |
+| Actor                       | Capability                  | Primary risk                                      |
+| --------------------------- | --------------------------- | ------------------------------------------------- |
+| **Unauthenticated visitor** | Public internet access      | Token guessing, Access Code brute force           |
+| **Recipient (legitimate)**  | Has QR link                 | Should only see their experience                  |
+| **Recipient (shared link)** | Has URL but not Memory Code | Must be blocked without code (after grace period) |
+| **Malicious admin**         | Compromised admin account   | Data exfiltration, content tampering              |
+| **Automated scanner**       | Bots, crawlers              | Discovery of experience URLs                      |
 
 ### Mitigations by Layer
 
@@ -74,8 +74,8 @@ flowchart TD
 
 Recipients do **not** use Supabase Auth. Authentication is:
 
-1. **Access Code** — required on first visit from a new device
-2. **Trusted Device Cookie** — `experience_sessions` row backs a session cookie after successful code entry
+1. **Memory Code** — required on new devices **after 24-hour grace period** from first successful access
+2. **Trusted Device** — `experience_sessions` row backs a session cookie; devices registered during grace or after successful Memory Code entry
 
 ---
 
@@ -83,11 +83,11 @@ Recipients do **not** use Supabase Auth. Authentication is:
 
 ### Three-Layer Model
 
-| Layer           | Gift Domain                            | Admin Domain                               |
-| --------------- | -------------------------------------- | ------------------------------------------ |
-| **Application** | Access Code or valid session cookie    | `authenticated` + email = `ADMIN_EMAIL`    |
-| **RLS**         | `anon`: zero policies                  | `authenticated`: full CRUD (except delete) |
-| **Privileges**  | `service_role` for all recipient reads | `authenticated` client for Studio writes   |
+| Layer           | Gift Domain                                               | Admin Domain                               |
+| --------------- | --------------------------------------------------------- | ------------------------------------------ |
+| **Application** | Memory Code, grace-period rules, or valid trusted session | `authenticated` + email = `ADMIN_EMAIL`    |
+| **RLS**         | `anon`: zero policies                                     | `authenticated`: full CRUD (except delete) |
+| **Privileges**  | `service_role` for all recipient reads                    | `authenticated` client for Studio writes   |
 
 ### Why `service_role` for Recipients
 
@@ -126,9 +126,11 @@ Migrations 011–015 (repo files) address findings from the Sprint 03A security 
 
 ---
 
-## Memory Key (Access Code)
+## Memory Code (Product) / Memory Key (Engineering)
 
-The Access Code is the recipient's password to their gift experience.
+In product and UI copy, use **Memory Code**. In code and schema, technical names remain (`memory_key_hash`, `access_attempts`, `MEMORY_KEY_PEPPER`).
+
+The Memory Code is the recipient's private key to their gift experience.
 
 | Aspect        | Rule                                                                          |
 | ------------- | ----------------------------------------------------------------------------- |
@@ -139,7 +141,19 @@ The Access Code is the recipient's password to their gift experience.
 | UI            | Never displayed after initial admin setup                                     |
 | Rate limiting | `access_attempts` table tracks failed attempts per `(experience_id, ip_hash)` |
 
-### Trusted Device Flow
+### Experience Access Flow (Founder Decision — Planned Sprint 07)
+
+Memory Code must **not** interrupt the first emotional experience.
+
+| Phase                                               | Rule                                                                                                         |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **QR scan**                                         | Recipient opens `/e/[token]`                                                                                 |
+| **Grace period (24h from first successful access)** | Any device may open without Memory Code. Each successful access registers as Trusted Device.                 |
+| **After grace expires**                             | Existing Trusted Devices → no code. New devices → Memory Code required → on success, becomes Trusted Device. |
+
+**Purpose:** Better first emotional moment; supports device changes; low friction at delivery; security after the emotional window.
+
+**Status:** Product rule locked in Sprint 05.5. Application logic and any schema extensions — **Planned Sprint 07**. No implementation in Sprint 05.5 or Sprint 06.
 
 ```mermaid
 sequenceDiagram
@@ -147,7 +161,38 @@ sequenceDiagram
     participant S as Server
     participant DB as experience_sessions
 
-    R->>S: Submit Access Code
+    R->>S: Scan QR (first ever access)
+    S->>S: Record first_opened_at, start 24h grace
+    S-->>R: Render experience (no Memory Code)
+
+    Note over R,S: Within 24h grace — new device
+    R->>S: Open from another device
+    S-->>R: Render experience + register Trusted Device
+
+    Note over R,S: After grace — trusted device
+    R->>S: Request with session cookie
+    S-->>R: Render experience (no code)
+
+    Note over R,S: After grace — new device
+    R->>S: Open from unknown device
+    S-->>R: Show Memory Code form
+    R->>S: Submit Memory Code
+    S->>S: Hash + verify
+    S->>DB: INSERT trusted session
+    S-->>R: Render experience
+```
+
+**Schema note (final):** Grace window computed dynamically from `experiences.first_opened_at + 24 hours`. **No `grace_expires_at` column** — founder decision final. Application logic in `features/access/services/` (Sprint 07). No grace-period migration.
+
+### Trusted Device Flow (Post-Grace)
+
+```mermaid
+sequenceDiagram
+    participant R as Recipient
+    participant S as Server
+    participant DB as experience_sessions
+
+    R->>S: Submit Memory Code
     S->>S: Hash + verify against memory_key_hash
     alt Valid
         S->>DB: INSERT session (hashed token, expires_at)
@@ -157,23 +202,23 @@ sequenceDiagram
         S-->>R: Error message
     end
 
-    Note over R,S: Return visit
+    Note over R,S: Return visit (trusted device)
     R->>S: Request with session cookie
     S->>DB: Lookup session_token_hash
     alt Valid + not expired + not revoked
         S-->>R: Render experience (no code needed)
     else Invalid
-        S-->>R: Show Access Code form again
+        S-->>R: Show Memory Code form (if post-grace + untrusted)
     end
 ```
 
-**Status:** Schema ready; application logic not yet implemented.
+**Status:** Schema ready for sessions and attempts; grace-period logic **Planned Sprint 07**.
 
 ---
 
 ## Rate Limiting
 
-### Access Code Attempts
+### Memory Code Attempts
 
 - Data: `access_attempts` table
 - Query index: `(experience_id, ip_hash, attempted_at)`

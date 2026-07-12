@@ -1,34 +1,35 @@
 import { requireAdminUser } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
-import { LogoutButton } from "@/features/studio/components/logout-button";
+import { DashboardActionQueue } from "@/features/studio/components/dashboard-action-queue";
+import { ACTION_QUEUE_STATUSES } from "@/features/studio/config/action-queue";
+import { OrdersRepository } from "@/features/studio/repositories/orders.repository";
+import { todayRangeIso } from "@/features/studio/utils/dates";
 
 export const metadata = {
-  title: "Studio — Celebrate Florist",
-  description: "Admin workspace",
+  title: "Dashboard — Celebrate Florist Studio",
+  description: "Studio action queue",
 };
 
-export default async function StudioHomePage() {
-  const user = await requireAdminUser();
+export default async function StudioDashboardPage() {
+  await requireAdminUser();
+
+  const supabase = await createClient();
+  const ordersRepo = new OrdersRepository(supabase);
+  const { start, end } = todayRangeIso();
+
+  const [actionOrders, todaysDeliveries] = await Promise.all([
+    ordersRepo.findMany({ status: [...ACTION_QUEUE_STATUSES] }),
+    ordersRepo.findMany({
+      scheduledOnOrAfter: start,
+      scheduledOnOrBefore: end,
+    }),
+  ]);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-6 px-4 py-10">
-      <header className="flex items-center justify-between gap-4 border-b border-border pb-4">
-        <div>
-          <p className="font-mono text-xs font-bold tracking-wide text-muted-foreground uppercase">
-            Celebrate Florist
-          </p>
-          <h1 className="font-serif text-2xl font-semibold">Studio</h1>
-        </div>
-        <LogoutButton />
-      </header>
-
-      <section className="rounded-2xl border border-border bg-card p-6">
-        <p className="text-sm text-muted-foreground">Signed in as</p>
-        <p className="mt-1 font-medium">{user.email}</p>
-        <p className="mt-4 text-sm text-muted-foreground">
-          Order and experience tools will appear here in upcoming sprints.
-        </p>
-      </section>
-    </main>
+    <DashboardActionQueue
+      actionOrders={actionOrders}
+      todaysDeliveries={todaysDeliveries}
+    />
   );
 }

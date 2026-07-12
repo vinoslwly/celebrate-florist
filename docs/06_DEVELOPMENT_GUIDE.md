@@ -268,7 +268,7 @@ npm run format         # Auto-format
 
 ### Future Work
 
-Add tests when Studio and Experience features are implemented. Priority: Access Code verification, RLS policy tests, Server Action integration tests.
+Add tests when Studio and Experience features are implemented. Priority: Memory Code grace-period verification, RLS policy tests, Server Action integration tests.
 
 ---
 
@@ -312,8 +312,10 @@ The landing page (`(public)` route group) deploys successfully. It requires only
 ```
 app/                    # Next.js App Router pages and layouts
   (public)/             # Public marketing routes
-  (studio)/             # Admin routes (future)
-  (experience)/         # Recipient routes (future)
+  (studio)/             # Admin routes (Sprint 05+)
+    studio/
+      orders/           # Order list, create, unified editor [id]
+  (experience)/         # Recipient routes (Sprint 07+)
 
 components/
   providers/            # React context providers
@@ -331,6 +333,7 @@ features/<domain>/        # Feature modules (domain-driven)
   config/               # Static config for this domain
 
 lib/                    # Shared utilities (supabase clients, utils)
+  repositories/         # Cross-domain infrastructure only (e.g. Repository base) — not business repos
 types/                  # Shared TypeScript types
 public/                 # Static assets
 scripts/                # CLI scripts (verify-supabase)

@@ -41,11 +41,11 @@ flowchart LR
 
 ### Three Surfaces
 
-| Surface        | Route prefix   | Route group    | Auth                          | Status         |
-| -------------- | -------------- | -------------- | ----------------------------- | -------------- |
-| **Public**     | `/`            | `(public)`     | None                          | ✅ Implemented |
-| **Studio**     | `/studio/*`    | `(studio)`     | Supabase Auth (single admin)  | 📁 Planned     |
-| **Experience** | `/e/[token]/*` | `(experience)` | Access Code + trusted session | 📁 Planned     |
+| Surface        | Route prefix   | Route group    | Auth                                  | Status                                           |
+| -------------- | -------------- | -------------- | ------------------------------------- | ------------------------------------------------ |
+| **Public**     | `/`            | `(public)`     | None                                  | ✅ Implemented                                   |
+| **Studio**     | `/studio/*`    | `(studio)`     | Supabase Auth (single admin)          | ✅ Partial — login, home, proxy gate (Sprint 05) |
+| **Experience** | `/e/[token]/*` | `(experience)` | Memory Code + grace + trusted session | 📋 Planned — Sprint 07+                          |
 
 ---
 
@@ -71,10 +71,12 @@ app/
 ├── (public)/          → URLs: /
 │   ├── layout.tsx
 │   └── page.tsx
-├── (studio)/          → URLs: /studio/*  [Future]
+├── (studio)/          → URLs: /studio/*
 │   └── studio/
-│       └── ...
-└── (experience)/      → URLs: /e/*       [Future]
+│       ├── login/     ✅ Sprint 05
+│       ├── orders/    📋 Sprint 06 — list, new, [id] unified editor
+│       └── (home)     📋 Sprint 06 — action-queue dashboard
+└── (experience)/      → URLs: /e/*       📋 Sprint 07+
     └── e/
         └── [token]/
             └── ...
@@ -104,35 +106,49 @@ app/
 
 ## Server Actions
 
-**Status:** Not yet implemented.
+**Status:** Infrastructure and Studio auth **implemented** (Sprint 04–05). Domain mutations (orders, experience, modes) **planned** Sprint 06+.
 
-Planned location per folder structure:
+### Layering
+
+| Layer          | Location                          | Role                                                                                             |
+| -------------- | --------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Wrappers       | `lib/actions/`                    | `withActionHandler`, `withAdminAction`, `validateActionInput`, `actionSuccess` / `actionFailure` |
+| Entry points   | `features/<domain>/actions/`      | Thin `"use server"` functions — validate input, call service, return `ActionResult`              |
+| Business rules | `features/<domain>/services/`     | Publish validation, mode routing, grace period, trusted device logic                             |
+| Data access    | `features/<domain>/repositories/` | Supabase queries only — no business rules                                                        |
+
+**Rule:** Server Actions stay **thin**. Do not put publish validation, grace-period rules, or mode routing inside actions or repositories.
+
+### Domain action locations (planned)
 
 ```
-features/studio/actions/     # Order CRUD, experience publish
-features/experience/actions/ # Experience data fetch (service_role)
-features/access/actions/     # Access Code verification, session creation
-features/analytics/actions/  # Event recording
+features/studio/actions/      # Order CRUD, experience draft, publish (admin)
+features/access/actions/    # Memory Code verification, session creation
+features/experience/actions/ # Recipient shell data fetch (service_role, post-gate)
+features/quiz/actions/      # Connection mode — admin + recipient
+features/match/actions/     # Memories mode
+features/treasures/actions/ # Treasures mode
+features/analytics/actions/ # Coarse event recording
 ```
 
-### Expected Pattern (Future)
+### Implemented pattern (Sprint 05)
 
 ```typescript
 "use server";
 
-import { serverEnv } from "@/config/env.server";
-// import admin client from lib/supabase/admin.ts
+import { validateActionInput, withActionHandler } from "@/lib/actions";
 
-export async function verifyAccessCode(experienceToken: string, code: string) {
-  // 1. Lookup experience by token (service_role)
-  // 2. Hash code with MEMORY_KEY_PEPPER
-  // 3. Compare to memory_key_hash
-  // 4. Create experience_session on success
-  // 5. Log to access_attempts and security_events
+export async function loginAction(input: unknown) {
+  return withActionHandler(async () => {
+    const data = validateActionInput(schema, input);
+    // delegate to supabase / services — return typed result
+  });
 }
 ```
 
-Server Actions will be the primary mutation path for Studio. Experience reads will also use Server Actions or Route Handlers with `service_role`.
+Admin-only mutations use `withAdminAction` (combines `requireAdminUser` + `withActionHandler`).
+
+Recipient reads and game submissions use `service_role` via `lib/supabase/admin.ts` **after** Memory Code / grace / trusted-session checks in `features/access/services/`.
 
 ---
 
@@ -140,24 +156,20 @@ Server Actions will be the primary mutation path for Studio. Experience reads wi
 
 Next.js 16 renamed `middleware.ts` to `proxy.ts`. Same runtime behavior.
 
-### Current Behavior
+### Current Behavior (Sprint 05)
 
 1. Matches only `/studio/:path*` and `/e/:path*` (opt-in, not opt-out).
 2. Creates Supabase server client with cookie read/write.
 3. Calls `supabase.auth.getUser()` to refresh session cookie.
-4. Returns `NextResponse.next()` — **no redirects, no rate limiting**.
+4. **Studio branch:** redirects unauthenticated users to `/studio/login`; rejects non-admin email; redirects authenticated admin away from login page.
+5. **`/e/*` branch:** session refresh only — Memory Code / grace logic lives in application layer (Sprint 07).
 
-### Why `(public)` Is Excluded
+### Future Extensions
 
-Marketing pages are fully static/cacheable. Matching them would add an unnecessary Supabase Auth round trip on every page view.
-
-### Future Extensions (documented in file comments)
-
-| Extension                                       | When              |
-| ----------------------------------------------- | ----------------- |
-| Redirect unauthenticated users from `/studio/*` | Sprint 04+        |
-| Rate limiting on `/e/*` Access Code attempts    | Experience sprint |
-| IP-based throttling                             | Experience sprint |
+| Extension                                    | When       |
+| -------------------------------------------- | ---------- |
+| Rate limiting on `/e/*` Memory Code attempts | Sprint 07  |
+| IP-based throttling                          | Sprint 07+ |
 
 ```mermaid
 sequenceDiagram
@@ -169,17 +181,18 @@ sequenceDiagram
     P->>P: createServerClient(cookies)
     P->>S: auth.getUser()
     S-->>P: user session (refreshed cookie)
-    P-->>B: NextResponse.next()
-    Note over P: Future: redirect if no user
+    P-->>B: NextResponse.next() or redirect
 ```
+
+### Why `(public)` Is Excluded
+
+Marketing pages are fully static/cacheable. Matching them would add an unnecessary Supabase Auth round trip on every page view.
 
 ---
 
 ## Authentication Flow
 
-**Status:** Infrastructure only — no login UI or route protection.
-
-### Planned Admin Auth (Studio)
+### Admin Auth (Studio) — ✅ Implemented (Sprint 05)
 
 ```mermaid
 sequenceDiagram
@@ -191,24 +204,24 @@ sequenceDiagram
     A->>ST: GET /studio/login
     A->>SB: signInWithPassword(email, password)
     SB-->>A: Session cookie
-    A->>P: GET /studio/dashboard
+    A->>P: GET /studio
     P->>SB: auth.getUser()
     SB-->>P: authenticated user
     P->>P: Check user.email === ADMIN_EMAIL
     alt email matches
         P-->>A: Allow request
     else email mismatch
-        P-->>A: Redirect /studio/unauthorized
+        P-->>A: Sign out + redirect /studio/login
     end
 ```
 
 ### Key Rules
 
-- **Single admin** — only one Supabase Auth user is expected; email verified against `ADMIN_EMAIL` env var.
+- **Single admin** — email verified against `ADMIN_EMAIL` (`config/env.server.ts` + Edge `proxy.ts`).
 - **No role/claims table** — authorization is "authenticated + correct email".
-- **No customer auth** — recipients authenticate via Access Code, not Supabase Auth.
+- **No customer auth** — recipients use Memory Code + trusted device, not Supabase Auth.
 
-See [04_SECURITY.md](./04_SECURITY.md) for Memory Key and trusted device flows.
+See [04_SECURITY.md](./04_SECURITY.md) for Memory Code grace period and trusted device flows.
 
 ---
 
@@ -219,8 +232,8 @@ Authorization operates at **three layers**:
 ```mermaid
 flowchart TD
     REQ["Incoming Request"]
-    PROXY["Layer 1: proxy.ts<br/>Session refresh / future redirect"]
-    APP["Layer 2: Application<br/>Access Code / ADMIN_EMAIL check"]
+    PROXY["Layer 1: proxy.ts<br/>Session refresh; Studio gate"]
+    APP["Layer 2: Application<br/>Memory Code / grace / ADMIN_EMAIL"]
     RLS["Layer 3: RLS<br/>Defense in depth for admin tables"]
 
     REQ --> PROXY
@@ -228,13 +241,13 @@ flowchart TD
     APP --> RLS
 ```
 
-| Layer           | Gift Domain (experiences, photos, etc.)           | Admin Domain (orders, studio)                              |
-| --------------- | ------------------------------------------------- | ---------------------------------------------------------- |
-| **proxy.ts**    | No auth check (future: rate limit)                | Future: require Supabase session                           |
-| **Application** | Access Code or trusted session via `service_role` | `authenticated` + `ADMIN_EMAIL` match                      |
-| **RLS**         | `anon` has **zero policies**                      | `authenticated` has full CRUD on orders, experiences, etc. |
+| Layer           | Gift Domain (experiences, photos, etc.)                          | Admin Domain (orders, studio)                              |
+| --------------- | ---------------------------------------------------------------- | ---------------------------------------------------------- |
+| **proxy.ts**    | Session refresh; future rate limit on `/e/*`                     | Requires Supabase session + `ADMIN_EMAIL` match            |
+| **Application** | Memory Code, grace period, or trusted session via `service_role` | `authenticated` + `ADMIN_EMAIL` match                      |
+| **RLS**         | `anon` has **zero policies**                                     | `authenticated` has full CRUD on orders, experiences, etc. |
 
-**Critical rule:** RLS is defense-in-depth for Gift domain, not the primary gate. Application code using `service_role` must enforce Access Code before returning content.
+**Critical rule:** RLS is defense-in-depth for Gift domain, not the primary gate. Application code using `service_role` must enforce Memory Code / grace rules before returning content.
 
 ---
 
@@ -277,7 +290,9 @@ stateDiagram-v2
     end note
 ```
 
-### Recipient Experience Access (Future)
+### Recipient Experience Access (Planned — Sprint 07)
+
+Full Memory Code grace-period flow: [04_SECURITY.md](./04_SECURITY.md).
 
 ```mermaid
 sequenceDiagram
@@ -288,19 +303,19 @@ sequenceDiagram
 
     R->>E: Open QR link
     E->>S: Lookup experience by token
-    S->>DB: SELECT (service_role, bypasses RLS)
-    alt Has valid session cookie
-        S-->>R: Render experience
-    else No session
-        S-->>R: Show Access Code form
-        R->>S: Submit Access Code
+    S->>DB: SELECT (service_role)
+    alt Within 24h grace OR trusted session
+        S-->>R: Render experience (no Memory Code)
+    else Post-grace, new device
+        S-->>R: Show Memory Code form
+        R->>S: Submit Memory Code
         S->>S: Hash + compare memory_key_hash
         alt Valid
             S->>DB: INSERT experience_session
             S-->>R: Set cookie + render experience
         else Invalid
             S->>DB: INSERT access_attempts (failed)
-            S-->>R: Error + rate limit message
+            S-->>R: Error message
         end
     end
 ```
@@ -368,54 +383,146 @@ Security is layered across HTTP headers, proxy, application gates, RLS, and data
 
 ### Environment Classification
 
-| Class  | File                   | Variables                                        | Client-safe?                  |
-| ------ | ---------------------- | ------------------------------------------------ | ----------------------------- |
-| Public | `config/env.ts`        | `NEXT_PUBLIC_*`                                  | Yes                           |
-| Server | `config/env.server.ts` | `SUPABASE_SERVICE_ROLE_KEY`, `MEMORY_KEY_PEPPER` | No                            |
-| Admin  | `.env.local` only      | `ADMIN_EMAIL`                                    | No (not yet in env.server.ts) |
+| Class  | File                   | Variables                                                       | Client-safe? |
+| ------ | ---------------------- | --------------------------------------------------------------- | ------------ |
+| Public | `config/env.ts`        | `NEXT_PUBLIC_*`                                                 | Yes          |
+| Server | `config/env.server.ts` | `SUPABASE_SERVICE_ROLE_KEY`, `MEMORY_KEY_PEPPER`, `ADMIN_EMAIL` | No           |
+
+`ADMIN_EMAIL` is required in `config/env.server.ts` (Sprint 04). `proxy.ts` reads `process.env.ADMIN_EMAIL` directly on Edge runtime.
+
+---
+
+## Code Architecture (Sprint 05.5 — Founder Decisions)
+
+> Locked in [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md) · Product context: [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)
+
+### Repository Convention — Feature-First
+
+Domain repositories live **inside their feature folder**. `lib/repositories/` holds **only** cross-domain infrastructure — not business repositories.
+
+```
+lib/repositories/
+└── base.ts              # Repository abstract base class (constructor injection)
+
+features/
+├── studio/repositories/     # OrdersRepository, ExperiencesRepository
+├── experience/repositories/ # Shell-level reads (if needed)
+├── quiz/repositories/       # Quiz questions, score bands
+├── match/repositories/      # Match pairs
+└── treasures/repositories/  # Envelopes
+```
+
+**Note:** `ThemesRepository` currently lives in `lib/repositories/` as the Sprint 04 reference implementation. New domain repos follow the feature-first rule above; `ThemesRepository` may move to `features/themes/repositories/` in a future cleanup sprint.
+
+Repositories contain **database access only** — no publish rules, no grace-period logic.
+
+### Services Layer
+
+Business rules live in `features/<domain>/services/`:
+
+| Service domain         | Examples                                             |
+| ---------------------- | ---------------------------------------------------- |
+| `studio/services/`     | Publish validation, order lifecycle checks           |
+| `access/services/`     | Grace period evaluation, trusted device registration |
+| `experience/services/` | Mode routing, shared experience orchestration        |
+| `quiz/services/`       | Quiz grading, template application                   |
+| `match/services/`      | Match validation, unlock rules                       |
+| `treasures/services/`  | Envelope sequence enforcement                        |
+
+### Experience Mode Structure — Hybrid Shell + Independent Modes
+
+`features/experience/` is the **shell / orchestrator** for recipients:
+
+- Routing entry at `/e/[token]`
+- Shared layout, letter, gallery, photobooth
+- **Mode registry** (`config/mode-registry.ts`) — maps `experience_mode` → mode module
+- Shared experience services
+
+Each interactive mode is a **separate feature** with its own Studio editor, repository, actions, services, and validation:
+
+```
+features/
+├── experience/    # Shell + registry + shared recipient UI
+├── quiz/          # Connection mode
+├── match/         # Memories mode
+└── treasures/     # Treasures mode
+```
+
+```mermaid
+flowchart TD
+    APP["app/(experience)/e/[token]"]
+    SHELL["features/experience/"]
+    REG["mode-registry"]
+    QUIZ["features/quiz/"]
+    MATCH["features/match/"]
+    TREASURES["features/treasures/"]
+
+    APP --> SHELL
+    SHELL --> REG
+    REG --> QUIZ
+    REG --> MATCH
+    REG --> TREASURES
+```
+
+### Dependency Rules
+
+| Rule                         | Detail                                   |
+| ---------------------------- | ---------------------------------------- |
+| `experience` → mode features | ✅ Via mode registry only                |
+| Mode features → `studio`     | ❌ Forbidden                             |
+| Feature → feature (direct)   | ❌ Forbidden except registry indirection |
+| Any feature → `lib/`         | ✅ Shared infrastructure                 |
+| `lib/` → `features/`         | ❌ Forbidden                             |
+
+Mode features each include a **Studio editor panel** (components under `features/quiz/components/` etc.) composed into the Unified Order Editor at `/studio/orders/[id]` — not separate Studio routes per mode.
 
 ---
 
 ## Feature Module Structure
 
-Each domain in `features/` follows a consistent layout (scaffolded, not all populated):
+Each domain in `features/` follows a consistent layout:
 
 ```
 features/<domain>/
 ├── components/     # UI components
 ├── hooks/          # React hooks
-├── actions/        # Server Actions ("use server")
-├── services/       # Business logic (pure functions)
-├── repositories/   # Database query layer
-└── config/         # Static configuration (if applicable)
+├── actions/        # Server Actions ("use server") — thin entry points
+├── services/       # Business logic
+├── repositories/   # Database query layer (feature-first)
+└── config/         # Static configuration, templates, registry
 ```
 
 **Implemented modules:**
 
-- `features/landing/` — 12 section components + 5 config files
-- `features/themes/` — 5 theme configs + `all-themes.ts` aggregator
+| Module              | Status                                                    |
+| ------------------- | --------------------------------------------------------- |
+| `features/landing/` | ✅ 12 section components + config                         |
+| `features/themes/`  | ✅ 5 theme configs + aggregator                           |
+| `features/studio/`  | ✅ Auth (login, logout, proxy gate); 📋 orders Sprint 06+ |
 
-**Scaffolded (empty):** `studio`, `experience`, `access`, `preview`, `photobooth`, `analytics`
+**Scaffolded (planned):** `experience`, `access`, `preview`, `photobooth`, `analytics`, `quiz`, `match`, `treasures`
 
 ---
 
 ## Supabase Client Architecture
 
-| Client  | File                     | Key            | RLS      | Use case                                        |
-| ------- | ------------------------ | -------------- | -------- | ----------------------------------------------- |
-| Browser | `lib/supabase/client.ts` | anon           | Yes      | Future client-side auth in Studio               |
-| Server  | `lib/supabase/server.ts` | anon + cookies | Yes      | Server Components, future admin reads           |
-| Admin   | `lib/supabase/admin.ts`  | service_role   | Bypasses | **Future** — recipient reads, privileged writes |
+| Client  | File                     | Key            | RLS      | Use case                                      |
+| ------- | ------------------------ | -------------- | -------- | --------------------------------------------- |
+| Browser | `lib/supabase/client.ts` | anon           | Yes      | Client Components (Studio login form)         |
+| Server  | `lib/supabase/server.ts` | anon + cookies | Yes      | Server Components, admin reads/writes via RLS |
+| Admin   | `lib/supabase/admin.ts`  | service_role   | Bypasses | Recipient reads post-gate; privileged writes  |
 
 ```typescript
-// lib/supabase/server.ts — pattern today
+// lib/supabase/server.ts — admin Studio operations
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { env } from "@/config/env";
-// Uses anon key; RLS applies
+// Uses anon key; RLS applies for authenticated admin
 ```
 
-The server client intentionally uses the **anon key**, not service role. Privileged operations will use a separate admin client introduced in Sprint 04+.
+The server client uses the **anon key** for Studio (admin authenticated via RLS). The **admin client** (`service_role`) is used only server-side after application-layer gates for recipient flows.
+
+**Implemented:** All three clients exist (Sprint 04). `lib/supabase/admin.ts` has `server-only` guard.
 
 ---
 
@@ -425,4 +532,8 @@ The server client intentionally uses the **anon key**, not service role. Privile
 - [03_DATABASE.md](./03_DATABASE.md) — schema, RLS, storage
 - [04_SECURITY.md](./04_SECURITY.md) — threat model, secrets, CSP
 - [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md) — locked rules
+- [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md) — Product V2 architecture context
+- [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md) — V2 impact matrix
+- [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md) — sprint plan
+- [12_STUDIO_UX.md](./12_STUDIO_UX.md) — Studio admin UX
 - [07_AI_GUIDE.md](./07_AI_GUIDE.md) — coding rules for AI

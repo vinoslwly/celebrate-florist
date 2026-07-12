@@ -5,6 +5,9 @@
  * @see docs/03_DATABASE.md
  */
 
+export type ExperienceMode =
+  "moments" | "connection" | "memories" | "treasures";
+
 export type OrderStatus =
   | "draft"
   | "designing"
@@ -62,6 +65,7 @@ export type OrderRow = {
   status: OrderStatus;
   scheduled_delivery_at: string | null;
   delivered_at: string | null;
+  experience_mode: ExperienceMode;
   created_at: string;
   updated_at: string;
 };
@@ -74,6 +78,8 @@ export type ExperienceRow = {
   greeting_name: string;
   closing_name: string;
   event_type: EventType;
+  experience_mode: ExperienceMode;
+  quiz_title: string | null;
   letter_content: string;
   letter_closing: string;
   memory_key_hash: string;

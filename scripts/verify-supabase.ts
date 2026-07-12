@@ -7,16 +7,11 @@
  */
 import { createClient } from "@supabase/supabase-js";
 
-async function main() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { env } from "@/config/env";
 
-  if (!url || !anonKey) {
-    console.error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local",
-    );
-    process.exit(1);
-  }
+async function main() {
+  const url = env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   const client = createClient(url, anonKey);
 

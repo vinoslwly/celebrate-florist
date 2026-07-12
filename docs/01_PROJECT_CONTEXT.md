@@ -32,7 +32,7 @@ Celebrate Florist turns a flower delivery into a **lasting memory**. The physica
 Design principles (from implementation):
 
 - **Warm, personal, not corporate** — typography and copy reflect a friendly florist, not a tech startup.
-- **Privacy by default** — recipients need an Access Code on new devices; content is never publicly browsable.
+- **Privacy by default** — Memory Code after 24-hour grace period; content never publicly browsable.
 - **Simplicity over features** — every feature must earn its complexity.
 - **Offline-first commerce** — no payment gateway; human relationship via WhatsApp.
 
@@ -62,7 +62,7 @@ These are non-negotiable without explicit founder approval:
 - No customer accounts
 - One Order → One Experience (1:1 enforced in database)
 - Preview Link ≠ Experience Link (separate tokens and workflows)
-- Access Code required on new devices (hashed, never stored plaintext)
+- Memory Code + 24-hour grace period + trusted devices (hashed, never stored plaintext) — **Planned Sprint 07**
 - Maximum 6 memory photos per experience
 - Photobooth photos **never** stored in Supabase
 - Gifts archived after 365 days of inactivity
@@ -129,7 +129,7 @@ flowchart TB
 
     subgraph Experience["Recipient Surface (Future)"]
         EXP["Greeting Experience<br/>/e/[token]"]
-        AC["Access Code Gate"]
+        AC["Memory Code / Grace / Trusted Device"]
         TD["Trusted Device Cookie"]
     end
 
@@ -160,7 +160,7 @@ flowchart TB
     PROXY --> SBAUTH
 ```
 
-**Key architectural rule:** Recipients never read Gift domain data via the `anon` key. The server uses `service_role` after verifying Access Code or trusted session. See [02_ARCHITECTURE.md](./02_ARCHITECTURE.md) and [04_SECURITY.md](./04_SECURITY.md).
+**Key architectural rule:** Recipients never read Gift domain data via the `anon` key. The server uses `service_role` after verifying Memory Code, grace-period rules, or trusted session. See [02_ARCHITECTURE.md](./02_ARCHITECTURE.md) and [04_SECURITY.md](./04_SECURITY.md).
 
 ---
 
@@ -274,7 +274,7 @@ Derived from codebase conventions and sprint comments:
 Items referenced in design docs or folder structure but **not yet implemented**:
 
 - Studio dashboard and admin auth gate (Sprint 04+)
-- Experience delivery pages and Access Code flow
+- Experience delivery pages and Memory Code grace-period flow (**Planned Sprint 07**)
 - `lib/supabase/admin.ts` service role client
 - `lib/crypto/`, `lib/tokens/`, `lib/validation/` modules (folders may exist empty)
 - `IP_HASH_PEPPER` environment variable (referenced in security design; not in `.env.example` yet)

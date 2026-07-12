@@ -1,7 +1,7 @@
 # 07 — AI Guide
 
 > **This is the most important document for AI coding assistants.**  
-> **Related:** [Index](./00_INDEX.md) · [Project Context](./01_PROJECT_CONTEXT.md) · [Architecture](./02_ARCHITECTURE.md) · [Database](./03_DATABASE.md) · [Security](./04_SECURITY.md) · [Founder Decisions](./05_FOUNDER_DECISIONS.md) · [Development Guide](./06_DEVELOPMENT_GUIDE.md)
+> **Related:** [Index](./00_INDEX.md) · [Project Context](./01_PROJECT_CONTEXT.md) · [Architecture](./02_ARCHITECTURE.md) · [Database](./03_DATABASE.md) · [Security](./04_SECURITY.md) · [Founder Decisions](./05_FOUNDER_DECISIONS.md) · [Development Guide](./06_DEVELOPMENT_GUIDE.md) · [Studio UX](./12_STUDIO_UX.md)
 
 ---
 
@@ -9,9 +9,12 @@
 
 1. Read [00_INDEX.md](./00_INDEX.md) — current sprint status and what exists today.
 2. Read [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md) — locked constraints.
-3. Read the relevant domain doc ([02_ARCHITECTURE.md](./02_ARCHITECTURE.md), [03_DATABASE.md](./03_DATABASE.md), or [04_SECURITY.md](./04_SECURITY.md)).
-4. Inspect the actual codebase — docs may lag implementation; code is the final authority.
-5. If unsure, **ask the founder** — do not guess on architecture or business rules.
+3. For **Sprint 06 Studio work**, read [12_STUDIO_UX.md](./12_STUDIO_UX.md) and [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md#sprint-06-implementation-checklist).
+4. Read the relevant domain doc ([02_ARCHITECTURE.md](./02_ARCHITECTURE.md), [03_DATABASE.md](./03_DATABASE.md), or [04_SECURITY.md](./04_SECURITY.md)).
+5. Inspect the actual codebase — docs may lag implementation; code is the final authority.
+6. If unsure, **ask the founder** — do not guess on architecture or business rules.
+
+**Sprint 05.5 is closed.** Docs 07–12 are the official implementation baseline. Feature dependency rules in [02_ARCHITECTURE.md](./02_ARCHITECTURE.md) supersede older cross-import wording in this guide.
 
 ---
 
@@ -87,7 +90,7 @@ features/<domain>/
 ```
 
 - Put code in the domain it belongs to.
-- Don't create cross-feature imports unless through `lib/` or `components/shared/`.
+- Feature dependency rules: see [02_ARCHITECTURE.md](./02_ARCHITECTURE.md) § Dependency Rules (`experience` → modes via registry; modes ↛ `studio`; no direct sibling imports).
 - Empty scaffolded folders are intentional — populate them in the correct sprint.
 
 ### Environment Variables

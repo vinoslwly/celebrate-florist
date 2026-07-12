@@ -15,6 +15,14 @@ export {
   type PaginationInput,
 } from "@/schemas/common";
 export {
-  studioLoginSchema,
-  type StudioLoginInput,
-} from "@/schemas/studio-auth";
+  changeExperienceModeSchema,
+  createOrderSchema,
+  updateExperienceDraftSchema,
+  type ChangeExperienceModeInput,
+  type CreateOrderInput,
+  type UpdateExperienceDraftInput,
+} from "@/schemas/studio-orders";
+export {
+  experienceModeSchema,
+  type ExperienceModeInput,
+} from "@/schemas/experience-mode";

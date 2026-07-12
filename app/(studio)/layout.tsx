@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
+import { StudioLayoutWrapper } from "@/features/studio/components/studio-layout-wrapper";
+
 export default function StudioLayout({ children }: { children: ReactNode }) {
-  return (
-    <div className="min-h-screen bg-background text-foreground">{children}</div>
-  );
+  return <StudioLayoutWrapper>{children}</StudioLayoutWrapper>;
 }
