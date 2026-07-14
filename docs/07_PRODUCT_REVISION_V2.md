@@ -50,6 +50,32 @@ Celebrate will compete on **curated interactivity**, not static content hosting:
 
 The greeting letter, photo gallery, and photobooth **remain**. They become the foundation of **Moments Experience** (entry tier), not the entire product.
 
+### Interactive Reward Philosophy (Sprint 08R — Locked)
+
+Premium modes deliver emotional content **through interaction**, not immediately on open:
+
+> **Game First → Reward → Letter → Gallery → Photobooth**
+
+Recipients **earn** the letter and gallery by participating (quiz, match game, or envelope sequence). This is Celebrate's differentiation from static greeting tools.
+
+| Mode           | Interactive gate              | Reward timing                                                       |
+| -------------- | ----------------------------- | ------------------------------------------------------------------- |
+| **Moments**    | None                          | Letter immediate on OPEN                                            |
+| **Connection** | Quiz submit                   | Letter + gallery after any successful submit (CF-1)                 |
+| **Memories**   | Match game (cinematic reveal) | Unlock message → letter → gallery — **always after submit** (FD-M5) |
+| **Treasures**  | Envelope sequence             | Letter after final envelope                                         |
+
+Full journey diagrams: [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) (SSOT). Founder decisions CF-1–CF-5: [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md).
+
+### Replayable Experience (CF-R1 + CF-R2 — Locked)
+
+| Principle | Rule                                                                                               |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| **CF-R1** | Digital Experience Gift — replayable lifetime; journey progress preserved until Photobooth trigger |
+| **CF-R2** | CF-R2-A/B/C — Photobooth trigger, no visit inference, reload after trigger replays ✉️              |
+
+SSOT: [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md) · Sprint 10: [15](./15_SPRINT_10_CF-R2_REPLAY_RESET.md). **CF-R2 shipped for Treasures.**
+
 ---
 
 ## New Positioning
@@ -192,7 +218,7 @@ Example — **New Connection**:
 - Template Birthday
 - Template Proposal
 
-Pre-fills quiz questions and copy; admin edits before publish. Connection templates in Sprint 08; Memories/Treasures in Sprint 09A/09B.
+Pre-fills quiz questions and copy; admin edits before publish. Connection templates **Already Implemented** (Sprint 08). Memories/Treasures templates are **Future Idea** — out of Sprint 09 scope (founder kickoff A-5).
 
 ---
 
@@ -222,7 +248,7 @@ See [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md) for per-area classi
 - Recipient UI — mode-specific interactive sections after shared greeting core
 - Database — normalized tables + limited JSONB ([10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md); Database Design Review closed)
 - Publish validation matrix — documented in [03_DATABASE.md](./03_DATABASE.md#planned-v2-schema-sprint-06)
-- Analytics — coarse business events only (opened, completed, mode); `experience_completed` optional Sprint 07
+- Analytics — coarse business events only (`experience_opened`, mode via JOIN); **no** `experience_completed` (OD-1 locked)
 - Implementation sprint sequence — [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md) supersedes the pre-revision Sprint 06 scope
 
 ### What Does Not Change (Founder Decisions)
@@ -246,7 +272,7 @@ These remain locked unless founder explicitly amends [05_FOUNDER_DECISIONS.md](.
 | `03_DATABASE.md`          | **Valid until migration 016+** — V1 schema live; Planned V2 section + publish validation matrix added.                                                  |
 | `04_SECURITY.md`          | **Valid** — security model unchanged; grace period uses `first_opened_at + 24h` (no new column).                                                        |
 | `05_FOUNDER_DECISIONS.md` | **Valid** — includes Architecture, Database, and Studio Design Review decisions.                                                                        |
-| `06_DEVELOPMENT_GUIDE.md` | **Valid** — workflow unchanged.                                                                                                                         |
+| `06_DEVELOPMENT_GUIDE.md` | **Valid** — includes Sprint 08R and 09A verification tables.                                                                                            |
 | `12_STUDIO_UX.md`         | **Authoritative** — Studio IA, workflow, unified editor (Sprint 06+).                                                                                   |
 | `07_AI_GUIDE.md`          | **Valid** — read with Product Revision package before Sprint 06 (via index).                                                                            |
 
@@ -278,4 +304,5 @@ These remain locked unless founder explicitly amends [05_FOUNDER_DECISIONS.md](.
 - [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md) — schema recommendations (no SQL)
 - [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md) — sprint breakdown
 - [12_STUDIO_UX.md](./12_STUDIO_UX.md) — Studio admin UX
+- [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) — Experience Journey SSOT (includes FD-M1–FD-M5)
 - [00_INDEX.md](./00_INDEX.md) — documentation entry point

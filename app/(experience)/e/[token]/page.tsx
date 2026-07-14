@@ -8,13 +8,17 @@ import {
 } from "@/features/access/services/access-gate.service";
 import { recordAnalyticsEvent } from "@/features/analytics/services/record-analytics.service";
 import { MemoryCodeGate } from "@/features/experience/components/memory-code-gate";
+import { RecipientModeUnavailable } from "@/features/experience/components/recipient-mode-unavailable";
 import {
   isLiveRecipientMode,
   RecipientExperienceView,
 } from "@/features/experience/config/mode-registry";
+import { fetchConnectionGatePayload } from "@/features/experience/services/fetch-connection-gate-payload.service";
+import { fetchMemoriesGatePayload } from "@/features/experience/services/fetch-memories-gate-payload.service";
 import { fetchPublishedExperience } from "@/features/experience/services/fetch-published-experience.service";
+import { fetchTreasuresGatePayload } from "@/features/experience/services/fetch-treasures-gate-payload.service";
 import { recordFirstOpened } from "@/features/experience/services/record-first-open.service";
-import { fetchRecipientQuiz } from "@/features/quiz/services/fetch-recipient-quiz.service";
+import { fetchTreasuresReward } from "@/features/treasures/services/fetch-treasures-reward.service";
 
 export const metadata = {
   title: "Your gift — Celebrate Florist",
@@ -52,30 +56,59 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
     eventType: "experience_opened",
   });
 
-  const payload = await fetchPublishedExperience(gate.experience.id);
   const mode = gate.experience.experience_mode;
 
-  const quiz =
-    mode === "connection"
-      ? await fetchRecipientQuiz(gate.experience.id)
-      : undefined;
+  if (mode === "connection" && isLiveRecipientMode(mode)) {
+    const connectionGate = await fetchConnectionGatePayload(gate.experience.id);
 
-  if (!isLiveRecipientMode(mode)) {
     return (
       <RecipientExperienceView
-        mode={mode}
-        payload={payload}
+        mode="connection"
+        connectionGate={connectionGate}
         experienceToken={token}
       />
     );
   }
 
+  if (mode === "memories" && isLiveRecipientMode(mode)) {
+    const memoriesGate = await fetchMemoriesGatePayload(gate.experience.id);
+
+    return (
+      <RecipientExperienceView
+        mode="memories"
+        memoriesGate={memoriesGate}
+        experienceToken={token}
+      />
+    );
+  }
+
+  if (mode === "treasures" && isLiveRecipientMode(mode)) {
+    const treasuresGate = await fetchTreasuresGatePayload(gate.experience.id);
+    const initialReward = treasuresGate.envelopes.rewardEligible
+      ? await fetchTreasuresReward(admin, token, context)
+      : null;
+
+    return (
+      <RecipientExperienceView
+        mode="treasures"
+        treasuresGate={treasuresGate}
+        experienceToken={token}
+        initialReward={initialReward}
+      />
+    );
+  }
+
+  if (!isLiveRecipientMode(mode)) {
+    return <RecipientModeUnavailable mode={mode} />;
+  }
+
+  const payload = await fetchPublishedExperience(gate.experience.id);
+
   return (
     <RecipientExperienceView
-      mode={mode}
+      mode="moments"
       payload={payload}
       experienceToken={token}
-      quiz={quiz}
     />
   );
 }

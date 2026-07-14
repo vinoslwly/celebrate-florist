@@ -4,28 +4,38 @@ import { ValidationError } from "@/lib/errors";
 
 import type { ExperienceMode, ExperienceRow, OrderRow } from "@/types/database";
 
+import { ExperienceMatchRepository } from "@/features/match/repositories/experience-match.repository";
+import { evaluateExperienceMatch } from "@/features/match/services/validate-match-config.service";
+import type { MatchStudioConfig } from "@/features/match/types";
 import { ExperienceQuizRepository } from "@/features/quiz/repositories/experience-quiz.repository";
 import { evaluateExperienceQuiz } from "@/features/quiz/services/validate-quiz-config.service";
 import type { ExperienceQuiz } from "@/features/quiz/types";
 import { getExperienceModeConfig } from "@/features/studio/config/experience-modes";
 import { isMemoryKeyHashVerifiable } from "@/features/studio/config/memory-code-sentinel";
-import {
-  MEMORIES_TREASURES_PUBLISH_BLOCKED_MESSAGE,
-  type PublishChecklistItem,
-} from "@/features/studio/config/publish-checklist";
+import type { PublishChecklistItem } from "@/features/studio/config/publish-checklist";
+import { ExperiencePhotosRepository } from "@/features/studio/repositories/experience-photos.repository";
+import { ExperienceEnvelopesRepository } from "@/features/treasures/repositories/experience-envelopes.repository";
+import { evaluateExperienceEnvelopes } from "@/features/treasures/services/validate-envelope-config.service";
+import type { EnvelopeStudioConfig } from "@/features/treasures/types";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type { PublishChecklistItem } from "@/features/studio/config/publish-checklist";
 
-const BLOCKED_PREMIUM_MESSAGE = MEMORIES_TREASURES_PUBLISH_BLOCKED_MESSAGE;
+export type PublishChecklistContext = {
+  quiz?: ExperienceQuiz;
+  match?: MatchStudioConfig;
+  envelopes?: EnvelopeStudioConfig;
+  uploadedPhotoSortOrders?: number[];
+};
 
 function isPublishableMode(mode: ExperienceMode): boolean {
-  return mode === "moments" || mode === "connection";
-}
-
-function isBlockedPremiumMode(mode: ExperienceMode): boolean {
-  return mode === "memories" || mode === "treasures";
+  return (
+    mode === "moments" ||
+    mode === "connection" ||
+    mode === "memories" ||
+    mode === "treasures"
+  );
 }
 
 function assertSharedPublishRequirements(
@@ -95,11 +105,82 @@ function appendConnectionQuizChecklistItems(
   });
 }
 
+function appendMemoriesMatchChecklistItems(
+  items: PublishChecklistItem[],
+  match: MatchStudioConfig,
+  uploadedPhotoSortOrders: number[],
+): void {
+  items.push({
+    id: "match_pairs",
+    label: "Match pairs saved",
+    status: match.pairs.length >= 2 ? "pass" : "fail",
+    message:
+      match.pairs.length >= 2
+        ? undefined
+        : "Save at least 2 match pairs before publishing.",
+  });
+
+  items.push({
+    id: "match_unlock_message",
+    label: "Final unlock message saved",
+    status: match.finalUnlockMessage?.trim() ? "pass" : "fail",
+    message: match.finalUnlockMessage?.trim()
+      ? undefined
+      : "Save a final unlock message before publishing.",
+  });
+
+  const validation = evaluateExperienceMatch(
+    { pairs: match.pairs },
+    match.finalUnlockMessage,
+    uploadedPhotoSortOrders,
+  );
+
+  items.push({
+    id: "match_validation",
+    label: "Match configuration valid",
+    status: validation.ok ? "pass" : "fail",
+    message: validation.ok ? undefined : validation.message,
+  });
+}
+
+function appendTreasuresEnvelopeChecklistItems(
+  items: PublishChecklistItem[],
+  envelopes: EnvelopeStudioConfig,
+  uploadedPhotoSortOrders: number[],
+): void {
+  items.push({
+    id: "envelope_count",
+    label: "Envelopes saved",
+    status: envelopes.envelopes.length >= 2 ? "pass" : "fail",
+    message:
+      envelopes.envelopes.length >= 2
+        ? undefined
+        : "Save at least 2 envelopes before publishing.",
+  });
+
+  const validation = evaluateExperienceEnvelopes(
+    { envelopes: envelopes.envelopes },
+    uploadedPhotoSortOrders,
+  );
+
+  items.push({
+    id: "envelope_validation",
+    label: "Envelope configuration valid",
+    status: validation.ok ? "pass" : "fail",
+    message: validation.ok ? undefined : validation.message,
+  });
+}
+
 export function buildPublishChecklist(
   order: OrderRow,
   experience: ExperienceRow,
-  quiz: ExperienceQuiz = { questions: [], bands: [] },
+  context: PublishChecklistContext = {},
 ): PublishChecklistItem[] {
+  const quiz = context.quiz ?? { questions: [], bands: [] };
+  const match = context.match ?? { pairs: [], finalUnlockMessage: null };
+  const envelopes = context.envelopes ?? { envelopes: [] };
+  const uploadedPhotoSortOrders = context.uploadedPhotoSortOrders ?? [];
+
   const items: PublishChecklistItem[] = [];
   const modeConfig = getExperienceModeConfig(experience.experience_mode);
 
@@ -109,12 +190,12 @@ export function buildPublishChecklist(
       label: `${modeConfig.label} mode publish`,
       status: "pass",
     });
-  } else if (isBlockedPremiumMode(experience.experience_mode)) {
+  } else {
     items.push({
       id: "mode",
       label: `${modeConfig.label} mode publish`,
-      status: "blocked",
-      message: BLOCKED_PREMIUM_MESSAGE,
+      status: "fail",
+      message: "This experience mode cannot be published.",
     });
   }
 
@@ -172,6 +253,18 @@ export function buildPublishChecklist(
     appendConnectionQuizChecklistItems(items, quiz);
   }
 
+  if (experience.experience_mode === "memories") {
+    appendMemoriesMatchChecklistItems(items, match, uploadedPhotoSortOrders);
+  }
+
+  if (experience.experience_mode === "treasures") {
+    appendTreasuresEnvelopeChecklistItems(
+      items,
+      envelopes,
+      uploadedPhotoSortOrders,
+    );
+  }
+
   return items;
 }
 
@@ -180,13 +273,44 @@ export async function buildPublishChecklistForExperience(
   order: OrderRow,
   experience: ExperienceRow,
 ): Promise<PublishChecklistItem[]> {
-  if (experience.experience_mode !== "connection") {
-    return buildPublishChecklist(order, experience);
+  if (experience.experience_mode === "connection") {
+    const quizRepo = new ExperienceQuizRepository(client);
+    const quiz = await quizRepo.findCompleteByExperienceId(experience.id);
+    return buildPublishChecklist(order, experience, { quiz });
   }
 
-  const quizRepo = new ExperienceQuizRepository(client);
-  const quiz = await quizRepo.findCompleteByExperienceId(experience.id);
-  return buildPublishChecklist(order, experience, quiz);
+  if (experience.experience_mode === "memories") {
+    const matchRepo = new ExperienceMatchRepository(client);
+    const photosRepo = new ExperiencePhotosRepository(client);
+    const [matchData, photos] = await Promise.all([
+      matchRepo.findCompleteByExperienceId(experience.id),
+      photosRepo.findByExperienceId(experience.id),
+    ]);
+
+    return buildPublishChecklist(order, experience, {
+      match: {
+        pairs: matchData.pairs,
+        finalUnlockMessage: experience.final_unlock_message,
+      },
+      uploadedPhotoSortOrders: photos.map((photo) => photo.sort_order),
+    });
+  }
+
+  if (experience.experience_mode === "treasures") {
+    const envelopesRepo = new ExperienceEnvelopesRepository(client);
+    const photosRepo = new ExperiencePhotosRepository(client);
+    const [envelopes, photos] = await Promise.all([
+      envelopesRepo.findEnvelopesByExperienceId(experience.id),
+      photosRepo.findByExperienceId(experience.id),
+    ]);
+
+    return buildPublishChecklist(order, experience, {
+      envelopes: { envelopes },
+      uploadedPhotoSortOrders: photos.map((photo) => photo.sort_order),
+    });
+  }
+
+  return buildPublishChecklist(order, experience);
 }
 
 export function canPublishFromChecklist(
@@ -201,10 +325,6 @@ export async function assertPublishAllowed(
   experience: ExperienceRow,
   options: { skipPreview?: boolean; quiz?: ExperienceQuiz } = {},
 ): Promise<void> {
-  if (isBlockedPremiumMode(experience.experience_mode)) {
-    throw new ValidationError(BLOCKED_PREMIUM_MESSAGE);
-  }
-
   if (!isPublishableMode(experience.experience_mode)) {
     throw new ValidationError("This experience mode cannot be published.");
   }
@@ -219,6 +339,43 @@ export async function assertPublishAllowed(
       ));
 
     const validation = evaluateExperienceQuiz(quiz);
+    if (!validation.ok) {
+      throw new ValidationError(validation.message);
+    }
+  }
+
+  if (experience.experience_mode === "memories") {
+    const matchRepo = new ExperienceMatchRepository(client);
+    const photosRepo = new ExperiencePhotosRepository(client);
+    const [matchData, photos] = await Promise.all([
+      matchRepo.findCompleteByExperienceId(experience.id),
+      photosRepo.findByExperienceId(experience.id),
+    ]);
+
+    const validation = evaluateExperienceMatch(
+      matchData,
+      experience.final_unlock_message,
+      photos.map((photo) => photo.sort_order),
+    );
+
+    if (!validation.ok) {
+      throw new ValidationError(validation.message);
+    }
+  }
+
+  if (experience.experience_mode === "treasures") {
+    const envelopesRepo = new ExperienceEnvelopesRepository(client);
+    const photosRepo = new ExperiencePhotosRepository(client);
+    const [envelopes, photos] = await Promise.all([
+      envelopesRepo.findEnvelopesByExperienceId(experience.id),
+      photosRepo.findByExperienceId(experience.id),
+    ]);
+
+    const validation = evaluateExperienceEnvelopes(
+      { envelopes },
+      photos.map((photo) => photo.sort_order),
+    );
+
     if (!validation.ok) {
       throw new ValidationError(validation.message);
     }

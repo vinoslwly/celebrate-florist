@@ -358,7 +358,7 @@ Enforced in application layer; optional DB CHECK via trigger (Future Idea).
 
 **Already Implemented:** `experience_analytics.event_type` enum with letter/gallery/photobooth events.
 
-**Founder decision (final):** `experience_completed` may be added in Sprint 07 **if needed**. No per-question, per-photo, or per-envelope analytics in V2.
+**Founder decision (final):** OD-1 locked — **no** `experience_completed` analytics event, **no** migration for analytics enum expansion. Continue `experience_opened` only; segment by `experiences.experience_mode` JOIN.
 
 **No** `metadata JSONB` required for V2 unless completion signal needs auxiliary data (Future Idea).
 
@@ -416,13 +416,15 @@ Recipient-submitted data (quiz answers, match attempts):
 | Analytics micro-events                  | **No** — coarse business events only                                                                                  |
 | Migration number                        | **016+**                                                                                                              |
 
-**Migration sequencing (Planned):**
+**Migration sequencing (Planned — use timestamp filenames, D-1):**
 
-1. `016` — `experience_mode` on `experiences` + `orders`; nullable `quiz_title` on `experiences`; TEXT + CHECK; index on `experience_mode`
-2. `017` — quiz tables + RLS
-3. `018` — match pairs table + `final_unlock_message` + RLS
-4. `019` — envelopes table + RLS
-5. `020` — `experience_completed` analytics event (if needed) — **not** micro-event expansion
+1. `20260712160000_experience_mode.sql` — implemented
+2. `20260712200000_experience_quiz.sql` — implemented
+3. `20260713020000_experience_quiz_service_role_grants.sql` — implemented (hotfix)
+4. `20260713160000_experience_match_pairs.sql` — Sprint 09A
+5. `*_experience_envelopes.sql` — Sprint 09B (timestamp TBD at implementation)
+
+**Withdrawn:** logical migration `020` for `experience_completed` — superseded by OD-1 (Sprint 08). Do **not** add `experience_completed` to analytics enum.
 
 Each migration independently deployable and documented in `03_DATABASE.md` when implemented.
 

@@ -15,6 +15,7 @@ type PhotosUploadPanelProps = {
   experienceId: string;
   initialPhotos: ExperiencePhotoRow[];
   disabled?: boolean;
+  onPhotosChange?: (photos: ExperiencePhotoRow[]) => void;
 };
 
 const SLOTS = [1, 2, 3, 4, 5, 6] as const;
@@ -24,8 +25,9 @@ export function PhotosUploadPanel({
   experienceId,
   initialPhotos,
   disabled = false,
+  onPhotosChange,
 }: PhotosUploadPanelProps) {
-  const [photos, setPhotos] = useState(initialPhotos);
+  const [photos, setPhotos] = useState(initialPhotos ?? []);
   const [busySlot, setBusySlot] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRefs = useRef<Record<number, HTMLInputElement | null>>({});
@@ -52,12 +54,15 @@ export function PhotosUploadPanel({
       return;
     }
 
+    let next: ExperiencePhotoRow[] = [];
     setPhotos((current) => {
       const withoutSlot = current.filter((p) => p.sort_order !== slot);
-      return [...withoutSlot, result.data.photo].sort(
+      next = [...withoutSlot, result.data.photo].sort(
         (a, b) => a.sort_order - b.sort_order,
       );
+      return next;
     });
+    onPhotosChange?.(next);
   }
 
   async function handleDelete(photo: ExperiencePhotoRow) {
@@ -77,7 +82,12 @@ export function PhotosUploadPanel({
       return;
     }
 
-    setPhotos((current) => current.filter((p) => p.id !== photo.id));
+    let next: ExperiencePhotoRow[] = [];
+    setPhotos((current) => {
+      next = current.filter((p) => p.id !== photo.id);
+      return next;
+    });
+    onPhotosChange?.(next);
   }
 
   return (

@@ -339,18 +339,216 @@ Do not fabricate multi-device grace evidence. Schedule the above as a **post-dep
 
 **Code-verified:**
 
-| Check                                                      | Evidence                                                                 |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Buyer preview loads quiz for `connection` mode only        | `fetch-buyer-preview.service.ts`                                         |
-| Preview DTO excludes `correct_option_index`                | `fetch-preview-quiz.service.ts` → `PreviewQuizView`                      |
-| Recipient DTO excludes `correct_option_index`              | `fetch-recipient-quiz.service.ts` → `RecipientQuizView`                  |
-| Grading is server-side only; answers not persisted         | `submit-quiz-answers.service.ts`, `grade-quiz-answers.service.ts` (OD-5) |
-| Connection publish requires 1–6 questions + ≥ 1 score band | `publish-validation.service.ts`                                          |
-| Mode change deletes quiz rows when leaving Connection      | `change-experience-mode.service.ts`                                      |
-| Analytics uses `experience_opened` only (OD-1)             | `app/(experience)/e/[token]/page.tsx`; no migration 020 in repo          |
-| Memories/Treasures publish still blocked                   | `publish-validation.service.ts`                                          |
+| Check                                                      | Evidence                                                                                  |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Buyer preview loads quiz for `connection` mode only        | `fetch-buyer-preview.service.ts`                                                          |
+| Preview DTO excludes `correct_option_index`                | `fetch-preview-quiz.service.ts` → `PreviewQuizView`                                       |
+| Recipient DTO excludes `correct_option_index`              | `fetch-recipient-quiz.service.ts` → `RecipientQuizView`                                   |
+| Grading is server-side only; answers not persisted         | `submit-quiz-answers.service.ts`, `grade-quiz-answers.service.ts` (OD-5)                  |
+| Connection publish requires 1–6 questions + ≥ 1 score band | `publish-validation.service.ts`                                                           |
+| Mode change deletes quiz rows when leaving Connection      | `change-experience-mode.service.ts`                                                       |
+| Analytics uses `experience_opened` only (OD-1)             | `app/(experience)/e/[token]/page.tsx`; no migration 020 in repo                           |
+| Memories publish blocked; Treasures publish blocked        | `publish-validation.service.ts` — **Memories unblocked Phase 5**; Treasures still blocked |
 
-**NOT verified locally (manual E2E required):**
+### Sprint 08R — Connection Journey Verification
+
+> **SSOT:** [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) · **Founder decisions:** CF-1–CF-5 in [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md)
+
+#### Architecture verification
+
+| Check                                               | Evidence                                                                       |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Connection uses `fetchConnectionGatePayload()` only | `app/(experience)/e/[token]/page.tsx` — Connection branch (line ~58)           |
+| Moments uses `fetchPublishedExperience()` only      | Same file — Moments branch (line ~69)                                          |
+| `ConnectionExperienceFlow` is client orchestrator   | `features/experience/components/connection-experience-flow.tsx`                |
+| `QuizPlayer` is quiz-only (reusable)                | `features/quiz/components/quiz-player.tsx` — no letter/gallery/session unlock  |
+| Mode registry discriminated union                   | `features/experience/config/mode-registry.tsx` — `connectionGate` vs `payload` |
+
+#### Security verification
+
+| Check                                            | Evidence                                                                       |
+| ------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Gate projection strips letter fields             | `toConnectionGateExperience()` in `fetch-connection-gate-payload.service.ts`   |
+| Reward built only post-submit                    | `buildConnectionRewardPayload()` in `submit-quiz-answers.service.ts`           |
+| `correct_option_index` absent from recipient DTO | `RecipientQuizQuestion` type; `fetch-recipient-quiz.service.ts`                |
+| Letter/gallery not rendered pre-unlock (SSR)     | `connection-unlock-session.ts` returns `null` on server → `isUnlocked = false` |
+| Gallery signed URLs not in initial payload       | `ConnectionGatePayload` type excludes photos                                   |
+
+#### Regression verification
+
+| Area                                      | Status       | Notes                                                    |
+| ----------------------------------------- | ------------ | -------------------------------------------------------- |
+| Moments recipient flow                    | ✅ Unchanged | Still `fetchPublishedExperience()` + `MomentsExperience` |
+| Memories/Treasures stubs                  | ✅ Unchanged | Non-live path unchanged                                  |
+| Studio / Quiz Builder                     | ✅ Unchanged | No 08R changes                                           |
+| Publish flow                              | ✅ Unchanged | Connection publish validation intact                     |
+| Access gate / Memory Code / grace / trust | ✅ Unchanged | Gate logic in `page.tsx` preserved                       |
+| Analytics                                 | ✅ Unchanged | `experience_opened` on granted access                    |
+| Theme                                     | ✅ Unchanged | Resolved via gate or published payload                   |
+| Photobooth                                | ✅ Unchanged | Post-unlock (Connection) or immediate (Moments)          |
+| Buyer preview backend                     | ✅ Unchanged | `fetchBuyerPreview` / `fetchPreviewQuiz` preserved       |
+
+#### Acceptance criteria (Sprint 08R)
+
+| #   | Criterion                                                                      | Status |
+| --- | ------------------------------------------------------------------------------ | ------ |
+| 1   | Connection journey: Quiz → Submit → Score+Band → Letter → Gallery → Photobooth | ✅     |
+| 2   | Buyer preview: Quiz → Letter → Gallery → Approve (no gating)                   | ✅     |
+| 3   | Gate Payload on initial load; Reward Payload after submit only                 | ✅     |
+| 4   | Connection live path does not call `fetchPublishedExperience()`                | ✅     |
+| 5   | Moments live path still calls `fetchPublishedExperience()`                     | ✅     |
+| 6   | CF-1: score never blocks letter/gallery unlock                                 | ✅     |
+| 7   | CF-2: sessionStorage unlock only; no DB migration                              | ✅     |
+| 8   | `npm run typecheck` + `npm run lint` + `npm run build` pass                    | ✅     |
+
+#### Manual browser checklist
+
+| Check                                                      | Status                                 |
+| ---------------------------------------------------------- | -------------------------------------- |
+| Connection: first visit shows quiz only (no letter in DOM) | Recommended before first live delivery |
+| Connection: submit reveals score, band, letter, gallery    | Recommended                            |
+| Connection: refresh same tab preserves unlock              | Recommended                            |
+| Connection: new tab requires quiz replay                   | Expected (CF-2)                        |
+| Buyer preview Connection: quiz section before letter       | Recommended                            |
+| Moments: letter visible on first granted open              | Recommended                            |
+| Memory Code / grace regression with Connection order       | Recommended                            |
+
+#### Network verification checklist
+
+| Request                                   | Expected payload                                         | Verified       |
+| ----------------------------------------- | -------------------------------------------------------- | -------------- |
+| GET `/e/[token]` (Connection, first load) | Gate: theme + quiz only; no letter; no signed photo URLs | Code review ✅ |
+| POST `submitQuizAnswersAction`            | `{ result, reward }` with letter + signed photos         | Code review ✅ |
+| GET `/e/[token]` (Moments)                | Full published experience including letter + photos      | Code review ✅ |
+
+#### SSR verification
+
+| Field             | Initial Connection SSR | Verified |
+| ----------------- | ---------------------- | -------- |
+| `letter_content`  | Not rendered           | ✅       |
+| `letter_closing`  | Not rendered           | ✅       |
+| `closing_name`    | Not rendered           | ✅       |
+| Signed photo URLs | Not rendered           | ✅       |
+
+#### RSC verification
+
+| Prop                 | Initial Connection RSC              | Verified |
+| -------------------- | ----------------------------------- | -------- |
+| Letter fields        | Absent from `ConnectionGatePayload` | ✅       |
+| Signed photo URLs    | Absent                              | ✅       |
+| Quiz correct answers | Stripped in `RecipientQuizView`     | ✅       |
+
+#### DTO verification
+
+| DTO                         | Forbidden fields                                   | Verified     |
+| --------------------------- | -------------------------------------------------- | ------------ |
+| `RecipientQuizQuestion`     | `correct_option_index`                             | ✅           |
+| `ConnectionGateExperience`  | `letter_content`, `letter_closing`, `closing_name` | ✅           |
+| `RecipientMatchStory` (09A) | `photo_sort_order` mapping                         | ✅ (Phase 3) |
+
+#### Payload verification
+
+| Payload                   | Contents                                    | When                         |
+| ------------------------- | ------------------------------------------- | ---------------------------- |
+| `ConnectionGatePayload`   | `experience` (safe fields), `theme`, `quiz` | Initial load                 |
+| `ConnectionRewardPayload` | letter fields, signed photo URLs            | After successful submit only |
+
+#### Dependency verification (grep)
+
+```
+fetchConnectionGatePayload  → page.tsx Connection branch only
+fetchPublishedExperience    → page.tsx Moments + non-live stubs only
+```
+
+Connection recipient path must **not** grep-match `fetchPublishedExperience`. Moments recipient path **must** grep-match `fetchPublishedExperience`.
+
+### Sprint 09A — Memories Verification (Phase 3)
+
+**Code-verified:**
+
+| Check                                                 | Evidence                                                                             |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Aggregate repo owns replace/delete-all orchestration  | `experience-match.repository.ts`; sub-repo has CRUD only (LOW-06 avoided)            |
+| Draft save allows incomplete config                   | `validateMatchConfigDraft()` in `save-match-config.service.ts`                       |
+| Publish validation separate from draft save           | `validateMatchConfigPublish()` + `assertMatchPublishable()` (Phase 5)                |
+| Recipient DTO excludes `photo_sort_order`             | `RecipientMatchStory` / `RecipientMatchView`; `map-match-views.service.ts`           |
+| Preview DTO excludes correct mappings (A-3)           | `PreviewMatchView`; `fetch-preview-match.service.ts`                                 |
+| Batch grading 100% server-side; answers not persisted | `submit-match-answers.service.ts`, `grade-match.service.ts`                          |
+| `final_unlock_message` only returned when all correct | `grade-match.service.ts` — **Phase 3 code; superseded by FD-M5** (align in Phase 6A) |
+
+> **Note:** Phase 3 grading reflects pre–FD-M5 design. Phase 6A will align `gradeMatchAnswers()` with FD-M5 (reward never blocked). FD-M3 (no retry) enforced in Phase 6B/6C client orchestration.
+
+**NOT verified locally (manual E2E required — Phase 6+):**
+
+| Check                                                             | Status                                            |
+| ----------------------------------------------------------------- | ------------------------------------------------- |
+| Full Memories publish → preview → recipient match flow            | NOT VERIFIED                                      |
+| Buyer preview shows stories/photos without answer leak in browser | NOT VERIFIED                                      |
+| Match unlimited retry UX in browser                               | **N/A** — superseded by FD-M3 (single submission) |
+| Connection/Moments regression after Memories services             | NOT VERIFIED (code review only)                   |
+
+### Sprint 09A — Memories Verification (Phase 4)
+
+**Code-verified:**
+
+| Check                                                       | Evidence                                                             |
+| ----------------------------------------------------------- | -------------------------------------------------------------------- |
+| Studio UI → Server Action → Service → Repository flow       | `match-config.ts` → `saveMatchConfig` / `fetchMatchConfig`           |
+| Thin UI — no business validation in React                   | Components only call actions; errors from server `ValidationError`   |
+| Single data model (`MatchStudioConfig` / `MatchDraftState`) | `match-draft.ts` maps config ↔ draft; save returns server config     |
+| Manual save only (no auto-save)                             | `MatchBuilderPanel.handleSave` — explicit button                     |
+| Unlock message after match pairs                            | `match-builder-panel.tsx` field order                                |
+| Photo slot selector — one slot per pair (A-1 UX)            | `MatchPhotoSlotSelector` disables used/empty slots                   |
+| Publish flow untouched                                      | `publish-validation.service.ts` — Memories publish wired in Phase 5  |
+| Memories editor replaces "Coming soon" stub                 | `order-editor-form.tsx` + `experience-modes.ts` `editorSprint: null` |
+
+**NOT verified locally (manual E2E required — Phase 4):**
+
+| Check                                                     | Status       |
+| --------------------------------------------------------- | ------------ |
+| Save match draft from Studio browser                      | NOT VERIFIED |
+| Photo slot selector UX with uploaded photos               | NOT VERIFIED |
+| Server validation errors displayed in Studio UI           | NOT VERIFIED |
+| Mode change away from Memories shows correct warning copy | NOT VERIFIED |
+
+### Sprint 09A — Memories Verification (Phase 5)
+
+**Code-verified:**
+
+| Check                                                       | Evidence                                                          |
+| ----------------------------------------------------------- | ----------------------------------------------------------------- |
+| Memories mode publishable when checklist passes             | `isPublishableMode()` includes `memories`                         |
+| Treasures mode still blocked at publish                     | `isBlockedPremiumMode()` — Treasures only                         |
+| `evaluateExperienceMatch()` wired to checklist              | `appendMemoriesMatchChecklistItems()`                             |
+| `evaluateExperienceMatch()` wired to `assertPublishAllowed` | `assertPublishAllowed()` memories branch                          |
+| Photo slot occupancy validated at publish                   | `uploadedPhotoSortOrders` from `ExperiencePhotosRepository`       |
+| Mode change deletes match pairs when leaving Memories       | `change-experience-mode.service.ts` → `deleteAllByExperienceId()` |
+| Mode change clears `final_unlock_message`                   | `updateDraft({ finalUnlockMessage: null })`                       |
+| Order detail uses async checklist                           | `buildPublishChecklistForExperience()` in `orders/[id]/page.tsx`  |
+| Connection + Moments publish unchanged                      | Regression — no changes to quiz/moments branches                  |
+
+### Sprint 09A — Memories Architecture Lock (Phase 5.5)
+
+**Documentation-only — no code changes.**
+
+| Check                                                     | Status |
+| --------------------------------------------------------- | ------ |
+| FD-M1–FD-M5 recorded in `05_FOUNDER_DECISIONS.md`         | ✅     |
+| Match Retry marked SUPERSEDED by FD-M3                    | ✅     |
+| Reward-only-after-allCorrect marked superseded by FD-M5   | ✅     |
+| SSOT `13_EXPERIENCE_JOURNEY.md` Memories journey updated  | ✅     |
+| `08_EXPERIENCE_MODES.md` synchronized                     | ✅     |
+| Phase 6 architecture unambiguous (Gate/Reward mirror 08R) | ✅     |
+
+**Phase 6 implementation targets (locked, not yet built):**
+
+| Component                                                     | Phase |
+| ------------------------------------------------------------- | ----- |
+| `fetchMemoriesGatePayload()` / `buildMemoriesRewardPayload()` | 6A    |
+| `MemoriesExperienceFlow` / `MatchCinematicReveal`             | 6B    |
+| `memories-unlock-session.ts` / page wiring                    | 6C    |
+
+**NOT verified locally (manual E2E required — Phase 6+):**
 
 | Check                                                             | Status                          |
 | ----------------------------------------------------------------- | ------------------------------- |
@@ -469,7 +667,7 @@ After every `CREATE TABLE`, verify the following matrix before applying to remot
 | Role                             | anon                                                                   | authenticated                              | service_role                                                      |
 | -------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------- |
 | Table-level SELECT               | ❌ Revoked (Gift domain) or ✅ Granted (public ref data like `themes`) | ✅ only the operations the Studio UI needs | ✅ SELECT at minimum for any table read via `createAdminClient()` |
-| Table-level INSERT/UPDATE/DELETE | ❌ Revoked                                                             | ✅ only if Studio writes it                | ✅ full access (service_role bypasses RLS)                        |
+| Table-level INSERT/UPDATE/DELETE | ❌ Revoked                                                             | ✅ only if Studio writes it                | ✅ explicit GRANT per operation (RLS bypass ≠ table privileges)   |
 | RLS enabled                      | ✅ Required on every new table                                         | —                                          | — (service_role bypasses RLS)                                     |
 
 ### Per-path verification questions
@@ -484,20 +682,22 @@ For every new table, ask:
 
 ### Known table → required service_role operations
 
-| Table                         | service_role needs     | Reason                                        |
-| ----------------------------- | ---------------------- | --------------------------------------------- |
-| `orders`                      | SELECT, INSERT, UPDATE | Publish, preview, QR workflows                |
-| `experiences`                 | SELECT, INSERT, UPDATE | Recipient gate, publish lock                  |
-| `experience_photos`           | SELECT                 | Recipient + preview signed URLs               |
-| `experience_quiz_questions`   | **SELECT**             | Recipient grading, buyer preview (hotfix 018) |
-| `experience_quiz_score_bands` | **SELECT**             | Recipient grading, buyer preview (hotfix 018) |
-| `preview_links`               | SELECT, INSERT, UPDATE | Preview token lookup                          |
-| `experience_sessions`         | SELECT, INSERT, UPDATE | Trusted device session writes                 |
-| `access_attempts`             | SELECT, INSERT         | Rate limiting                                 |
-| `experience_analytics`        | SELECT, INSERT         | Event recording                               |
-| `security_events`             | SELECT, INSERT         | Audit trail                                   |
-| `audit_logs`                  | SELECT, INSERT         | Audit trail                                   |
-| Future mode tables (018, 019) | **SELECT at minimum**  | Same pattern as quiz tables                   |
+| Table                         | service_role needs         | Reason                                                                                         |
+| ----------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------- |
+| `orders`                      | SELECT, INSERT, UPDATE     | Publish, preview, QR workflows                                                                 |
+| `experiences`                 | SELECT, INSERT, UPDATE     | Recipient gate, publish lock                                                                   |
+| `experience_photos`           | SELECT                     | Recipient + preview signed URLs                                                                |
+| `experience_quiz_questions`   | **SELECT**                 | Recipient grading, buyer preview (hotfix 018)                                                  |
+| `experience_quiz_score_bands` | **SELECT**                 | Recipient grading, buyer preview (hotfix grants)                                               |
+| `experience_match_pairs`      | **SELECT**                 | Recipient match grading, buyer preview (Sprint 09A)                                            |
+| `experience_envelopes`        | **SELECT at minimum**      | Sprint 09B — include in same migration as CREATE TABLE                                         |
+| `experience_envelope_opens`   | **SELECT, INSERT, DELETE** | Recipient open progress + CF-R2 replay reset via `createAdminClient()` (hotfix 20260714110000) |
+| `preview_links`               | SELECT, INSERT, UPDATE     | Preview token lookup                                                                           |
+| `experience_sessions`         | SELECT, INSERT, UPDATE     | Trusted device session writes                                                                  |
+| `access_attempts`             | SELECT, INSERT             | Rate limiting                                                                                  |
+| `experience_analytics`        | SELECT, INSERT             | Event recording                                                                                |
+| `security_events`             | SELECT, INSERT             | Audit trail                                                                                    |
+| `audit_logs`                  | SELECT, INSERT             | Audit trail                                                                                    |
 
 ---
 
@@ -505,25 +705,25 @@ For every new table, ask:
 
 The following items are low/medium-priority findings that do not block production but should be addressed in future sprints:
 
-| ID     | Priority | Area                | Description                                                                                                                                                                                                                                                                                                       | Resolution Plan                                                                                                                                                                                                                                              |
-| ------ | -------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| MED-01 | Medium   | Auth Logging        | `loginAction` logs the raw submitted email on credential failure. This can pollute logs with PII.                                                                                                                                                                                                                 | Update `securityLogger` in `features/studio/actions/auth.ts` to log only the email domain (e.g. `email.split("@")[1]`), rather than the full address.                                                                                                        |
-| LOW-01 | Low      | Open Redirect       | `loginAction` returns `redirectTo` from server (`/studio`), which the client follows without validation.                                                                                                                                                                                                          | When redirect paths become dynamic, ensure client or server validates that `redirectTo` is a relative path or trusted origin to prevent open redirects.                                                                                                      |
-| LOW-02 | Low      | Barrel Clarity      | `lib/auth/index.ts` exports `isAdminEmailMatch` without a `server-only` guard, mixing with `server-only` exports.                                                                                                                                                                                                 | Separate Edge-safe pure functions into an explicit `lib/auth/edge.ts` or similar barrel to prevent accidental `server-only` build failures on client components.                                                                                             |
-| MED-02 | Medium   | Quiz Data           | `ExperienceQuizRepository.replaceAllForExperience()` uses delete-then-insert, consistent with `experience_photos`. Not atomic — a failed insert after delete may leave empty quiz data.                                                                                                                           | Acceptable for current MVP. Future: Postgres RPC in a dedicated migration when stronger multi-table consistency is required. See also `lib/actions/transaction.ts`.                                                                                          |
-| MED-03 | Medium   | Studio UX           | Server-rendered publish checklist can become temporarily stale after changing experience mode until the page refreshes.                                                                                                                                                                                           | Acceptable for Sprint 08 — does not affect publish correctness. UX improvement only; defer post–Sprint 08.                                                                                                                                                   |
-| MED-04 | Medium   | Publish Logic       | `isPremiumMode()` still treats every non-`moments` mode as premium. Publish validation uses explicit mode switching, so this is not a production bug today.                                                                                                                                                       | Re-evaluate after Sprint 08 when Memories/Treasures implementation begins. Refactor only if a later phase requires it.                                                                                                                                       |
-| MED-05 | Medium   | Quiz Security       | `submitQuizAnswersAction` has no per-session submit rate limit. A motivated actor could brute-force correct answers (max 3⁶ = 729 combinations for 6 MCQ questions). Access gate limits unauthenticated abuse but not repeated submits after access.                                                              | Defer to post–Sprint 08 hardening. Add server-side attempt cap or exponential backoff in a future security sprint; revisit Sprint 09 or dedicated hardening pass.                                                                                            |
-| MED-06 | Medium   | Database            | Migration 017 omitted `service_role` SELECT grants on `experience_quiz_questions` and `experience_quiz_score_bands`. Connection buyer preview and recipient quiz grading failed with permission denied (surfaced as misleading 404).                                                                              | **Fixed** — hotfix migration `20260713020000_experience_quiz_service_role_grants.sql` applied. Pattern: any new Gift-domain table read via `createAdminClient()` must grant SELECT to `service_role`.                                                        |
-| LOW-03 | Low      | Quiz UX             | One-submit-per-session uses `sessionStorage` only (OD-5). Clearing storage or a new tab allows another graded attempt on the same device.                                                                                                                                                                         | Accepted for V2 per OD-5. Revisit only if founder requires stricter anti-retake semantics (would need server state — conflicts with OD-5).                                                                                                                   |
-| LOW-04 | Low      | Buyer Preview       | Connection buyer preview renders quiz section even when zero questions are saved (draft state). Empty-state copy added in Phase 7; publish still blocked server-side.                                                                                                                                             | UX polish only. Optional: hide quiz section entirely until ≥ 1 question — defer post–Sprint 08 if founder prefers.                                                                                                                                           |
-| LOW-05 | Low      | Analytics           | `experience_opened` is inserted on every granted recipient page load — no deduplication vs `first_opened_at`. Coarse open counts may over-count returning recipients/trusted devices.                                                                                                                             | Acceptable for V2 coarse analytics (OD-1). Revisit Sprint 10 dashboard / analytics polish if unique-open metrics are required.                                                                                                                               |
-| LOW-06 | Low      | Quiz Repo           | `QuizQuestionsRepository` exposes `replaceAllForExperience()` on both the questions repo **and** the aggregate `ExperienceQuizRepository`. The aggregate wraps the sub-repos correctly, but the direct method on `QuizQuestionsRepository` is redundant and may be called independently, bypassing bands cleanup. | No production bug today (only aggregate is called externally). Remove `replaceAllForExperience` from the sub-repos in a future refactor, leaving only the aggregate-level method. Revisit Sprint 09A when Memories repo follows the same pattern.            |
-| LOW-07 | Low      | Preview Security    | `fetch-preview-quiz.service.ts` does NOT check `experience.status === "published"` before returning quiz data. Only `previewLink.experience_id` presence gates the call. A draft experience with an active preview link would expose quiz structure to the buyer before publish.                                  | Intended behavior for buyer preview (admin sends preview before publish). Safety is answer-exclusion only, not status gating. Low risk: only studio admin controls preview links. Document as accepted V2 behavior; revisit if preview access model changes. |
-| LOW-08 | Low      | Schema Consistency  | `experience_quiz_score_bands` table has no `created_at` column, unlike `experience_quiz_questions`. Minor inconsistency in migration 017.                                                                                                                                                                         | No functional impact — bands are replaced atomically and have no independent ordering by time. Add `created_at` to `experience_quiz_score_bands` in migration 018 or a dedicated schema cleanup migration if the inconsistency causes issues in Sprint 09A.  |
-| LOW-09 | Low      | Error Observability | `/preview/[token]` and `/e/[token]` pages catch all non-`ConfigError` failures with `notFound()` — infrastructure errors (e.g. Postgres `42501` permission denied) appear as generic 404, slowing diagnosis. Discovered during Sprint 08 hotfix (MED-06).                                                         | Intentional production behavior (no error detail leak to users). Improve server-side logging or distinguish `NotFoundError` vs other `ApplicationError` in page catch blocks during next observability pass. Revisit Sprint 09 or dedicated ops hardening.   |
-| LOW-10 | Low      | Security Config     | `IP_HASH_PEPPER` referenced in security design (`04_SECURITY.md`) but not yet in `config/env.ts` / `.env.example`. Rate-limit hashing uses placeholder or is incomplete.                                                                                                                                          | Post-V2 hardening. Add to env schema when full IP-hash rate limiting is implemented. Revisit Sprint 09 security pass or before high-volume launch.                                                                                                           |
-| LOW-11 | Low      | QA / Testing        | No automated E2E test suite for publish → preview → recipient flows. Sprint 08 Phase 8 marked 4 manual acceptance items NOT VERIFIED by automation.                                                                                                                                                               | Manual smoke test required before first live Connection delivery (P1 operational). Add Playwright or similar in Sprint 10 polish or when test ROI justifies setup.                                                                                           |
+| ID     | Priority | Area                | Description                                                                                                                                                                                                                                                                                                       | Resolution Plan                                                                                                                                                                                                                                                                                      |
+| ------ | -------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MED-01 | Medium   | Auth Logging        | `loginAction` logs the raw submitted email on credential failure. This can pollute logs with PII.                                                                                                                                                                                                                 | Update `securityLogger` in `features/studio/actions/auth.ts` to log only the email domain (e.g. `email.split("@")[1]`), rather than the full address.                                                                                                                                                |
+| LOW-01 | Low      | Open Redirect       | `loginAction` returns `redirectTo` from server (`/studio`), which the client follows without validation.                                                                                                                                                                                                          | When redirect paths become dynamic, ensure client or server validates that `redirectTo` is a relative path or trusted origin to prevent open redirects.                                                                                                                                              |
+| LOW-02 | Low      | Barrel Clarity      | `lib/auth/index.ts` exports `isAdminEmailMatch` without a `server-only` guard, mixing with `server-only` exports.                                                                                                                                                                                                 | Separate Edge-safe pure functions into an explicit `lib/auth/edge.ts` or similar barrel to prevent accidental `server-only` build failures on client components.                                                                                                                                     |
+| MED-02 | Medium   | Quiz Data           | `ExperienceQuizRepository.replaceAllForExperience()` uses delete-then-insert, consistent with `experience_photos`. Not atomic — a failed insert after delete may leave empty quiz data.                                                                                                                           | Acceptable for current MVP. Future: Postgres RPC in a dedicated migration when stronger multi-table consistency is required. See also `lib/actions/transaction.ts`.                                                                                                                                  |
+| MED-03 | Medium   | Studio UX           | Server-rendered publish checklist can become temporarily stale after changing experience mode until the page refreshes.                                                                                                                                                                                           | Acceptable for Sprint 08 — does not affect publish correctness. UX improvement only; defer post–Sprint 08.                                                                                                                                                                                           |
+| MED-04 | Medium   | Publish Logic       | `isPremiumMode()` still treats every non-`moments` mode as premium. Publish validation uses explicit mode switching, so this is not a production bug today.                                                                                                                                                       | Re-evaluate after Sprint 08 when Memories/Treasures implementation begins. Refactor only if a later phase requires it.                                                                                                                                                                               |
+| MED-05 | Medium   | Quiz Security       | `submitQuizAnswersAction` has no per-session submit rate limit. A motivated actor could brute-force correct answers (max 3⁶ = 729 combinations for 6 MCQ questions). Access gate limits unauthenticated abuse but not repeated submits after access.                                                              | Defer to post–Sprint 08 hardening. Add server-side attempt cap or exponential backoff in a future security sprint; revisit Sprint 09 or dedicated hardening pass.                                                                                                                                    |
+| MED-06 | Medium   | Database            | Migration 017 omitted `service_role` SELECT grants on `experience_quiz_questions` and `experience_quiz_score_bands`. Connection buyer preview and recipient quiz grading failed with permission denied (surfaced as misleading 404).                                                                              | **Fixed** — hotfix migration `20260713020000_experience_quiz_service_role_grants.sql` applied. Pattern: any new Gift-domain table read via `createAdminClient()` must grant SELECT to `service_role`.                                                                                                |
+| LOW-03 | Low      | Quiz UX             | One-submit-per-session uses `sessionStorage` only (OD-5). Clearing storage or a new tab allows another graded attempt on the same device.                                                                                                                                                                         | Accepted for V2 per OD-5. Revisit only if founder requires stricter anti-retake semantics (would need server state — conflicts with OD-5).                                                                                                                                                           |
+| LOW-04 | Low      | Buyer Preview       | Connection buyer preview renders quiz section even when zero questions are saved (draft state). Empty-state copy added in Phase 7; publish still blocked server-side.                                                                                                                                             | UX polish only. Optional: hide quiz section entirely until ≥ 1 question — defer post–Sprint 08 if founder prefers.                                                                                                                                                                                   |
+| LOW-05 | Low      | Analytics           | `experience_opened` is inserted on every granted recipient page load — no deduplication vs `first_opened_at`. Coarse open counts may over-count returning recipients/trusted devices.                                                                                                                             | Acceptable for V2 coarse analytics (OD-1). Revisit Sprint 10 dashboard / analytics polish if unique-open metrics are required.                                                                                                                                                                       |
+| LOW-06 | Low      | Quiz Repo           | `QuizQuestionsRepository` exposes `replaceAllForExperience()` on both the questions repo **and** the aggregate `ExperienceQuizRepository`. The aggregate wraps the sub-repos correctly, but the direct method on `QuizQuestionsRepository` is redundant and may be called independently, bypassing bands cleanup. | No production bug today (only aggregate is called externally). Remove `replaceAllForExperience` from the sub-repos in a future refactor, leaving only the aggregate-level method. **Memories match (Sprint 09A) follows the corrected pattern** — orchestration only on `ExperienceMatchRepository`. |
+| LOW-07 | Low      | Preview Security    | `fetch-preview-quiz.service.ts` does NOT check `experience.status === "published"` before returning quiz data. Only `previewLink.experience_id` presence gates the call. A draft experience with an active preview link would expose quiz structure to the buyer before publish.                                  | Intended behavior for buyer preview (admin sends preview before publish). Safety is answer-exclusion only, not status gating. Low risk: only studio admin controls preview links. Document as accepted V2 behavior; revisit if preview access model changes.                                         |
+| LOW-08 | Low      | Schema Consistency  | `experience_quiz_score_bands` table has no `created_at` column, unlike `experience_quiz_questions`. Minor inconsistency in migration 017.                                                                                                                                                                         | No functional impact. Add `created_at` in a **dedicated timestamped cleanup migration** if desired — do **not** bundle with Sprint 09A feature migration.                                                                                                                                            |
+| LOW-09 | Low      | Error Observability | `/preview/[token]` and `/e/[token]` pages catch all non-`ConfigError` failures with `notFound()` — infrastructure errors (e.g. Postgres `42501` permission denied) appear as generic 404, slowing diagnosis. Discovered during Sprint 08 hotfix (MED-06).                                                         | Intentional production behavior (no error detail leak to users). Improve server-side logging or distinguish `NotFoundError` vs other `ApplicationError` in page catch blocks during next observability pass. Revisit Sprint 09 or dedicated ops hardening.                                           |
+| LOW-10 | Low      | Security Config     | `IP_HASH_PEPPER` referenced in security design (`04_SECURITY.md`) but not yet in `config/env.ts` / `.env.example`. Rate-limit hashing uses placeholder or is incomplete.                                                                                                                                          | Post-V2 hardening. Add to env schema when full IP-hash rate limiting is implemented. Revisit Sprint 09 security pass or before high-volume launch.                                                                                                                                                   |
+| LOW-11 | Low      | QA / Testing        | No automated E2E test suite for publish → preview → recipient flows. Sprint 08 Phase 8 marked 4 manual acceptance items NOT VERIFIED by automation.                                                                                                                                                               | Manual smoke test required before first live Connection delivery (P1 operational). Add Playwright or similar in Sprint 10 polish or when test ROI justifies setup.                                                                                                                                   |
 
 ---
 
@@ -542,6 +742,7 @@ The following items are low/medium-priority findings that do not block productio
 ## Related Documents
 
 - [00_INDEX.md](./00_INDEX.md) — documentation entry point
+- [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) — Experience Journey SSOT
 - [03_DATABASE.md](./03_DATABASE.md) — schema reference and migration history
 - [04_SECURITY.md](./04_SECURITY.md) — secrets and env variable rules
 - [07_AI_GUIDE.md](./07_AI_GUIDE.md) — coding standards for AI assistants

@@ -1,6 +1,7 @@
 # 08 — Experience Modes
 
 > **Sprint:** 05.5 — Product Revision V2 (documentation only)  
+> **Journey SSOT:** [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) — **authoritative for recipient and buyer-preview ordering**  
 > **Related:** [Product Revision V2](./07_PRODUCT_REVISION_V2.md) · [Architecture Impact](./09_ARCHITECTURE_IMPACT.md) · [Database Revision Plan](./10_DATABASE_REVISION_PLAN.md) · [Founder Decisions](./05_FOUNDER_DECISIONS.md)
 
 ---
@@ -17,38 +18,45 @@
 
 ## Overview
 
-Celebrate offers **four experience products**. Every mode shares a **core layer** (Planned for recipient UI; schema-ready today):
+Celebrate offers **four experience products**. Every mode shares a **core layer** (**Already Implemented** — Sprint 07):
 
-| Core layer                                    | Status                                                                            |
-| --------------------------------------------- | --------------------------------------------------------------------------------- |
-| Memory Code gate + 24h grace + trusted device | **Already Implemented** (schema + auth infra); recipient UI **Planned Sprint 07** |
-| Themed greeting letter                        | **Planned**                                                                       |
-| Memory photo gallery (max 6)                  | **Planned** (schema + storage exist)                                              |
-| In-browser photobooth (no server storage)     | **Planned** (folder scaffolded)                                                   |
+| Core layer                                    | Status                  |
+| --------------------------------------------- | ----------------------- |
+| Memory Code gate + 24h grace + trusted device | **Already Implemented** |
+| Themed greeting letter                        | **Already Implemented** |
+| Memory photo gallery (max 6)                  | **Already Implemented** |
+| In-browser photobooth (no server storage)     | **Already Implemented** |
 
 Each mode adds an **interactive layer** on top of the core. Only **Moments** ships without mini-games.
+
+**Recipient journey order** (after access gate / OPEN) — see [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) for full detail:
+
+| Mode           | Journey (after OPEN)                                            |
+| -------------- | --------------------------------------------------------------- |
+| **Moments**    | Letter → Gallery → Photobooth                                   |
+| **Connection** | Quiz → Submit → Score + Band → Letter → Gallery → Photobooth    |
+| **Memories**   | Match Game → Unlock Message → Letter → Gallery → Photobooth     |
+| **Treasures**  | Envelope 1 → … → Final Envelope → Letter → Gallery → Photobooth |
 
 ```mermaid
 flowchart TB
     subgraph Core["Shared Core (all modes)"]
         MC[Memory Code / Grace / Trusted Device]
-        LT[Greeting Letter]
+        LT[Letter]
         GL[Photo Gallery max 6]
         PB[Photobooth browser-only]
     end
 
-    subgraph Modes["Interactive Layer"]
+    subgraph Modes["Interactive Layer — before reward content"]
         MO[Moments — none]
         CO[Connection — Quiz]
         ME[Memories — Match Game]
         TR[Treasures — Envelopes]
     end
 
-    MC --> LT --> GL --> PB
-    PB --> MO
-    PB --> CO
-    PB --> ME
-    PB --> TR
+    MC --> Modes
+    Modes --> LT --> GL --> PB
+    MO -.->|immediate| LT
 ```
 
 ---
@@ -70,27 +78,16 @@ Deliver the emotional core — letter, photos, photobooth — with **minimum fri
 
 **First-visit rule (Founder Decision):** During the **24-hour grace period** after first successful access, Memory Code is **not** required — any device may open and becomes trusted. After grace, new devices require Memory Code. Full flow: [04_SECURITY.md](./04_SECURITY.md).
 
-### User Journey (Planned — Sprint 07)
+### User Journey (**Already Implemented** — Sprint 07)
 
 ```mermaid
-sequenceDiagram
-    participant R as Recipient
-    participant E as Experience Page
-    participant C as Core Content
-
-    R->>E: Scan QR / open link
-    alt First access OR within 24h grace
-        E->>C: Show themed greeting letter (no Memory Code)
-        Note over E: Register Trusted Device
-    else Post-grace, new device
-        E->>R: Memory Code form
-        R->>E: Enter Memory Code
-        E->>C: Show themed greeting letter
-    end
-    R->>C: Scroll to photo gallery
-    R->>C: Optional photobooth session
-    R->>E: Experience complete
+flowchart LR
+    A[OPEN] --> B[Letter]
+    B --> C[Gallery]
+    C --> D[Photobooth]
 ```
+
+Access gate (Memory Code / grace / trusted device) applies before OPEN. After OPEN, letter, gallery, and photobooth are **immediate** — no secondary unlock.
 
 ### Emotion
 
@@ -127,15 +124,14 @@ Warmth, immediacy, intimacy. "They wrote this for me" — no cognitive load from
 | Memory Code                    | ✅ (admin sets; grace rules apply at recipient open) |
 | Quiz / match / envelope config | ❌                                                   |
 
-### Analytics (Simple Business Level Only)
+### Analytics (Simple Business Level Only — OD-1 Locked)
 
-| Event                | Notes                                  |
-| -------------------- | -------------------------------------- |
-| `experience_opened`  | **Already Implemented**                |
-| Experience completed | **Planned** — coarse completion signal |
-| Mode used            | Derived from `experience_mode`         |
+| Event               | Purpose      | Status                                                                                                                          |
+| ------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `experience_opened` | Engagement   | **Already Implemented**                                                                                                         |
+| Mode = moments      | Segmentation | **Already Implemented** — derive via `experiences.experience_mode` JOIN; **no** `experience_completed` event (no migration 020) |
 
-No per-section micro-analytics in V2. Photobooth/letter events optional — founder prioritizes simplicity.
+No per-section micro-analytics in V2.
 
 ### Security Considerations
 
@@ -157,18 +153,21 @@ Add a **personal couple quiz** — "How well do you know me?" — that turns rea
 - Close friends with inside jokes
 - Premium bouquet tier buyers
 
-### User Journey (**Already Implemented** — Sprint 08)
+### User Journey (**Already Implemented** — Sprint 08 + Sprint 08R)
 
 ```mermaid
 flowchart LR
-    A[Memory Code / Grace] --> B[Greeting Letter]
-    B --> C[Photo Gallery]
-    C --> D[Couple Quiz max 6 MC]
-    D --> E[Score + Message]
-    E --> F[Photobooth]
+    A[OPEN] --> B[Quiz]
+    B --> C[Submit]
+    C --> D[Score + Band Message]
+    D --> E[Letter]
+    E --> F[Gallery]
+    F --> G[Photobooth]
 ```
 
-Recipient answers **multiple-choice (A/B/C) questions, maximum 6**, authored by admin. Score displayed with personalized message tier (e.g. "You know them 80%!"). Buyer preview shows questions and score band messages **without** correct answers (OD-2).
+Recipient answers **multiple-choice (A/B/C) questions, maximum 6**, authored by admin. **Any successful submit unlocks** the letter, gallery, and photobooth (CF-1). Score affects band message only. Initial load delivers **Gate Payload** (quiz only); **Reward Payload** (letter + signed photos) arrives after submit (CF-4). Gallery is gated until unlock (CF-3). Unlock persists in `sessionStorage` only (CF-2).
+
+Buyer preview order: Quiz → Letter → Gallery → Approve (no gating — buyer sees all content).
 
 ### Templates (Founder Decision — **Already Implemented** Sprint 08)
 
@@ -227,6 +226,8 @@ No per-section micro-analytics in V2.
 
 - Quiz answers are recipient input — validate length, sanitize display (**Already Implemented** — Zod schemas)
 - Correct answers must not leak before submission (**Already Implemented** — `RecipientQuizView` / `PreviewQuizView` strip `correct_option_index`; grading server-side only)
+- Letter and signed photo URLs must not appear in initial Connection payload (**Already Implemented** — Sprint 08R Gate/Reward split, CF-4)
+- Gallery gated until quiz submit (**Already Implemented** — CF-3)
 - Rate-limit answer submissions per session — **Deferred** (see MED-05 in [06_DEVELOPMENT_GUIDE.md](./06_DEVELOPMENT_GUIDE.md))
 - No PII required from recipient (no accounts)
 
@@ -236,7 +237,7 @@ No per-section micro-analytics in V2.
 
 ### Purpose
 
-**Match The Memory** — recipient pairs story descriptions with the correct photo from the gallery. All correct → unlock final message.
+**Match The Memory** — recipient pairs story descriptions with photos shown through a **cinematic reveal window** (FD-M2). Emotional curiosity — not a pass/fail exam. Reward always delivered after submit (FD-M5).
 
 ### Target Customer
 
@@ -244,22 +245,26 @@ No per-section micro-analytics in V2.
 - Family gifts (parent → child graduation)
 - Premium buyers wanting narrative depth
 
-### User Journey (Planned)
+### User Journey (Planned — Sprint 09A Phase 6+)
 
 ```mermaid
 flowchart LR
-    A[Memory Code / Grace] --> B[Greeting Letter]
-    B --> C[Match Game]
-    C --> D{All correct?}
-    D -->|No| C
-    D -->|Yes| E[Final Message Reveal]
-    E --> F[Full Gallery Unlocked]
-    F --> G[Photobooth]
+    A[OPEN] --> B[Match Game]
+    B --> C[Submit]
+    C --> D[Score]
+    D --> E[Unlock Message]
+    E --> F[Letter]
+    F --> G[Gallery]
+    G --> H[Photobooth]
 ```
+
+Recipient pairs stories with photos shown through a **cinematic reveal window** (~20–30% visible, centered, feathered — FD-M2). **One submission only** (FD-M3 — supersedes unlimited retry). Score is emotional feedback; **reward always delivered** after valid submit (FD-M5). Match game gates letter and gallery (CF-5).
+
+> **Founder decisions:** FD-M1–FD-M5 locked in [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md). Journey SSOT: [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md).
 
 ### Emotion
 
-Nostalgia, effort rewarded, "you were there for these moments."
+Nostalgia, curiosity, emotional anticipation — _"you were there for these moments."_
 
 ### Advantages
 
@@ -269,8 +274,8 @@ Nostalgia, effort rewarded, "you were there for these moments."
 
 ### Limitations
 
-- Requires at least 3–4 photos with distinct stories
-- Drag/drop UX challenging on small screens — tap-to-match fallback needed
+- Requires at least **2** match pairs (publish minimum); best experience with 3–4+ distinct photo stories
+- Tap-to-match primary; drag optional enhancement on larger screens
 - Higher admin setup than Connection
 
 ### Future Expansion Ideas
@@ -279,29 +284,36 @@ Nostalgia, effort rewarded, "you were there for these moments."
 - Voice-recorded story clips (Future Idea)
 - Multi-round matching (Future Idea)
 
-### Admin Configuration (Planned)
+### Admin Configuration (Planned — Sprint 09A)
 
 Everything in Moments, plus:
 
 | Field                | Notes                                                                     |
 | -------------------- | ------------------------------------------------------------------------- |
-| Match pairs          | `story_text` ↔ `photo sort_order`                                         |
-| Final unlock message | Shown after all matches correct                                           |
+| Match pairs          | **2–6** pairs; `story_text` ↔ `photo_sort_order` (each slot used once)    |
+| Final unlock message | Shown after submit — always, regardless of score (FD-M5)                  |
 | Shuffle presentation | Client-side randomization — **no `shuffle_seed` in V2 schema** (deferred) |
+| Templates            | **Out of Sprint 09 scope** — Future Idea after core V2 complete           |
 
-### Analytics (Simple Business Level Only)
+### Buyer Preview (Locked — Sprint 09 Kickoff)
 
-| Event                | Purpose      |
-| -------------------- | ------------ |
-| `experience_opened`  | Engagement   |
-| Experience completed | Funnel end   |
-| Mode = memories      | Segmentation |
+Shows all stories, all uploaded photos (full — no cinematic mask), and overall game structure. **Must NOT reveal** correct story–photo mappings. Informational note: recipients experience cinematic reveal during live journey (FD-M2).
+
+### Analytics (Simple Business Level Only — OD-1 Locked)
+
+| Event               | Purpose      | Status                                                                                                              |
+| ------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `experience_opened` | Engagement   | **Already Implemented**                                                                                             |
+| Mode = memories     | Segmentation | **Planned** — derive via `experiences.experience_mode` JOIN; **no** `experience_completed` event (no migration 020) |
 
 ### Security Considerations
 
-- Game state validated server-side — client cannot skip to final message
-- Photo URLs still signed and server-minted (**Already Implemented** pattern)
-- Prevent brute-force match by limiting server-side attempts per session
+- **Batch submit** — full set validated server-side; client cannot skip to final message
+- **Cinematic reveal** — recipient sees masked photos only during game (FD-M2); buyer preview shows full photos
+- Photo URLs signed and server-minted (**Already Implemented** pattern)
+- Recipient DTO strips correct `photo_sort_order` mappings (mirror Connection OD-2)
+- **Single submission** after successful submit in same session (FD-M3 — supersedes unlimited retry)
+- **Score never blocks reward** (FD-M5 — extends CF-1)
 
 ---
 
@@ -317,19 +329,20 @@ Everything in Moments, plus:
 - Signature bouquet tier
 - Senders who want ceremony and pacing
 
-### User Journey (Planned)
+### User Journey (Planned — Sprint 09B)
 
 ```mermaid
 flowchart TD
-    A[Memory Code / Grace] --> B[Intro Letter]
-    B --> C[Envelope 1]
-    C --> D[Envelope 2]
-    D --> E[...]
-    E --> F[Final Envelope — Grand Reveal]
-    F --> G[Gallery + Photobooth]
+    A[OPEN] --> B[Envelope 1]
+    B --> C[Envelope 2]
+    C --> D[...]
+    D --> E[Final Envelope]
+    E --> F[Letter]
+    F --> G[Gallery]
+    G --> H[Photobooth]
 ```
 
-Recipient taps envelopes one by one. Earlier envelopes cannot be skipped. Animation reinforces anticipation.
+Recipient opens envelopes in sequence. **May revisit** previously unlocked envelopes. **May NOT skip ahead** — unlock order enforced server-side. Letter follows the final envelope (CF-5 — Treasures uses envelope ceremony, not a single game gate).
 
 ### Emotion
 
@@ -353,30 +366,35 @@ Anticipation, ceremony, layered surprise. "There's more…"
 - Haptic feedback on mobile (Future Idea)
 - Envelope open sound design (Future Idea)
 
-### Admin Configuration (Planned)
+### Admin Configuration (Planned — Sprint 09B)
 
 Everything in Moments, plus:
 
-| Field                      | Notes                                  |
-| -------------------------- | -------------------------------------- |
-| Envelope count (**max 6**) | Order matters; aligns with 6-photo cap |
-| Per-envelope content type  | `message` or `photo`                   |
-| Per-envelope body          | Text or photo reference                |
-| Final envelope flag        | Exactly one envelope marked final      |
+| Field                     | Notes                                    |
+| ------------------------- | ---------------------------------------- |
+| Envelope count (**2–6**)  | Order matters; aligns with 6-photo cap   |
+| Per-envelope content type | `message` or `photo`                     |
+| Per-envelope body         | Text or photo reference                  |
+| Final envelope flag       | Exactly one envelope marked final        |
+| Templates                 | **Out of Sprint 09 scope** — Future Idea |
 
-### Analytics (Simple Business Level Only)
+### Buyer Preview (Locked — Sprint 09 Kickoff)
 
-| Event                | Purpose      |
-| -------------------- | ------------ |
-| `experience_opened`  | Engagement   |
-| Experience completed | Funnel end   |
-| Mode = treasures     | Segmentation |
+Shows envelope structure and non-spoiler context. **Must NOT reveal** hidden envelope content or allow inferring unlock order secrets beyond what admin configured for buyer review.
+
+### Analytics (Simple Business Level Only — OD-1 Locked)
+
+| Event               | Purpose      | Status                                                                                                              |
+| ------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `experience_opened` | Engagement   | **Already Implemented**                                                                                             |
+| Mode = treasures    | Segmentation | **Planned** — derive via `experiences.experience_mode` JOIN; **no** `experience_completed` event (no migration 020) |
 
 ### Security Considerations
 
-- Envelope order enforced server-side — no client skip
-- Hidden photo content not in API response until envelope opened
-- Final envelope content especially protected in preview vs experience link separation
+- Envelope order enforced server-side — **no client skip ahead**
+- **Per-envelope fetch (A-4)** — hidden photo/message content not in API until envelope unlocked
+- Recipients may **revisit** previously opened envelopes only
+- Final envelope content protected in preview vs recipient link separation (buyer preview must not spoil)
 
 ---
 
@@ -406,6 +424,7 @@ Everything in Moments, plus:
 
 ## Related Documents
 
+- [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) — **Experience Journey SSOT**
 - [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md) — why four modes exist
 - [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md) — engineering impact
 - [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md) — how modes persist

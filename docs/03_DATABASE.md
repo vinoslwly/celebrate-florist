@@ -464,28 +464,29 @@ Recipients receive signed URLs minted server-side — never direct bucket access
 
 ## Migration History
 
-| #   | File                                                             | Purpose                                                           |
-| --- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
-| 001 | `20260710210001_extensions.sql`                                  | `pgcrypto`, `pg_trgm`                                             |
-| 002 | `20260710210002_enums.sql`                                       | 4 enum types                                                      |
-| 003 | `20260710210003_tables.sql`                                      | 11 tables                                                         |
-| 004 | `20260710210004_constraints.sql`                                 | FK, UNIQUE, CHECK constraints                                     |
-| 005 | `20260710210005_indexes.sql`                                     | 16 performance indexes + partial unique                           |
-| 006 | `20260710210006_functions.sql`                                   | 3 functions + sequence                                            |
-| 007 | `20260710210007_triggers.sql`                                    | updated_at, order_number, audit immutability                      |
-| 008 | `20260710210008_rls.sql`                                         | 20 RLS policies                                                   |
-| 009 | `20260710210009_storage.sql`                                     | 2 private buckets + policies                                      |
-| 010 | `20260710210010_seed.sql`                                        | 5 themes                                                          |
-| 011 | `20260710210011_harden_function_search_path.sql`                 | Pin `search_path` on functions                                    |
-| 012 | `20260710210012_revoke_rls_auto_enable_execute_from_public.sql`  | Close platform function RPC                                       |
-| 013 | `20260710210013_fix_missing_base_table_grants.sql`               | Revoke anon DML on sensitive tables                               |
-| 014 | `20260710210014_revoke_trigger_function_execute_from_public.sql` | Close trigger function EXECUTE                                    |
-| 015 | `20260710210015_seed_admin_email.sql`                            | Documents deploy-time config (no INSERT)                          |
-| 016 | `20260712160000_experience_mode.sql`                             | `experience_mode`, `quiz_title`, atomic create RPC                |
-| 017 | `20260712200000_experience_quiz.sql`                             | `experience_quiz_questions`, `experience_quiz_score_bands` + RLS  |
-| 018 | `20260713020000_experience_quiz_service_role_grants.sql`         | Hotfix — `service_role` SELECT on quiz tables (Migration 017 gap) |
+| #   | File                                                             | Purpose                                                                                    |
+| --- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 001 | `20260710210001_extensions.sql`                                  | `pgcrypto`, `pg_trgm`                                                                      |
+| 002 | `20260710210002_enums.sql`                                       | 4 enum types                                                                               |
+| 003 | `20260710210003_tables.sql`                                      | 11 tables                                                                                  |
+| 004 | `20260710210004_constraints.sql`                                 | FK, UNIQUE, CHECK constraints                                                              |
+| 005 | `20260710210005_indexes.sql`                                     | 16 performance indexes + partial unique                                                    |
+| 006 | `20260710210006_functions.sql`                                   | 3 functions + sequence                                                                     |
+| 007 | `20260710210007_triggers.sql`                                    | updated_at, order_number, audit immutability                                               |
+| 008 | `20260710210008_rls.sql`                                         | 20 RLS policies                                                                            |
+| 009 | `20260710210009_storage.sql`                                     | 2 private buckets + policies                                                               |
+| 010 | `20260710210010_seed.sql`                                        | 5 themes                                                                                   |
+| 011 | `20260710210011_harden_function_search_path.sql`                 | Pin `search_path` on functions                                                             |
+| 012 | `20260710210012_revoke_rls_auto_enable_execute_from_public.sql`  | Close platform function RPC                                                                |
+| 013 | `20260710210013_fix_missing_base_table_grants.sql`               | Revoke anon DML on sensitive tables                                                        |
+| 014 | `20260710210014_revoke_trigger_function_execute_from_public.sql` | Close trigger function EXECUTE                                                             |
+| 015 | `20260710210015_seed_admin_email.sql`                            | Documents deploy-time config (no INSERT)                                                   |
+| 016 | `20260712160000_experience_mode.sql`                             | `experience_mode`, `quiz_title`, atomic create RPC                                         |
+| 017 | `20260712200000_experience_quiz.sql`                             | `experience_quiz_questions`, `experience_quiz_score_bands` + RLS                           |
+| 018 | `20260713020000_experience_quiz_service_role_grants.sql`         | Hotfix — `service_role` SELECT on quiz tables (Migration 017 gap)                          |
+| —   | `20260713160000_experience_match_pairs.sql`                      | Sprint 09A — `experience_match_pairs`, `final_unlock_message`, RLS + `service_role` grants |
 
-**Status:** All **18** migration files in this repository are applied on remote Supabase (`celebrate-florist-prod`). Schema is in sync. Remote migration history shows **19 entries** (Sprint 03A audit split + `experience_quiz` + service_role grants hotfix).
+**Status:** **19** migration files in repo. **19** applied on remote Supabase (`celebrate-florist-prod`).
 
 ### Repo vs Remote Migration History
 
@@ -519,7 +520,13 @@ Post-implementation security audit findings addressed:
 
 ## V2 Schema (Sprint 06+)
 
-> Design locked in [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md). Migrations 018–019 remain planned.
+> Design locked in [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md). New migrations use **timestamp filenames** only (see D-1 in [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md)).
+
+### Migration naming convention (D-1 — Locked)
+
+- **Source of truth:** filename in `supabase/migrations/` (e.g. `20260713160000_experience_match_pairs.sql`)
+- **Do not** refer to logical ordinals "018"/"019" in new documentation or implementation
+- Historical table below uses `#` for readability; **filename column is authoritative**
 
 ### Migration 016 (Sprint 06) — Implemented
 
@@ -540,12 +547,15 @@ Post-implementation security audit findings addressed:
 | `experience_quiz_score_bands` | Score band messages — `min_percent`/`max_percent`/`message`      |
 | RLS + privileges              | `anon` zero; `authenticated` SELECT/INSERT/DELETE; **no UPDATE** |
 
-### Migrations 018–019 (Sprint 09A–09B) — Planned
+### Migrations (Sprint 09A–10) — Implemented
 
-| Migration | Tables                                                       |
-| --------- | ------------------------------------------------------------ |
-| 018       | `experience_match_pairs`; `experiences.final_unlock_message` |
-| 019       | `experience_envelopes`                                       |
+| Filename                                                           | Sprint | Status                                                                                                       |
+| ------------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------ |
+| `20260713160000_experience_match_pairs.sql`                        | 09A    | **Implemented** — `experience_match_pairs`, `experiences.final_unlock_message`                               |
+| `20260714100000_experience_envelopes.sql`                          | 09B    | **Implemented** — `experience_envelopes`, `experience_envelope_opens`; `service_role` SELECT/INSERT on opens |
+| `20260714110000_experience_envelope_opens_service_role_delete.sql` | 10     | **Implemented** — CRIT-01: `service_role` DELETE on `experience_envelope_opens` (CF-R2 replay reset)         |
+
+Each new migration **must** include `service_role` SELECT grants on day one (Sprint 08 lesson — MED-06). Recipient-progress tables that require admin-client writes must also grant DELETE where applicable (CRIT-01).
 
 ### Publish Validation Matrix
 
@@ -553,12 +563,12 @@ Enforced in `features/studio/services/` at publish. Reference for Sprint 08–09
 
 #### Per-mode requirements
 
-| Mode         | Required at publish                               | Limits                            |
-| ------------ | ------------------------------------------------- | --------------------------------- |
-| `moments`    | Core experience fields only                       | No mode child rows                |
-| `connection` | ≥ 1 question, ≥ 1 score band                      | ≤ 6 questions; A/B/C only         |
-| `memories`   | ≥ 2 match pairs, `final_unlock_message` not blank | Valid `photo_sort_order` per pair |
-| `treasures`  | ≥ 2 envelopes, exactly 1 `is_final`               | ≤ 6 envelopes                     |
+| Mode         | Required at publish                               | Limits                                        |
+| ------------ | ------------------------------------------------- | --------------------------------------------- |
+| `moments`    | Core experience fields only                       | No mode child rows                            |
+| `connection` | ≥ 1 question, ≥ 1 score band                      | ≤ 6 questions; A/B/C only                     |
+| `memories`   | ≥ 2 match pairs, `final_unlock_message` not blank | 2–6 pairs; unique `photo_sort_order` per pair |
+| `treasures`  | ≥ 2 envelopes, exactly 1 `is_final`               | ≤ 6 envelopes                                 |
 
 #### Cross-cutting rules
 

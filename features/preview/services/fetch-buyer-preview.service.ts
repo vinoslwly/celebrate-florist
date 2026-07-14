@@ -5,12 +5,14 @@ import { ThemesRepository } from "@/lib/repositories/themes.repository";
 import { StorageBucket, createSignedReadUrl } from "@/lib/storage";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+import { fetchPreviewMatch } from "@/features/match/services/fetch-preview-match.service";
 import { PreviewLinksRepository } from "@/features/preview/repositories/preview-links.repository";
 import type { BuyerPreviewPayload } from "@/features/preview/types";
 import { fetchPreviewQuiz } from "@/features/quiz/services/fetch-preview-quiz.service";
 import { ExperiencePhotosRepository } from "@/features/studio/repositories/experience-photos.repository";
 import { ExperiencesRepository } from "@/features/studio/repositories/experiences.repository";
 import { OrdersRepository } from "@/features/studio/repositories/orders.repository";
+import { fetchPreviewEnvelopes } from "@/features/treasures/services/fetch-preview-envelopes.service";
 
 export async function fetchBuyerPreview(
   previewToken: string,
@@ -62,6 +64,16 @@ export async function fetchBuyerPreview(
       ? await fetchPreviewQuiz(experience.id)
       : undefined;
 
+  const match =
+    experience.experience_mode === "memories"
+      ? await fetchPreviewMatch(experience.id)
+      : undefined;
+
+  const envelopes =
+    experience.experience_mode === "treasures"
+      ? await fetchPreviewEnvelopes(experience.id)
+      : undefined;
+
   return {
     order,
     experience,
@@ -69,5 +81,7 @@ export async function fetchBuyerPreview(
     photos: signedPhotos,
     previewToken,
     quiz,
+    match,
+    envelopes,
   };
 }

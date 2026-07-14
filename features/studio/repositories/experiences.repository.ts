@@ -10,6 +10,7 @@ export type UpdateExperienceDraftParams = {
   letterContent: string;
   letterClosing: string;
   quizTitle?: string | null;
+  finalUnlockMessage?: string | null;
   memoryKeyHash?: string;
 };
 
@@ -119,6 +120,7 @@ export class ExperiencesRepository extends Repository {
       letter_content: params.letterContent,
       letter_closing: params.letterClosing,
       quiz_title: params.quizTitle ?? null,
+      final_unlock_message: params.finalUnlockMessage ?? null,
     };
 
     if (params.memoryKeyHash) {

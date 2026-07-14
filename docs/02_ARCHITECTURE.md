@@ -420,14 +420,14 @@ Repositories contain **database access only** — no publish rules, no grace-per
 
 Business rules live in `features/<domain>/services/`:
 
-| Service domain         | Examples                                             |
-| ---------------------- | ---------------------------------------------------- |
-| `studio/services/`     | Publish validation, order lifecycle checks           |
-| `access/services/`     | Grace period evaluation, trusted device registration |
-| `experience/services/` | Mode routing, shared experience orchestration        |
-| `quiz/services/`       | Quiz grading, template application                   |
-| `match/services/`      | Match validation, unlock rules                       |
-| `treasures/services/`  | Envelope sequence enforcement                        |
+| Service domain         | Examples                                                                    |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `studio/services/`     | Publish validation, order lifecycle checks                                  |
+| `access/services/`     | Grace period evaluation, trusted device registration                        |
+| `experience/services/` | Mode routing, shared experience orchestration                               |
+| `quiz/services/`       | Quiz grading, template application                                          |
+| `match/services/`      | Match validation, unlock rules                                              |
+| `treasures/services/`  | Envelope open, gate/reward, CF-R2 replay reset (`completeTreasuresJourney`) |
 
 ### Experience Mode Structure — Hybrid Shell + Independent Modes
 
@@ -475,6 +475,19 @@ flowchart TD
 | `lib/` → `features/`         | ❌ Forbidden                             |
 
 Mode features each include a **Studio editor panel** (components under `features/quiz/components/` etc.) composed into the Unified Order Editor at `/studio/orders/[id]` — not separate Studio routes per mode.
+
+### Replayable Experience (CF-R1 + CF-R2 — Locked)
+
+Full audit: [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md). Sprint 10 plan: [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md).
+
+| Principle   | Rule                                                                                               |
+| ----------- | -------------------------------------------------------------------------------------------------- |
+| **CF-R1**   | Digital Experience Gift — replayable lifetime; journey progress preserved until Photobooth trigger |
+| **CF-R2-A** | Silent DELETE of `experience_envelope_opens` at Photobooth first reach                             |
+| **CF-R2-B** | No visit detection, inactivity timers, session cookies, or intent inference                        |
+| **CF-R2-C** | Reload after trigger → fresh ✉️ gate (intentional)                                                 |
+
+**Engineering principle:** Favor simplicity over post-trigger state preservation. **Implementation status:** ✅ Shipped Sprint 10.
 
 ---
 

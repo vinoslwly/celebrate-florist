@@ -203,6 +203,73 @@ Each decision includes the **what**, the **why**, and where it is **enforced** i
 | **Why**      | Bounded admin effort; fast recipient completion; clear UX on mobile.                |
 | **Enforced** | Application validation + Zod schemas at implementation.                             |
 
+### CF-1 — Quiz Score Never Blocks Reward (Sprint 08R)
+
+|              |                                                                                                                                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Quiz score **never** blocks reward. **Any successful submit** unlocks: score display, band message, letter, gallery, and photobooth. Score affects band message only — not access to emotional content.                   |
+| **Why**      | Connection is an emotional interaction, not an evaluation gate. Recipients should always receive the sender's letter after participating.                                                                                 |
+| **Enforced** | `submitQuizAnswers()` always returns reward payload on successful submit; `ConnectionExperienceFlow` renders letter/gallery after unlock regardless of score. See [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md). |
+
+### CF-2 — Connection Unlock Persistence (Sprint 08R)
+
+|              |                                                                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Connection unlock state uses **`sessionStorage` only** — key `cf_connection_unlock_${experienceId}`. **No database state. No migration.** |
+| **Why**      | Emotional replay-friendly UX; avoids server-side completion tracking for V2; new tab replays quiz (accepted trade-off).                   |
+| **Enforced** | `features/experience/lib/connection-unlock-session.ts`; no unlock columns on `experiences`.                                               |
+
+### CF-3 — Gallery Is Part of Reward (Sprint 08R)
+
+|              |                                                                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | Gallery is part of the **reward tier**. Gallery **never** appears before unlock. Signed photo URLs are withheld from initial Connection payload. |
+| **Why**      | Photos are emotional continuation after the letter — same gate as letter content in game-first modes.                                            |
+| **Enforced** | `ConnectionExperienceFlow` renders `PhotoGallery` only when `isUnlocked === true`; reward payload mints signed URLs post-submit.                 |
+
+### CF-4 — Connection Gate Payload / Reward Payload Split (Sprint 08R)
+
+|              |                                                                                                                                                                                                             |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Connection recipient flow uses **Gate Payload** on initial load → **Reward Payload** after successful quiz submit. Letter fields and signed photo URLs **never** exist in the initial payload.              |
+| **Why**      | Security and product timing — quiz earns the emotional reveal; prevents letter/photo leak in HTML, RSC, or first network response.                                                                          |
+| **Enforced** | `fetchConnectionGatePayload()` on Connection branch only; `buildConnectionRewardPayload()` via `submitQuizAnswersAction`. Connection does **not** call `fetchPublishedExperience()` on live recipient path. |
+
+### CF-5 — Premium Experience Philosophy: Game First (Sprint 08R)
+
+|              |                                                                                                                                                                                                                      |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Premium interactive modes follow: **Game First → Reward → Letter → Gallery → Photobooth**. Applies to **Connection** and **Memories**. **Treasures** uses envelope ceremony before letter (any order per FD-T1).     |
+| **Why**      | Interactive gifting differentiates Celebrate; emotional content is earned through participation, not delivered immediately. Treasures uses ceremony pacing via envelopes instead of a single game gate.              |
+| **Enforced** | Connection: Sprint 08R implemented. Memories: FD-M1–FD-M5 locked (Phase 5.5); gate/reward Phase 6A–6C. Treasures: Sprint 09B per-envelope fetch (A-4). SSOT: [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md). |
+
+### CF-R1 — Replayable Experience ✅ LOCKED
+
+|                         |                                                                                                                                                                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision**            | Celebrate Florist is a **Digital Experience Gift**. Recipients must be able to reopen an experience weeks, months, or years later and experience the **same emotional journey from the beginning** — like reopening a physical gift box, not a completed game save. |
+| **Journey progress**    | Progress before the replay trigger (Photobooth) **must be preserved** via server state.                                                                                                                                                                             |
+| **Lifetime replay**     | Progress **must not** permanently lock the experience as completed. After CF-R2 trigger, reload intentionally replays from ✉️.                                                                                                                                      |
+| **Evaluation question** | _"If the recipient comes back one year later, what experience should they feel?"_                                                                                                                                                                                   |
+| **Approved**            | Founder — 2026-07-14                                                                                                                                                                                                                                                |
+| **Sprint 10 scope**     | Treasures only                                                                                                                                                                                                                                                      |
+
+### CF-R2 — Replay Reset ✅ LOCKED (Final Revision)
+
+|                         |                                                                                                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **CF-R2-A**             | Replay trigger: **first Photobooth reach** after all envelopes complete → silent `DELETE FROM experience_envelope_opens`.                                                |
+| **CF-R2-B**             | Permanently rejected: inactivity timers, `last_accessed_at` logic, visit detection, session cookies, replay sessions, browser lifecycle hooks, analytics visit tracking. |
+| **CF-R2-C**             | Reload after replay trigger (refresh, reopen, return later) **intentionally** starts ✉️ fresh. Not a bug. No post-trigger state preservation.                            |
+| **No visit concept**    | Product does not detect same visit vs new visit. Only Current Experience or New Experience (page load).                                                                  |
+| **No additional UX**    | No Finish button, Replay button, confirmation dialog, or completion popup. Photobooth is the natural endpoint.                                                           |
+| **Invisible reset**     | Current page continues — letter, gallery, photobooth uninterrupted until reload.                                                                                         |
+| **Approved**            | Founder — 2026-07-14 (CF-R2 final revision)                                                                                                                              |
+| **Implementation plan** | [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md) — ✅ shipped Sprint 10                                                                        |
+| **Enforced**            | ✅ Treasures recipient flow (Sprint 10)                                                                                                                                  |
+
+**Permanent engineering guideline:** Favor product simplicity over technical sophistication. Future experience modes must evaluate against CF-R1 and CF-R2 before shipping.
+
 ### Treasures Envelope Limit
 
 |              |                                                              |
@@ -213,11 +280,135 @@ Each decision includes the **what**, the **why**, and where it is **enforced** i
 
 ### Experience Templates (Studio)
 
-|              |                                                                                                                                                                                                                               |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Decision** | Studio must offer **templates** so admin does not author every experience from scratch. Example: **New Connection** → choose Anniversary, Graduation, Birthday, or Proposal template → pre-filled questions and copy to edit. |
-| **Why**      | Scales admin workflow as order volume grows. Reduces time-per-order and errors.                                                                                                                                               |
-| **Enforced** | **Planned** — Connection templates in Sprint 08; Memories/Treasures templates in Sprint 09A/09B. Templates live in application config or seed data, not customer-editable CMS.                                                |
+|              |                                                                                                                                                                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Studio must offer **templates** so admin does not author every experience from scratch. Example: **New Connection** → choose Anniversary, Graduation, Birthday, or Proposal template → pre-filled questions and copy to edit.                         |
+| **Why**      | Scales admin workflow as order volume grows. Reduces time-per-order and errors.                                                                                                                                                                       |
+| **Enforced** | Connection templates **Already Implemented** (Sprint 08). Memories/Treasures templates are **Future Idea** — explicitly **out of Sprint 09 scope** per founder kickoff. Templates live in application config or seed data, not customer-editable CMS. |
+
+---
+
+## Sprint 09 Kickoff Decisions (Locked)
+
+> Full product detail: [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md) · Database: [03_DATABASE.md](./03_DATABASE.md)
+
+### A-1 — Match Pair Limits (Memories)
+
+|              |                                                                                                                                     |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | **Minimum 2**, **maximum 6** match pairs per experience. Each `photo_sort_order` (1–6) may be used **at most once** per experience. |
+| **Why**      | Aligns with Gift V2 immutable 1–6 photo slot architecture.                                                                          |
+| **Enforced** | Application validation + DB constraints at publish; migration for `experience_match_pairs`. **Formalized as FD-M4** (Phase 5.5).    |
+
+### A-2 — Match Interaction Model (Memories)
+
+|              |                                                                                                                                                                        |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | **Batch submit** only. Recipient completes all pair selections → Submit → server validates all answers → returns final result. **No** incremental per-pair validation. |
+| **Why**      | Consistent with Connection quiz (OD-5 stateless grading); simpler API; server-side validation; easier maintenance and security.                                        |
+| **Enforced** | `features/match/services/` — single submit action; no per-pair server round-trips.                                                                                     |
+
+### A-3 — Buyer Preview (Memories & Treasures)
+
+|              |                                                                                                                                                                                                                        |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Buyer preview **shows** all stories, all uploaded photos, and overall game structure. Buyer preview **must NOT reveal** correct story–photo mappings, hidden answers, or any information that allows solving the game. |
+| **Why**      | Buyer understands the experience without spoiling the recipient experience.                                                                                                                                            |
+| **Enforced** | Preview-safe DTOs in `features/match/services/` and `features/treasures/services/` (Sprint 09A/09B).                                                                                                                   |
+
+### A-4 — Treasures API Design
+
+|              |                                                                                                                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | **Per-envelope fetch.** Server returns content of the **next unlocked envelope only** after validation. **Do not** preload all envelopes or hidden content in the initial payload. |
+| **Why**      | Security and surprise experience take priority.                                                                                                                                    |
+| **Enforced** | Recipient envelope open action + server-side unlock order validation (Sprint 09B).                                                                                                 |
+
+### A-5 — Templates Out of Sprint 09
+
+|              |                                                                                                                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Memories/Treasures **starter templates are out of Sprint 09 scope.** Sprint 09 focuses on core gameplay, Studio, publish, buyer preview, recipient experience, security, and architecture quality only. |
+| **Why**      | Ship core V2 experience first; templates after four-mode baseline is complete.                                                                                                                          |
+| **Enforced** | No `features/match/config/templates/` or `features/treasures/config/templates/` in Sprint 09 unless founder reopens scope.                                                                              |
+
+### D-1 — Migration Naming
+
+|              |                                                                                                                                                                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Use **timestamp-based migration filenames** only (e.g. `20260713160000_experience_match_pairs.sql`). **Do not** use logical ordinals such as "018" or "019" during implementation or in new documentation. Reference the **actual filename** in docs. |
+| **Why**      | Hotfix migration consumed ambiguous ordinal numbering; filename is source of truth.                                                                                                                                                                   |
+| **Enforced** | `supabase/migrations/` + [03_DATABASE.md](./03_DATABASE.md) migration history table.                                                                                                                                                                  |
+
+### Match Retry (Memories) — SUPERSEDED
+
+> **Status:** **SUPERSEDED** by **FD-M3** (Sprint 09A Phase 5.5 — 2026-07-13). Retained for audit trail only.
+
+|              |                                                                                                                                                                      |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Recipients may **retry the Match game unlimited times.** This is an emotional experience, not a competitive game.                                                    |
+| **Why**      | Reduce frustration; no anti-retake semantics required for Memories (contrast with optional MED-05 hardening for Connection quiz brute-force).                        |
+| **Enforced** | ~~Client may re-submit batch; server re-grades each attempt. No server-side attempt cap for Memories in V2.~~ **Withdrawn** — replaced by FD-M3 (single submission). |
+
+**Superseded by:** [FD-M3 — Single Submission](#fd-m3--single-submission-sprint-09a-phase-55)
+
+---
+
+## Sprint 09A Phase 5.5 — Memories Founder Decisions (Locked)
+
+> **Status:** **LOCKED** — 2026-07-13 · **SSOT journey:** [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) · **Extends:** CF-1 (Connection) → FD-M5 (Memories)
+
+### FD-M1 — Single Reveal Style
+
+|              |                                                                                                                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Memories uses **exactly one** reveal mechanic for every experience. **No** difficulty selector, reveal style selector, Studio configuration, random reveal modes, or future strategy pattern. |
+| **Why**      | Emotional consistency; cleaner Studio; simpler UX; premium feel without cognitive load.                                                                                                       |
+| **Enforced** | Recipient UI Phase 6B — single `MatchCinematicReveal` presentation component; no admin config fields.                                                                                         |
+
+### FD-M2 — Cinematic Reveal Window
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | Recipient **never** sees the full photo during the match game. Every photo is shown through a **cinematic reveal window**: ~20–30% visible, centered window, soft feathered edges, premium cinematic feel. Creates curiosity and nostalgia — **not** a difficulty mechanic. **Presentation layer only** — no database fields, no Studio configuration, no per-photo customization. Buyer preview continues showing **full photos** (no masking). |
+| **Why**      | Emotional teaser — _"looking through a tiny window into an old memory"_ — rather than a visual puzzle or Saweria-style random blocks.                                                                                                                                                                                                                                                                                                            |
+| **Enforced** | `MatchCinematicReveal` in recipient UI (Phase 6B); CSS mask client-side only.                                                                                                                                                                                                                                                                                                                                                                    |
+
+### FD-M3 — Single Submission
+
+|                |                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision**   | **One submission only** after a successful submit in the same browser session. **No** retry button, try again, re-grade, or second attempt. Wrong answers remain wrong; score is part of the memory. Unlock persistence mirrors **CF-2**: `sessionStorage` only — key `cf_memories_unlock_${experienceId}`; same-tab refresh preserves unlock; new tab / cleared sessionStorage starts fresh (accepted). **No server persistence. No migration.** |
+| **Why**        | Memories is an emotional interaction, not an examination. Single commitment moment before reward.                                                                                                                                                                                                                                                                                                                                                 |
+| **Enforced**   | `memories-unlock-session.ts` (Phase 6C); `MemoriesExperienceFlow` (Phase 6B). **Supersedes** [Match Retry (Memories)](#match-retry-memories--superseded).                                                                                                                                                                                                                                                                                         |
+| **Supersedes** | Match Retry — unlimited retries (Sprint 09 kickoff)                                                                                                                                                                                                                                                                                                                                                                                               |
+
+### FD-M4 — Maximum Photos (Memories Pairs)
+
+|              |                                                                                                                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Memories match pairs: **minimum 2**, **maximum 6**. No difficulty scaling. No additional configuration. Aligns with global 6-photo cap — not a separate Memories-only limit. |
+| **Why**      | Consistent with Gift V2 photo slot architecture (A-1). Example discussions using 4 photos were illustrative only.                                                            |
+| **Enforced** | `MATCH_MIN_PAIRS` / `MATCH_MAX_PAIRS` in `schemas/studio-match.ts`; `validateMatchConfigPublish()`; publish validation (Phase 5 ✅).                                         |
+
+### FD-M5 — Reward Never Blocked (Memories)
+
+|                |                                                                                                                                                                                                                                                                                                     |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision**   | **Extends CF-1 to Memories.** Score is emotional feedback only — **never** blocks unlock message, letter, gallery, or photobooth. After any **valid** batch submit, recipient always receives: Score → Unlock Message → Letter → Gallery → Photobooth. Correctness affects score presentation only. |
+| **Why**        | Same emotional philosophy as Connection — participation earns the gift, not perfect recall.                                                                                                                                                                                                         |
+| **Enforced**   | `gradeMatchAnswers()` + `buildMemoriesRewardPayload()` (Phase 6A); `MemoriesExperienceFlow` (Phase 6B). **Supersedes** prior design where `finalUnlockMessage` required `allCorrect`.                                                                                                               |
+| **Supersedes** | Reward only after all pairs correct (pre–Phase 5.5 grading design)                                                                                                                                                                                                                                  |
+
+### Treasure Navigation (Treasures) — PARTIALLY SUPERSEDED
+
+> **CF-R1 update:** Lifetime replay requirement may change how "revisit" works across future visits. See [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md). **Within an active visit**, revisit behavior below remains valid.
+
+|              |                                                                                                                                                                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Recipients may open envelopes in **any order** (FD-T1). Recipients may **revisit** previously opened envelopes during the same visit. Reward unlocks when **all** envelopes are opened — `is_final` is creator metadata only (FD-T4). |
+| **Why**      | Surprise and freedom — no forced sequence. Ceremony without rigid progression.                                                                                                                                                        |
+| **Enforced** | Sprint 09B — `openEnvelope` service; no sequential validation. **Supersedes** prior "skip ahead blocked" language in older docs.                                                                                                      |
 
 ### Moments Letter Animation
 
@@ -561,4 +752,5 @@ AI assistants must **never** unilaterally override a decision listed here.
 - [02_ARCHITECTURE.md](./02_ARCHITECTURE.md) — technical architecture and code layout
 - [12_STUDIO_UX.md](./12_STUDIO_UX.md) — Studio admin UX (order-centric, unified editor)
 - [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md) — Product Revision V2 decisions
+- [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) — Experience Journey SSOT (CF-1–CF-5, FD-M1–FD-M5)
 - [07_AI_GUIDE.md](./07_AI_GUIDE.md) — how AI assistants must respect these decisions

@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 
 import { env } from "@/config/env";
 
+import { fetchMatchConfig } from "@/features/match/services/fetch-match-config.service";
+import type { MatchStudioConfig } from "@/features/match/types";
 import { ExperienceQuizRepository } from "@/features/quiz/repositories/experience-quiz.repository";
 import { OrderEditorForm } from "@/features/studio/components/order-editor-form";
 import { extractAdminMemoryCode } from "@/features/studio/config/memory-code-admin-ref";
@@ -15,9 +17,11 @@ import { ExperiencePhotosRepository } from "@/features/studio/repositories/exper
 import { ExperiencesRepository } from "@/features/studio/repositories/experiences.repository";
 import { OrdersRepository } from "@/features/studio/repositories/orders.repository";
 import {
-  buildPublishChecklist,
+  buildPublishChecklistForExperience,
   canPublishFromChecklist,
 } from "@/features/studio/services/publish-validation.service";
+import { fetchEnvelopeConfig } from "@/features/treasures/services/fetch-envelope-config.service";
+import type { EnvelopeStudioConfig } from "@/features/treasures/types";
 
 export const metadata = {
   title: "Order — Celebrate Florist Studio",
@@ -54,7 +58,25 @@ export default async function OrderDetailPage({
     experience.experience_mode === "connection"
       ? await quizRepo.findCompleteByExperienceId(experience.id)
       : { questions: [], bands: [] };
-  const checklistItems = buildPublishChecklist(order, experience, initialQuiz);
+  const initialMatch: MatchStudioConfig =
+    experience.experience_mode === "memories"
+      ? await fetchMatchConfig(supabase, {
+          orderId: order.id,
+          experienceId: experience.id,
+        })
+      : { pairs: [], finalUnlockMessage: null };
+  const initialEnvelopes: EnvelopeStudioConfig =
+    experience.experience_mode === "treasures"
+      ? await fetchEnvelopeConfig(supabase, {
+          orderId: order.id,
+          experienceId: experience.id,
+        })
+      : { envelopes: [] };
+  const checklistItems = await buildPublishChecklistForExperience(
+    supabase,
+    order,
+    experience,
+  );
   const canPublish = canPublishFromChecklist(checklistItems);
   const adminMemoryCodeReference = extractAdminMemoryCode(order.admin_notes);
   const publishedRecipientUrl =
@@ -78,6 +100,8 @@ export default async function OrderDetailPage({
         experience={experience}
         photos={photos}
         initialQuiz={initialQuiz}
+        initialMatch={initialMatch}
+        initialEnvelopes={initialEnvelopes}
         checklistItems={checklistItems}
         canPublish={canPublish}
         adminMemoryCodeReference={adminMemoryCodeReference}

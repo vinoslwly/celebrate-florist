@@ -4,10 +4,13 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { LetterView } from "@/features/experience/components/letter-view";
+import { PhotoGallery } from "@/features/experience/components/photo-gallery";
+import { BuyerPreviewMatch } from "@/features/match/components/buyer-preview-match";
 import { approvePreviewAction } from "@/features/preview/actions/approve-preview";
 import type { BuyerPreviewPayload } from "@/features/preview/types";
 import { BuyerPreviewQuiz } from "@/features/quiz/components/buyer-preview-quiz";
 import { resolveThemeTokens } from "@/features/themes/config/resolve-theme";
+import { BuyerPreviewTreasures } from "@/features/treasures/components/buyer-preview-treasures";
 
 type BuyerPreviewShellProps = {
   payload: BuyerPreviewPayload;
@@ -49,30 +52,70 @@ export function BuyerPreviewShell({ payload }: BuyerPreviewShellProps) {
         </p>
       </header>
 
-      <LetterView experience={experience} theme={theme} />
+      {payload.envelopes ? (
+        <>
+          <BuyerPreviewTreasures envelopes={payload.envelopes} />
+          <LetterView experience={experience} theme={theme} />
+          <PhotoGallery photos={photos} theme={theme} />
+        </>
+      ) : (
+        <>
+          {payload.match ? (
+            <>
+              <BuyerPreviewMatch match={payload.match} photos={photos} />
+              <p className="text-center text-xs leading-relaxed text-muted-foreground">
+                Recipients will first uncover glimpses of each memory through a
+                cinematic reveal before discovering the full moments after
+                completing the experience.
+              </p>
+              {payload.match.finalUnlockMessage?.trim() ? (
+                <section className="rounded-2xl border border-border bg-card p-6 text-center space-y-3">
+                  <h2 className="font-serif text-xl font-semibold">
+                    Unlock message
+                  </h2>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {payload.match.finalUnlockMessage}
+                  </p>
+                </section>
+              ) : null}
+            </>
+          ) : null}
 
-      {photos.length > 0 ? (
-        <section className="space-y-4">
-          <h2 className="font-serif text-xl font-semibold">Memory photos</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {photos.map((photo) => (
-              <div
-                key={photo.id}
-                className="overflow-hidden rounded-xl border border-border bg-card"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photo.signedUrl}
-                  alt={`Memory photo ${photo.sort_order}`}
-                  className="aspect-square h-full w-full object-cover"
-                />
+          {payload.quiz ? (
+            <>
+              <BuyerPreviewQuiz quiz={payload.quiz} />
+              <p className="text-center text-xs text-muted-foreground">
+                Recipients take the quiz before the letter is revealed.
+              </p>
+            </>
+          ) : null}
+
+          <LetterView experience={experience} theme={theme} />
+
+          {photos.length > 0 ? (
+            <section className="space-y-4">
+              <h2 className="font-serif text-xl font-semibold">
+                Memory photos
+              </h2>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {photos.map((photo) => (
+                  <div
+                    key={photo.id}
+                    className="overflow-hidden rounded-xl border border-border bg-card"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photo.signedUrl}
+                      alt={`Memory photo ${photo.sort_order}`}
+                      className="aspect-square h-full w-full object-cover"
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {payload.quiz ? <BuyerPreviewQuiz quiz={payload.quiz} /> : null}
+            </section>
+          ) : null}
+        </>
+      )}
 
       <section className="rounded-2xl border border-border bg-card p-6 space-y-4">
         <h2 className="text-sm font-semibold">Buyer approval</h2>

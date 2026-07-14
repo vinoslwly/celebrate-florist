@@ -6,6 +6,8 @@ import type { ExperienceMode, ExperienceRow, OrderRow } from "@/types/database";
 import type { ExperiencePhotoRow } from "@/types/database";
 
 import { Button } from "@/components/ui/button";
+import { MatchBuilderPanel } from "@/features/match/components/match-builder-panel";
+import type { MatchStudioConfig } from "@/features/match/types";
 import { QuizBuilderPanel } from "@/features/quiz/components/quiz-builder-panel";
 import type { ExperienceQuiz } from "@/features/quiz/types";
 import {
@@ -20,12 +22,16 @@ import { PhotosUploadPanel } from "@/features/studio/components/photos-upload-pa
 import { PublishChecklist } from "@/features/studio/components/publish-checklist";
 import { EXPERIENCE_MODES } from "@/features/studio/config/experience-modes";
 import type { PublishChecklistItem } from "@/features/studio/config/publish-checklist";
+import { EnvelopeBuilderPanel } from "@/features/treasures/components/envelope-builder-panel";
+import type { EnvelopeStudioConfig } from "@/features/treasures/types";
 
 type OrderEditorFormProps = {
   order: OrderRow;
   experience: ExperienceRow;
   photos: ExperiencePhotoRow[];
   initialQuiz: ExperienceQuiz;
+  initialMatch: MatchStudioConfig;
+  initialEnvelopes: EnvelopeStudioConfig;
   checklistItems: PublishChecklistItem[];
   canPublish: boolean;
   adminMemoryCodeReference: string | null;
@@ -38,6 +44,8 @@ export function OrderEditorForm({
   experience,
   photos,
   initialQuiz,
+  initialMatch,
+  initialEnvelopes,
   checklistItems,
   canPublish,
   adminMemoryCodeReference,
@@ -48,6 +56,9 @@ export function OrderEditorForm({
   const [closingName, setClosingName] = useState(experience.closing_name);
   const [letterContent, setLetterContent] = useState(experience.letter_content);
   const [letterClosing, setLetterClosing] = useState(experience.letter_closing);
+  const [experiencePhotos, setExperiencePhotos] = useState<
+    ExperiencePhotoRow[]
+  >(photos ?? []);
   const [experienceMode, setExperienceMode] = useState<ExperienceMode>(
     experience.experience_mode,
   );
@@ -215,8 +226,9 @@ export function OrderEditorForm({
       <PhotosUploadPanel
         orderId={order.id}
         experienceId={experience.id}
-        initialPhotos={photos}
+        initialPhotos={experiencePhotos}
         disabled={isLocked}
+        onPhotosChange={(next) => setExperiencePhotos(next ?? [])}
       />
 
       {experienceMode === "connection" ? (
@@ -237,6 +249,31 @@ export function OrderEditorForm({
             letterContent,
             letterClosing,
           }}
+          disabled={isLocked}
+        />
+      ) : experienceMode === "memories" ? (
+        <MatchBuilderPanel
+          key={[
+            experience.id,
+            experience.final_unlock_message ?? "",
+            ...initialMatch.pairs.map((pair) => pair.id),
+          ].join(":")}
+          orderId={order.id}
+          experienceId={experience.id}
+          initialMatch={initialMatch}
+          photos={experiencePhotos}
+          disabled={isLocked}
+        />
+      ) : experienceMode === "treasures" ? (
+        <EnvelopeBuilderPanel
+          key={[
+            experience.id,
+            ...initialEnvelopes.envelopes.map((envelope) => envelope.id),
+          ].join(":")}
+          orderId={order.id}
+          experienceId={experience.id}
+          initialEnvelopes={initialEnvelopes}
+          photos={experiencePhotos}
           disabled={isLocked}
         />
       ) : (
@@ -289,7 +326,11 @@ export function OrderEditorForm({
           <p className="mt-1 text-xs text-muted-foreground">
             {experienceMode === "connection" && pendingMode !== "connection"
               ? "Saved quiz questions, score bands, and quiz title will be permanently removed."
-              : "Incompatible premium configuration will be removed when changing mode."}
+              : experienceMode === "memories" && pendingMode !== "memories"
+                ? "Saved match pairs and final unlock message will be permanently removed."
+                : experienceMode === "treasures" && pendingMode !== "treasures"
+                  ? "Saved envelope configuration will be permanently removed."
+                  : "Incompatible premium configuration will be removed when changing mode."}
           </p>
           <div className="mt-3 flex gap-2">
             <Button

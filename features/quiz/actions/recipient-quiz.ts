@@ -10,9 +10,10 @@ import {
   evaluateAccessGate,
   getAccessRequestContext,
 } from "@/features/access/services/access-gate.service";
+import type { ConnectionQuizSubmitResult } from "@/features/experience/types/connection-gate.types";
 import { fetchRecipientQuiz } from "@/features/quiz/services/fetch-recipient-quiz.service";
 import { submitQuizAnswers } from "@/features/quiz/services/submit-quiz-answers.service";
-import type { QuizGradeResult, RecipientQuizView } from "@/features/quiz/types";
+import type { RecipientQuizView } from "@/features/quiz/types";
 import {
   fetchRecipientQuizSchema,
   submitQuizAnswersSchema,
@@ -39,13 +40,13 @@ export async function fetchRecipientQuizAction(
 
 export async function submitQuizAnswersAction(
   input: unknown,
-): Promise<ActionResult<{ result: QuizGradeResult }>> {
+): Promise<ActionResult<ConnectionQuizSubmitResult>> {
   return withActionHandler(async () => {
     const data = validateActionInput(submitQuizAnswersSchema, input);
     const context = await getAccessRequestContext();
     const admin = createAdminClient();
-    const result = await submitQuizAnswers(admin, data, context);
+    const submitResult = await submitQuizAnswers(admin, data, context);
 
-    return { result };
+    return submitResult;
   });
 }

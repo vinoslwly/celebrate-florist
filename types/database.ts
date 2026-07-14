@@ -80,6 +80,7 @@ export type ExperienceRow = {
   event_type: EventType;
   experience_mode: ExperienceMode;
   quiz_title: string | null;
+  final_unlock_message: string | null;
   letter_content: string;
   letter_closing: string;
   memory_key_hash: string;
@@ -124,6 +125,38 @@ export type QuizScoreBandRow = {
   min_percent: number;
   max_percent: number;
   message: string;
+};
+
+/** Memories mode — story ↔ photo slot pairing for Match The Memory. */
+export type MatchPairRow = {
+  id: string;
+  experience_id: string;
+  sort_order: number;
+  story_text: string;
+  photo_sort_order: number;
+  created_at: string;
+};
+
+/** Treasures mode — authored envelope row (FD-T5: message, photo, or both). */
+export type ExperienceEnvelopeRow = {
+  id: string;
+  experience_id: string;
+  sort_order: number;
+  message_text: string | null;
+  photo_sort_order: number | null;
+  is_final: boolean;
+  created_at: string;
+};
+
+/**
+ * Treasures mode — recipient open progress (FD-T2).
+ * One row per opened envelope; UNIQUE prevents duplicate opens on revisit (FD-T3).
+ */
+export type ExperienceEnvelopeOpenRow = {
+  id: string;
+  experience_id: string;
+  envelope_sort_order: number;
+  opened_at: string;
 };
 
 export type PreviewLinkRow = {
@@ -200,6 +233,9 @@ export type TableName =
   | "experience_photos"
   | "experience_quiz_questions"
   | "experience_quiz_score_bands"
+  | "experience_match_pairs"
+  | "experience_envelopes"
+  | "experience_envelope_opens"
   | "preview_links"
   | "experience_sessions"
   | "access_attempts"

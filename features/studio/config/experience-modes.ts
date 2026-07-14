@@ -25,13 +25,13 @@ export const EXPERIENCE_MODES: ExperienceModeConfig[] = [
     value: "memories",
     label: "Memories",
     description: "Match the Memory — pair stories with photos.",
-    editorSprint: "Sprint 09A",
+    editorSprint: null,
   },
   {
     value: "treasures",
     label: "Treasures",
-    description: "Secret envelopes — sequential reveals.",
-    editorSprint: "Sprint 09B",
+    description: "Secret envelopes — each holds a complete memory surprise.",
+    editorSprint: null,
   },
 ];
 

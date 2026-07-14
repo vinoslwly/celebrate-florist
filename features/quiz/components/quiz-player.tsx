@@ -3,60 +3,26 @@
 import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import type { ConnectionQuizSubmitResult } from "@/features/experience/types/connection-gate.types";
 import { submitQuizAnswersAction } from "@/features/quiz/actions/recipient-quiz";
 import type {
-  QuizGradeResult,
   RecipientQuizQuestion,
   RecipientQuizView,
 } from "@/features/quiz/types";
 
 type QuizPlayerProps = {
-  experienceId: string;
   experienceToken: string;
   quiz: RecipientQuizView;
-};
-
-type StoredQuizSession = {
-  result: QuizGradeResult;
+  /** When set, parent orchestrates unlock — no internal result card or sessionStorage. */
+  onSubmitSuccess?: (data: ConnectionQuizSubmitResult) => void;
 };
 
 const OPTION_LABELS = ["A", "B", "C"] as const;
 
-function sessionStorageKey(experienceId: string): string {
-  return `cf_quiz_submitted_${experienceId}`;
-}
-
-function readStoredSession(experienceId: string): StoredQuizSession | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const raw = sessionStorage.getItem(sessionStorageKey(experienceId));
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(raw) as StoredQuizSession;
-  } catch {
-    return null;
-  }
-}
-
-function writeStoredSession(
-  experienceId: string,
-  result: QuizGradeResult,
-): void {
-  sessionStorage.setItem(
-    sessionStorageKey(experienceId),
-    JSON.stringify({ result }),
-  );
-}
-
 export function QuizPlayer({
-  experienceId,
   experienceToken,
   quiz,
+  onSubmitSuccess,
 }: QuizPlayerProps) {
   const sortedQuestions = useMemo(
     () =>
@@ -75,20 +41,6 @@ export function QuizPlayer({
   });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<QuizGradeResult | null>(() => {
-    if (typeof window === "undefined") {
-      return null;
-    }
-
-    return readStoredSession(experienceId)?.result ?? null;
-  });
-  const [submitted, setSubmitted] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    return readStoredSession(experienceId) !== null;
-  });
 
   function updateAnswer(question: RecipientQuizQuestion, optionIndex: number) {
     setAnswers((current) => ({
@@ -98,10 +50,6 @@ export function QuizPlayer({
   }
 
   async function handleSubmit() {
-    if (submitted) {
-      return;
-    }
-
     setBusy(true);
     setError(null);
 
@@ -122,25 +70,7 @@ export function QuizPlayer({
       return;
     }
 
-    setResult(response.data.result);
-    setSubmitted(true);
-    writeStoredSession(experienceId, response.data.result);
-  }
-
-  if (result) {
-    return (
-      <section
-        aria-live="polite"
-        className="rounded-2xl border border-border bg-card p-6 space-y-4 text-center"
-      >
-        <h2 className="font-serif text-2xl font-semibold">Your score</h2>
-        <p className="text-5xl font-semibold tabular-nums">{result.percent}%</p>
-        <p className="text-sm text-muted-foreground">
-          {result.correctCount} of {result.totalQuestions} correct
-        </p>
-        <p className="text-base leading-relaxed">{result.message}</p>
-      </section>
-    );
+    onSubmitSuccess?.(response.data);
   }
 
   return (
@@ -177,7 +107,7 @@ export function QuizPlayer({
               Question {index + 1}
             </h3>
             <p className="text-sm leading-relaxed">{question.prompt}</p>
-            <fieldset className="space-y-2" disabled={busy || submitted}>
+            <fieldset className="space-y-2" disabled={busy}>
               <legend className="sr-only">
                 Answers for question {index + 1}
               </legend>
@@ -196,7 +126,7 @@ export function QuizPlayer({
                       name={`quiz-${question.sortOrder}`}
                       checked={answers[question.sortOrder] === optionIndex}
                       onChange={() => updateAnswer(question, optionIndex)}
-                      disabled={busy || submitted}
+                      disabled={busy}
                       className="mt-0.5 size-4 accent-primary"
                     />
                     <span>
@@ -215,7 +145,7 @@ export function QuizPlayer({
         <Button
           type="button"
           onClick={() => void handleSubmit()}
-          disabled={busy || submitted || sortedQuestions.length === 0}
+          disabled={busy || sortedQuestions.length === 0}
         >
           {busy ? "Submitting…" : "Submit answers"}
         </Button>

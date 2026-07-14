@@ -51,7 +51,8 @@ gantt
     section Build
     Sprint 06 Studio + Schema      :done, s06, 2026-07, 2026-08
     Sprint 07 Moments E2E          :s07, 2026-08, 2026-09
-    Sprint 08 Connection Quiz      :s08, 2026-09, 2026-10
+    Sprint 08 Connection Quiz      :done, s08, 2026-09, 2026-10
+    Sprint 08R Connection Journey  :done, s08r, 2026-10, 2026-10
     Sprint 09A Memories            :s09a, 2026-10, 2026-11
     Sprint 09B Treasures           :s09b, 2026-11, 2026-12
     Sprint 10 Polish + Launch      :s10, 2026-12, 2027-01
@@ -391,7 +392,7 @@ flowchart TB
 
 ## Sprint 08 — Connection Experience (Quiz + Templates)
 
-> **Status:** **Complete** — all Sprint 08 deliverables implemented; Phase 8 acceptance + hotfix verified; Sprint 09A cleared to begin.
+> **Status:** **Complete** — all Sprint 08 deliverables implemented; Phase 8 acceptance + hotfix verified.
 
 **Goal:** Ship **Connection** premium mode — couple quiz (max 6 multiple choice) with **starter templates**.
 
@@ -421,23 +422,102 @@ flowchart TB
 
 ### Deployable Outcome
 
-- Connection tier fully sellable with templates
+- Connection tier fully sellable with templates (original letter-first flow — superseded by Sprint 08R)
 - Moments + Connection production-ready
+
+---
+
+## Sprint 08R — Connection Journey Revision (Gate / Reward Architecture)
+
+> **Status:** **Complete** — all phases 08R-A through 08R-D accepted and closed.  
+> **SSOT:** [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) · **Decisions:** CF-1–CF-5 in [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md)
+
+**Goal:** Revise Connection recipient flow to **game-first reward architecture** — quiz gates letter and gallery; Gate Payload on load, Reward Payload after submit. Documentation synchronized in 08R-D.
+
+**Context:** Sprint 08 shipped Connection with letter before quiz. Sprint 08R realigns implementation and docs with premium experience philosophy without changing quiz Studio/backend fundamentals.
+
+### Sprint 08R Implementation Checklist
+
+| Phase | Scope                                                                                  | Status |
+| ----- | -------------------------------------------------------------------------------------- | ------ |
+| 08R-A | Gate Payload + Reward Payload types, services, contracts                               | ✅     |
+| 08R-B | `ConnectionExperienceFlow` orchestration; `QuizPlayer` refactor; sessionStorage unlock | ✅     |
+| 08R-C | Verification, regression, buyer preview reorder, security evidence                     | ✅     |
+| 08R-D | Documentation synchronization — SSOT linked; drift resolved                            | ✅     |
+
+### Deliverables (08R-A–C)
+
+| Area                             | Work                                                                        | Status |
+| -------------------------------- | --------------------------------------------------------------------------- | ------ |
+| `fetchConnectionGatePayload()`   | Safe experience projection + theme + recipient quiz                         | ✅     |
+| `buildConnectionRewardPayload()` | Letter + signed photos after submit                                         | ✅     |
+| `ConnectionExperienceFlow`       | Client orchestrator — quiz → unlock → score → letter → gallery → photobooth | ✅     |
+| `connection-unlock-session.ts`   | `sessionStorage` only (CF-2)                                                | ✅     |
+| Page wiring                      | Connection: gate fetch only; Moments: published fetch only                  | ✅     |
+| Buyer preview                    | Quiz → Letter → Gallery → Approve (no gating)                               | ✅     |
+
+### Deployable Outcome
+
+- Connection recipient journey matches SSOT: Quiz → Score+Band → Letter → Gallery → Photobooth
+- Security: no letter/photos in initial payload (CF-4); gallery gated (CF-3)
+- **Sprint 09A Phase 5** cleared to resume
+
+### Not in Scope (08R)
+
+- Memories/Treasures recipient UI (Sprint 09A Phase 6+ / 09B)
+- New migrations or server-side unlock persistence
+- Analytics changes (OD-1 unchanged)
 
 ---
 
 ## Sprint 09A — Memories Experience
 
-**Goal:** Ship **Memories** mode — Match The Memory game.
+> **Status:** **Active** — Phases 1–5 complete; Phase 5.5 (founder lock) complete; **Phase 6A next**. Founder decisions: CF-1–CF-5, FD-M1–FD-M5 ([05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md)).
+
+**Goal:** Ship **Memories** mode — Match The Memory with cinematic reveal (FD-M2), single submission (FD-M3), reward never blocked (FD-M5), gate/reward architecture mirroring Sprint 08R.
 
 ### Planned Deliverables
 
-| Area               | Work                                                                                 |
-| ------------------ | ------------------------------------------------------------------------------------ |
-| Migration 018      | `experience_match_pairs`, `final_unlock_message` + RLS (no UPDATE post-publish)      |
-| Studio             | Match pair editor (story + photo slot); optional Memories templates                  |
-| `features/match/`  | Tap/drag match UI, unlock final message                                              |
-| Publish validation | Memories: ≥ 2 pairs, `final_unlock_message`; each `photo_sort_order` must have photo |
+| Area               | Work                                                                                                           |
+| ------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Migration          | `20260713160000_experience_match_pairs.sql` — pairs table, `final_unlock_message`, RLS + `service_role` grants |
+| Studio             | Match pair editor (story + photo slot); **no templates** (A-5 out of scope)                                    |
+| `features/match/`  | Gate/Reward backend (6A); cinematic reveal UI + orchestration (6B–6C)                                          |
+| Buyer preview      | Stories + full photos + structure; **no** correct mappings (A-3); cinematic note (7)                           |
+| Publish validation | Memories: 2–6 pairs, unique photo slots, `final_unlock_message`; photo slot occupied                           |
+
+### Sprint 09A Implementation Checklist
+
+| Phase | Scope                                                                                       | Status |
+| ----- | ------------------------------------------------------------------------------------------- | ------ |
+| 0     | Doc sync + founder decision lock                                                            | ✅     |
+| 1     | Migration + types                                                                           | ✅     |
+| 2     | Repositories + Zod schemas                                                                  | ✅     |
+| 3     | Services + validation + guards                                                              | ✅     |
+| 4     | Studio Match Editor                                                                         | ✅     |
+| 5     | Publish validation + mode-change cleanup                                                    | ✅     |
+| 5.5   | FD-M1–FD-M5 founder decision lock (documentation)                                           | ✅     |
+| 6A    | Gate/Reward backend (`fetchMemoriesGatePayload`, `buildMemoriesRewardPayload`, grade FD-M5) | ⏳     |
+| 6B    | Recipient UI (`MemoriesExperienceFlow`, `MatchCinematicReveal`)                             | ⏳     |
+| 6C    | Page wiring + `memories-unlock-session.ts`                                                  | ⏳     |
+| 7     | Buyer preview + regression + doc sync                                                       | ⏳     |
+| 8     | QA closure                                                                                  | ⏳     |
+
+### Phase 6 Architecture (Locked — Phase 5.5)
+
+Mirror Sprint 08R Connection pattern:
+
+| Layer          | Memories (Phase 6)                                                                                                      |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Gate Payload   | `MemoriesGatePayload` — stories, masked photo URLs, theme; no letter, no unlock message, no mappings                    |
+| Reward Payload | `MemoriesRewardPayload` — score result, unlock message, letter, signed gallery URLs (always after valid submit — FD-M5) |
+| Fetch          | `fetchMemoriesGatePayload()` — Memories branch only in `page.tsx`                                                       |
+| Build          | `buildMemoriesRewardPayload()` — via `submitMatchAnswersAction`                                                         |
+| Orchestrator   | `MemoriesExperienceFlow` (client)                                                                                       |
+| Reveal UI      | `MatchCinematicReveal` — single style (FD-M1, FD-M2)                                                                    |
+| Unlock         | `memories-unlock-session.ts` — `cf_memories_unlock_${experienceId}` (FD-M3, mirrors CF-2)                               |
+
+**Do not invent alternate architecture.** No difficulty config. No reveal strategy pattern. No DB migrations for reveal.
 
 ### Deployable Outcome
 
@@ -451,16 +531,19 @@ flowchart TB
 
 ## Sprint 09B — Treasures Experience
 
-**Goal:** Ship **Treasures** mode — Secret Envelopes (max 6).
+> **Status:** **Planned** — begins after Sprint 09A Phase 8 acceptance.
+
+**Goal:** Ship **Treasures** mode — Secret Envelopes (2–6, per-envelope fetch, revisit unlocked only).
 
 ### Planned Deliverables
 
-| Area                  | Work                                                                                |
-| --------------------- | ----------------------------------------------------------------------------------- |
-| Migration 019         | `experience_envelopes` + RLS (no UPDATE post-publish)                               |
-| Studio                | Envelope sequencer (message/photo, final flag, max 6); optional Treasures templates |
-| `features/treasures/` | Sequential envelope open UI                                                         |
-| Publish validation    | Treasures: 2–6 envelopes, exactly 1 final                                           |
+| Area                  | Work                                                                              |
+| --------------------- | --------------------------------------------------------------------------------- |
+| Migration             | `*_experience_envelopes.sql` (timestamp filename) + RLS + `service_role` grants   |
+| Studio                | Envelope sequencer (message/photo, final flag, 2–6); **no templates** (A-5)       |
+| `features/treasures/` | Sequential envelope UI; per-envelope fetch (A-4); revisit unlocked, no skip ahead |
+| Buyer preview         | Structure without hidden content spoilage (A-3)                                   |
+| Publish validation    | Treasures: 2–6 envelopes, exactly 1 final                                         |
 
 ### Deployable Outcome
 
@@ -472,7 +555,34 @@ flowchart TB
 
 ---
 
-## Sprint 10 — Polish, Marketing, Analytics
+## Sprint 10 — CF-R2 Treasures Replay Reset ✅ COMPLETE
+
+**Goal:** Implement **CF-R2** for Treasures (CF-R1 compliance). No other mode changes.
+
+> **Full plan & QA:** [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md)
+
+### Deliverables (Shipped)
+
+| Phase   | Work                                                 | Status |
+| ------- | ---------------------------------------------------- | ------ |
+| **10A** | `completeTreasuresJourney` service + action          | ✅     |
+| **10B** | Photobooth mount wiring in `TreasuresExperienceFlow` | ✅     |
+| **10C** | QA + documentation sync                              | ✅     |
+
+### Out of Scope (Sprint 10)
+
+- Connection / Memories / Moments changes
+- New visit/session tables
+- Landing polish, analytics dashboard (deferred)
+
+### Deployable Outcome
+
+- Treasures recipients replay full envelope journey on reload after Photobooth trigger
+- Journey progress preserved until Photobooth; reload after trigger intentionally fresh
+
+---
+
+## Sprint 10+ — Polish, Marketing, Analytics (Deferred)
 
 **Goal:** Launch-quality refinement across all modes.
 
@@ -531,8 +641,9 @@ flowchart TB
 | 05.5         | Landing + Studio login (unchanged)                                |
 | 06           | Studio order-centric IA + unified editor + action-queue dashboard |
 | 07           | **Moments** full delivery + Memory Code grace period              |
-| 08           | Moments + **Connection** (with templates)                         |
-| 09A          | + **Memories**                                                    |
+| 08           | Moments + **Connection** (with templates; original flow)          |
+| 08R          | Connection **game-first journey** — gate/reward architecture      |
+| 09A          | + **Memories** (Phases 1–5.5 complete; Phase 6A+ in progress)     |
 | 09B          | All **four modes**                                                |
 | 10           | Launch-polished **four modes** + marketing                        |
 
@@ -567,4 +678,5 @@ flowchart TB
 - [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)
 - [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)
 - [12_STUDIO_UX.md](./12_STUDIO_UX.md) — Studio admin UX specification
+- [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) — Experience Journey SSOT
 - [00_INDEX.md](./00_INDEX.md)
