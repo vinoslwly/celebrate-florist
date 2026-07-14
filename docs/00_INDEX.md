@@ -30,6 +30,18 @@ Sprint 05.5 was **documentation only** — no code, no migrations. Sprints 00–
 
 Founder approved **CF-R1** and **CF-R2** (CF-R2-A/B/C). **Sprint 10 is officially complete.** Engineering freeze in effect — no new implementation without explicit founder approval. See [14](./14_REPLAYABLE_EXPERIENCE.md) · [15](./15_SPRINT_10_CF-R2_REPLAY_RESET.md).
 
+## 📋 Roadmap V1 — Post Sprint 10 (Founder Approved)
+
+Sprint 00–10 = **Phase A — Product Foundation** ✅ complete. Platform core is shipped. Official long-term roadmap:
+
+| Phase                            | Sprints | Status      | Purpose                                                                  |
+| -------------------------------- | ------- | ----------- | ------------------------------------------------------------------------ |
+| **Phase A — Product Foundation** | 00–10   | ✅ Complete | Engineering, 4 modes, replayability, platform core                       |
+| **Phase B — Experience Layer**   | 11–16   | 📋 Planned  | Scene architecture, UI system, motion, photobooth, **Studio UX**, polish |
+| **Phase C — Release Layer**      | 17–19   | 📋 Planned  | QA, production readiness (incl. landing/SEO), **V1 Launch**              |
+
+**Sprint 11 has not started.** Full detail: [11_IMPLEMENTATION_ROADMAP_V2.md — Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved).
+
 ## ✅ Sprint 05.5 — CLOSED (Official Implementation Baseline)
 
 Sprint 05.5 is **closed**. All documentation in this package is the **official baseline** for Sprint 06+ implementation. No further design reviews required unless the founder explicitly reopens a decision.
@@ -112,16 +124,16 @@ Read these documents in order. Each file builds on the previous one.
 
 ## Current Project Status
 
-| Area                        | Status                                                                                                                                                               |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Development phase**       | **Engineering freeze** — Sprints 08–10 complete; no new implementation without founder approval                                                                      |
-| **Current sprint**          | **None active** — latest: **Sprint 10** (CF-R2 Treasures replay reset) ✅ closed                                                                                     |
-| **Latest completed sprint** | **Sprint 10** — CF-R2 replay reset (10A–10C) + CRIT-01 `service_role` DELETE hotfix                                                                                  |
-| **Deployment**              | Vercel project linked; Studio + recipient `/e/[token]` + buyer `/preview/[token]` routes deployable                                                                  |
-| **Database**                | **21** migrations in repo (`celebrate-florist-prod`); match pairs (09A), envelopes + opens (09B), CRIT-01 DELETE grant (10) — see [03_DATABASE.md](./03_DATABASE.md) |
-| **Security**                | Sprint 02B hardening complete; RLS and privilege hardening complete (migrations 011–015)                                                                             |
-| **Product**                 | **V2:** All **four experience modes** production-ready — Moments, Connection, Memories, Treasures (Studio publish, preview, QR, recipient UI)                        |
-| **Production readiness**    | **Four-mode platform shipped** — apply pending migrations to remote before CF-R2 works in production ([06](./06_DEVELOPMENT_GUIDE.md))                               |
+| Area                        | Status                                                                                                                                                                      |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Development phase**       | **Engineering freeze** — Phase A (Sprint 00–10) complete; Phase B/C planned per [Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved) |
+| **Current sprint**          | **None active** — next planned: **Sprint 11** (Experience Architecture) — **not started**                                                                                   |
+| **Latest completed sprint** | **Sprint 10** — CF-R2 replay reset (10A–10C) + CRIT-01 `service_role` DELETE hotfix                                                                                         |
+| **Deployment**              | Vercel project linked; Studio + recipient `/e/[token]` + buyer `/preview/[token]` routes deployable                                                                         |
+| **Database**                | **21** migrations in repo; all Sprint 09A–10 migrations applied on remote — see [03_DATABASE.md](./03_DATABASE.md)                                                          |
+| **Security**                | Sprint 02B hardening complete; RLS and privilege hardening complete (migrations 011–015)                                                                                    |
+| **Product**                 | **V2:** All **four experience modes** production-ready — Moments, Connection, Memories, Treasures (Studio publish, preview, QR, recipient UI)                               |
+| **Production readiness**    | **Platform core shipped** — Phase B/C transforms functional product into premium launch experience                                                                          |
 
 ### Sprint History
 
@@ -145,6 +157,25 @@ Read these documents in order. Each file builds on the previous one.
 | **Sprint 09B**                        | ✅ **Closed** | Treasures envelopes (max 6) — Studio editor, recipient UI, per-envelope fetch (FD-T1–T5)                        |
 | **Sprint 10**                         | ✅ **Closed** | CF-R2 Treasures replay reset (10A–10C) + CRIT-01 production hotfix ([15](./15_SPRINT_10_CF-R2_REPLAY_RESET.md)) |
 
+### Planned Roadmap (Phase B — Experience Layer)
+
+| Sprint        | Status     | Summary                                                                                          |
+| ------------- | ---------- | ------------------------------------------------------------------------------------------------ |
+| **Sprint 11** | 📋 Planned | Experience Architecture — multi-mode Scene Engine spec; wraps Gate/Reward; **not visual polish** |
+| **Sprint 12** | 📋 Planned | UI System — design tokens, components, layout (feeds Motion System)                              |
+| **Sprint 13** | 📋 Planned | Motion System — cinematic transitions; reduced-motion; photobooth excluded                       |
+| **Sprint 14** | 📋 Planned | Experience Components — Photobooth redesign (Layout B, Layout K)                                 |
+| **Sprint 15** | 📋 Planned | **Studio UX** — operational polish; UX only; no backend changes                                  |
+| **Sprint 16** | 📋 Planned | Polish — micro interactions, loading states, a11y, performance                                   |
+
+### Planned Roadmap (Phase C — Release Layer)
+
+| Sprint        | Status     | Summary                                                                                                     |
+| ------------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| **Sprint 17** | 📋 Planned | QA — all modes, Studio, desktop/mobile, regression, security                                                |
+| **Sprint 18** | 📋 Planned | Production Readiness — docs, monitoring, analytics, **landing readiness**, SEO, metadata, release checklist |
+| **Sprint 19** | 📋 Planned | **V1 Launch** — production deployment; critical bug fixes only                                              |
+
 ---
 
 ## AI Instructions
@@ -153,7 +184,7 @@ Every AI assistant working on this repository **MUST**:
 
 1. **Read this file first**, then follow the reading order above.
 2. **Read the Product Revision V2 package (docs 07–12) before Sprint 07 code** — especially [12_STUDIO_UX.md](./12_STUDIO_UX.md) for Studio work.
-3. **Follow [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)** for sprint history — engineering freeze after Sprint 10; do not start new work without founder approval.
+3. **Follow [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)** — Phase A complete; Roadmap V1 (Sprint 11–19) is the official post–Sprint 10 plan. Do not start Sprint 11 without founder approval.
 4. **Consult [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)** for recipient and buyer-preview journey ordering — **SSOT for all modes**.
 5. **Never modify architecture** without explicit founder approval.
 6. **Respect [Founder Decisions](./05_FOUNDER_DECISIONS.md)** — they override convenience.
@@ -165,14 +196,14 @@ Every AI assistant working on this repository **MUST**:
 
 ### What Exists Today (Code Reality)
 
-| Layer            | Implemented                                                                                                                                                                                                                                     | Not Yet Implemented                               |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| Routes           | `app/(public)/` landing; `app/(studio)/` login, dashboard, orders CRUD; `app/(experience)/e/[token]`; `app/(preview)/preview/[token]`                                                                                                           | —                                                 |
-| Features (code)  | `features/landing/`, `features/themes/`, `features/studio/`, `features/experience/`, `features/access/`, `features/preview/`, `features/photobooth/`, `features/analytics/`, `features/quiz/`, **`features/match/`**, **`features/treasures/`** | Sprint 10+ polish, analytics dashboard (deferred) |
-| Supabase clients | `lib/supabase/client.ts`, `server.ts`, `admin.ts`                                                                                                                                                                                               | —                                                 |
-| Auth             | Session helpers, Studio login/logout, `proxy.ts` gate, Memory Code grace/trusted devices, recipient access gate                                                                                                                                 | —                                                 |
-| Database         | Full V1 schema + migrations through Sprint 10 — mode schema (016), quiz (017), match pairs (09A), envelopes + opens (09B), CRIT-01 DELETE grant (10) — see [03_DATABASE.md](./03_DATABASE.md)                                                   | —                                                 |
-| Product          | V2 four-mode platform — **all four modes E2E shipped** (Studio publish, preview, QR, recipient UI for Moments, Connection, Memories, Treasures); CF-R2 replay reset (Treasures)                                                                 | Landing polish, analytics dashboard (deferred)    |
+| Layer            | Implemented                                                                                                                                                                                                                                     | Not Yet Implemented                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Routes           | `app/(public)/` landing; `app/(studio)/` login, dashboard, orders CRUD; `app/(experience)/e/[token]`; `app/(preview)/preview/[token]`                                                                                                           | —                                                                               |
+| Features (code)  | `features/landing/`, `features/themes/`, `features/studio/`, `features/experience/`, `features/access/`, `features/preview/`, `features/photobooth/`, `features/analytics/`, `features/quiz/`, **`features/match/`**, **`features/treasures/`** | Phase B — Scene Engine, UI system, motion, photobooth, Studio UX (Sprint 11–16) |
+| Supabase clients | `lib/supabase/client.ts`, `server.ts`, `admin.ts`                                                                                                                                                                                               | —                                                                               |
+| Auth             | Session helpers, Studio login/logout, `proxy.ts` gate, Memory Code grace/trusted devices, recipient access gate                                                                                                                                 | —                                                                               |
+| Database         | Full V1 schema + migrations through Sprint 10 — see [03_DATABASE.md](./03_DATABASE.md)                                                                                                                                                          | —                                                                               |
+| Product          | V2 four-mode platform — **all four modes E2E shipped**; CF-R2 replay reset (Treasures)                                                                                                                                                          | Phase B/C — premium experience + Studio UX + V1 launch (Sprint 11–19)           |
 
 ---
 

@@ -25,28 +25,28 @@
 
 ## Summary Matrix
 
-| Area                          | Impact                    | Priority sprint                                          |
-| ----------------------------- | ------------------------- | -------------------------------------------------------- |
-| Database schema               | **MAJOR CHANGE**          | Sprint 06–07                                             |
-| Recipient experience UI       | **MAJOR CHANGE**          | Sprint 07–09                                             |
-| Studio dashboard              | **MAJOR CHANGE**          | Sprint 06–08                                             |
-| Admin workflow                | **MAJOR CHANGE**          | Sprint 06–08                                             |
-| Repositories                  | **MINOR CHANGE**          | Sprint 06+                                               |
-| Server Actions / API          | **MINOR CHANGE**          | Sprint 06+                                               |
-| Storage                       | **MINOR CHANGE**          | Sprint 06–07                                             |
-| Validation (Zod)              | **MINOR CHANGE**          | Sprint 06+                                               |
-| Analytics                     | **MINOR CHANGE**          | Sprint 07 — coarse events only (opened, completed, mode) |
-| Audit logs                    | **MINOR CHANGE**          | Sprint 06+                                               |
-| Security / RLS                | **MINOR CHANGE**          | Sprint 06–07                                             |
-| Memory Code grace period      | **MAJOR CHANGE**          | Sprint 07                                                |
-| Studio templates              | **MINOR CHANGE**          | Sprint 08 (Connection), 09A/09B (Memories/Treasures)     |
-| Landing page / marketing copy | **MINOR CHANGE**          | Sprint 10+                                               |
-| Proxy / auth                  | **NO CHANGE**             | —                                                        |
-| Photobooth architecture       | **NO CHANGE**             | —                                                        |
-| Preview vs experience tokens  | **NO CHANGE**             | —                                                        |
-| Supabase clients              | **NO CHANGE**             | —                                                        |
-| Deployment / Vercel           | **NO CHANGE**             | —                                                        |
-| Future scalability            | **MAJOR CHANGE** (design) | Ongoing                                                  |
+| Area                          | Impact                    | Priority sprint                                                             |
+| ----------------------------- | ------------------------- | --------------------------------------------------------------------------- |
+| Database schema               | **MAJOR CHANGE**          | Sprint 06–07                                                                |
+| Recipient experience UI       | **MAJOR CHANGE**          | Sprint 07–09                                                                |
+| Studio dashboard              | **MAJOR CHANGE**          | Sprint 06–08                                                                |
+| Admin workflow                | **MAJOR CHANGE**          | Sprint 06–08                                                                |
+| Repositories                  | **MINOR CHANGE**          | Sprint 06+                                                                  |
+| Server Actions / API          | **MINOR CHANGE**          | Sprint 06+                                                                  |
+| Storage                       | **MINOR CHANGE**          | Sprint 06–07                                                                |
+| Validation (Zod)              | **MINOR CHANGE**          | Sprint 06+                                                                  |
+| Analytics                     | **MINOR CHANGE**          | Sprint 07 — coarse events only (opened, completed, mode)                    |
+| Audit logs                    | **MINOR CHANGE**          | Sprint 06+                                                                  |
+| Security / RLS                | **MINOR CHANGE**          | Sprint 06–07                                                                |
+| Memory Code grace period      | **MAJOR CHANGE**          | Sprint 07                                                                   |
+| Studio templates              | **MINOR CHANGE**          | Sprint 08 (Connection), 09A/09B (Memories/Treasures)                        |
+| Landing page / marketing copy | **MINOR CHANGE**          | Phase C — Sprint 18 Production Readiness (landing readiness, SEO, metadata) |
+| Proxy / auth                  | **NO CHANGE**             | —                                                                           |
+| Photobooth architecture       | **NO CHANGE**             | —                                                                           |
+| Preview vs experience tokens  | **NO CHANGE**             | —                                                                           |
+| Supabase clients              | **NO CHANGE**             | —                                                                           |
+| Deployment / Vercel           | **NO CHANGE**             | —                                                                           |
+| Future scalability            | **MAJOR CHANGE** (design) | Ongoing                                                                     |
 
 ---
 

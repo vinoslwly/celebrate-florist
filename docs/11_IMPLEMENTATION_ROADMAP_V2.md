@@ -35,27 +35,64 @@
 | —                                                              | Sprint 08: **Connection** (quiz + templates)                                |
 | —                                                              | Sprint 09A: **Memories**                                                    |
 | —                                                              | Sprint 09B: **Treasures**                                                   |
-| —                                                              | Sprint 10: Polish, landing marketing, analytics                             |
+| —                                                              | Sprint 10: **CF-R2 Treasures replay reset** (Phase A closure)               |
+| —                                                              | **Roadmap V1 (post–Sprint 10):** Phase B Experience Layer (Sprint 11–16)    |
+| —                                                              | **Roadmap V1 (post–Sprint 10):** Phase C Release Layer (Sprint 17–19)       |
+
+---
+
+## Roadmap V1 — Post Sprint 10 (Founder Approved)
+
+> **Engineering freeze remains in effect.** Sprint 11 has **not** started. This section is the **official long-term roadmap** after Phase A closure (post–audit revision — Founder 2026-07-14). It **replaces** the previous placeholder _"Sprint 10+ → Polish / Marketing / Analytics"_.
+
+Celebrate has entered a new development stage. Sprint 00–10 delivered the **functional platform core**. Remaining work transforms that core into a **premium emotional experience** ready for public V1 launch — not additional backend feature development.
+
+### Phase structure
+
+| Phase                            | Sprints | Status          | Purpose                                                                                                                                                             |
+| -------------------------------- | ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase A — Product Foundation** | 00–10   | ✅ **Complete** | Engineering foundation, architecture, security, four experience modes, replayability (CF-R1/CF-R2), platform core. **No additional core product features planned.** |
+| **Phase B — Experience Layer**   | 11–16   | 📋 Planned      | Premium recipient experience + Studio operational UX + polish. **No backend redesign** unless a critical production bug is discovered.                              |
+| **Phase C — Release Layer**      | 17–19   | 📋 Planned      | QA, production readiness, and official V1 launch. **No new features.**                                                                                              |
+
+### Dependency philosophy
+
+Each sprint depends only on the previous sprint. No sprint should require redesigning decisions made by earlier sprints.
+
+```
+Sprint 11 → 12 → 13 → 14 → 15 → 16 → 17 → 18 → 19
+```
 
 ---
 
 ## Sprint Map Overview
 
 ```mermaid
-gantt
-    title Implementation Roadmap V2 (Planned)
-    dateFormat YYYY-MM
-    section Foundation
-    Sprint 00-05 Already Implemented :done, s05, 2026-01, 2026-06
-    Sprint 05.5 Product Revision     :done, s055, 2026-06, 2026-07
-    section Build
-    Sprint 06 Studio + Schema      :done, s06, 2026-07, 2026-08
-    Sprint 07 Moments E2E          :s07, 2026-08, 2026-09
-    Sprint 08 Connection Quiz      :done, s08, 2026-09, 2026-10
-    Sprint 08R Connection Journey  :done, s08r, 2026-10, 2026-10
-    Sprint 09A Memories            :s09a, 2026-10, 2026-11
-    Sprint 09B Treasures           :s09b, 2026-11, 2026-12
-    Sprint 10 Polish + Launch      :s10, 2026-12, 2027-01
+flowchart LR
+    subgraph PhaseA["Phase A — Product Foundation ✅"]
+        S00["Sprint 00–05"]
+        S06["Sprint 06–07"]
+        S08["Sprint 08–08R"]
+        S09["Sprint 09A–09B"]
+        S10["Sprint 10"]
+    end
+
+    subgraph PhaseB["Phase B — Experience Layer 📋"]
+        S11["Sprint 11<br/>Experience Architecture"]
+        S12["Sprint 12<br/>UI System"]
+        S13["Sprint 13<br/>Motion System"]
+        S14["Sprint 14<br/>Experience Components"]
+        S15["Sprint 15<br/>Studio UX"]
+        S16["Sprint 16<br/>Polish"]
+    end
+
+    subgraph PhaseC["Phase C — Release Layer 📋"]
+        S17["Sprint 17<br/>QA"]
+        S18["Sprint 18<br/>Production Readiness"]
+        S19["Sprint 19<br/>Launch"]
+    end
+
+    S00 --> S06 --> S08 --> S09 --> S10 --> S11 --> S12 --> S13 --> S14 --> S15 --> S16 --> S17 --> S18 --> S19
 ```
 
 Dates are illustrative — founder sets actual schedule.
@@ -470,9 +507,9 @@ flowchart TB
 
 ---
 
-## Sprint 09A — Memories Experience
+## Sprint 09A — Memories Experience ✅
 
-> **Status:** **Active** — Phases 1–5 complete; Phase 5.5 (founder lock) complete; **Phase 6A next**. Founder decisions: CF-1–CF-5, FD-M1–FD-M5 ([05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md)).
+> **Status:** **Complete** — Phases 1–7 shipped. See [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md).
 
 **Goal:** Ship **Memories** mode — Match The Memory with cinematic reveal (FD-M2), single submission (FD-M3), reward never blocked (FD-M5), gate/reward architecture mirroring Sprint 08R.
 
@@ -497,11 +534,11 @@ flowchart TB
 | 4     | Studio Match Editor                                                                         | ✅     |
 | 5     | Publish validation + mode-change cleanup                                                    | ✅     |
 | 5.5   | FD-M1–FD-M5 founder decision lock (documentation)                                           | ✅     |
-| 6A    | Gate/Reward backend (`fetchMemoriesGatePayload`, `buildMemoriesRewardPayload`, grade FD-M5) | ⏳     |
-| 6B    | Recipient UI (`MemoriesExperienceFlow`, `MatchCinematicReveal`)                             | ⏳     |
-| 6C    | Page wiring + `memories-unlock-session.ts`                                                  | ⏳     |
-| 7     | Buyer preview + regression + doc sync                                                       | ⏳     |
-| 8     | QA closure                                                                                  | ⏳     |
+| 6A    | Gate/Reward backend (`fetchMemoriesGatePayload`, `buildMemoriesRewardPayload`, grade FD-M5) | ✅     |
+| 6B    | Recipient UI (`MemoriesExperienceFlow`, `MatchCinematicReveal`)                             | ✅     |
+| 6C    | Page wiring + `memories-unlock-session.ts`                                                  | ✅     |
+| 7     | Buyer preview + regression + doc sync                                                       | ✅     |
+| 8     | QA closure                                                                                  | ✅     |
 
 ### Phase 6 Architecture (Locked — Phase 5.5)
 
@@ -529,21 +566,21 @@ Mirror Sprint 08R Connection pattern:
 
 ---
 
-## Sprint 09B — Treasures Experience
+## Sprint 09B — Treasures Experience ✅
 
-> **Status:** **Planned** — begins after Sprint 09A Phase 8 acceptance.
+> **Status:** **Complete** — Studio editor, recipient UI, per-envelope fetch (FD-T1–T5). See [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md).
 
-**Goal:** Ship **Treasures** mode — Secret Envelopes (2–6, per-envelope fetch, revisit unlocked only).
+**Goal:** Ship **Treasures** mode — Secret Envelopes (2–6, per-envelope fetch, any order — FD-T1).
 
-### Planned Deliverables
+### Deliverables (Shipped)
 
-| Area                  | Work                                                                              |
-| --------------------- | --------------------------------------------------------------------------------- |
-| Migration             | `*_experience_envelopes.sql` (timestamp filename) + RLS + `service_role` grants   |
-| Studio                | Envelope sequencer (message/photo, final flag, 2–6); **no templates** (A-5)       |
-| `features/treasures/` | Sequential envelope UI; per-envelope fetch (A-4); revisit unlocked, no skip ahead |
-| Buyer preview         | Structure without hidden content spoilage (A-3)                                   |
-| Publish validation    | Treasures: 2–6 envelopes, exactly 1 final                                         |
+| Area                  | Work                                                                    | Status |
+| --------------------- | ----------------------------------------------------------------------- | ------ |
+| Migration             | `20260714100000_experience_envelopes.sql` + RLS + `service_role` grants | ✅     |
+| Studio                | Envelope editor (message/photo, final flag, 2–6)                        | ✅     |
+| `features/treasures/` | Envelope UI; per-envelope fetch (A-4); any order (FD-T1)                | ✅     |
+| Buyer preview         | Structure without hidden content spoilage (A-3)                         | ✅     |
+| Publish validation    | Treasures: 2–6 envelopes, exactly 1 final                               | ✅     |
 
 ### Deployable Outcome
 
@@ -577,30 +614,243 @@ Mirror Sprint 08R Connection pattern:
 
 ### Deployable Outcome
 
-- Treasures recipients replay full envelope journey on reload after Photobooth trigger
+- Treasures recipients replay full envelope journey on reload after Photobooth trigger (Sprint 10 / CF-R2)
 - Journey progress preserved until Photobooth; reload after trigger intentionally fresh
 
 ---
 
-## Sprint 10+ — Polish, Marketing, Analytics (Deferred)
+# Phase B — Experience Layer (Sprint 11–16)
 
-**Goal:** Launch-quality refinement across all modes.
+> **Status:** 📋 **Planned — not started.** Engineering freeze until founder explicitly clears Sprint 11.
 
-### Planned Deliverables
+Transforms the existing platform into a **premium emotional product** and a **polished operational Studio**. **No backend redesign** unless a critical production bug is discovered.
 
-| Area          | Work                                                    |
-| ------------- | ------------------------------------------------------- |
-| Landing page  | Four-mode comparison; marketing-owned pricing copy      |
-| Studio        | Dashboard metrics (orders by mode, completion rates)    |
-| Performance   | Moments fast-path audit; lazy-load premium game bundles |
-| Accessibility | Keyboard nav, reduced motion                            |
-| Docs          | Sync `01_PROJECT_CONTEXT.md` vision with V2             |
-| Ops           | 365-day archival job (Future Idea if not done)          |
+**Current recipient flows (functional, not yet cinematic):** All four modes per [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md). Example (Treasures):
 
-### Deployable Outcome
+```
+QR → Envelope → Letter → Gallery → Photobooth
+```
 
-- Investor-ready demo across all tiers
-- Marketing site reflects platform positioning
+Today these are ordinary page transitions. Phase B defines and implements the experience layer that will power cinematic presentation.
+
+---
+
+## Sprint 11 — Experience Architecture
+
+> **Status:** 📋 Planned — **not started**
+
+**Objective:** Design the Scene Engine architecture. **This sprint is NOT about visual polish.** **Architecture-first only — no implementation spikes.**
+
+### Deliverables (definition only — no premium animation implementation)
+
+| Area                          | Scope                                                              |
+| ----------------------------- | ------------------------------------------------------------------ |
+| Scene Manager                 | Multi-mode scene graph architecture                                |
+| Transition Manager            | Rules for how scenes connect                                       |
+| Animation timing architecture | Logical sequencing contracts (visual tokens deferred to Sprint 12) |
+| Navigation flow               | Recipient navigation model across scenes                           |
+| Progress flow                 | How progress is represented in the experience layer                |
+| State flow                    | Client state model for scene transitions                           |
+
+**Scene Engine must support all recipient journeys in [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)** — Moments, Connection, Memories, and Treasures. **Not Treasures-only.**
+
+### Architecture constraints (Founder — post-audit)
+
+| Rule                    | Detail                                                                                                                                                    |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Wrap, don't replace** | Scene Engine **wraps** existing Gate/Reward architecture (`*ExperienceFlow` orchestrators, gate/reward payloads). It must **not** replace business logic. |
+| **CF-R2 protected**     | CF-R2 replay timing (Photobooth trigger → silent reset) remains a **protected contract**. Scene lifecycle must preserve CF-R2-A/B/C.                      |
+| **Mode-pluggable**      | Each mode registers its own scene graph alongside `mode-registry.tsx` patterns.                                                                           |
+
+### Non-goals (Sprint 11)
+
+Scene Engine must **NOT** modify:
+
+- Repositories
+- Services
+- Server Actions
+- Database / migrations
+- Access gate (`features/access/`)
+- Reward gate / grading logic
+- Gate Payload or Reward Payload contracts
+
+**Deliverable:** Scene Engine **specification + ADRs** that will later power cinematic transitions. **No premium animations implemented in this sprint. No implementation spikes.**
+
+---
+
+## Sprint 12 — UI System
+
+> **Status:** 📋 Planned
+
+**Objective:** Build the Design System.
+
+| Scope             | Detail                                  |
+| ----------------- | --------------------------------------- |
+| Typography        | Shared type scale and hierarchy         |
+| Color System      | Mode-aware palette rules                |
+| Radius, Shadow    | Consistent elevation and shape language |
+| Component Library | Reusable UI primitives                  |
+| Layout Rules      | Grid, containers, section rhythm        |
+| Spacing Rules     | Consistent spacing tokens               |
+| Responsive Rules  | Breakpoint behavior                     |
+
+**Deliverable:** Every Celebrate mode shares **one consistent visual language**. Design tokens produced here become the **foundation for Sprint 13 Motion System**.
+
+---
+
+## Sprint 13 — Motion System
+
+> **Status:** 📋 Planned
+
+**Objective:** Transform the recipient experience into an emotional presentation.
+
+| Scope              | Detail                                                                |
+| ------------------ | --------------------------------------------------------------------- |
+| Presentation style | Canva-inspired presentation approach                                  |
+| Scene transitions  | Cross-scene motion — **follows Scene Graph architecture (Sprint 11)** |
+| Camera movement    | Pan, focus, depth                                                     |
+| Fade, Blur, Zoom   | Core motion vocabulary                                                |
+| Envelope animation | Envelope open/reveal motion                                           |
+| Letter animation   | Letter reveal motion                                                  |
+| Gallery animation  | Gallery entrance/scroll motion                                        |
+| Reduced motion     | Accessibility path required (`prefers-reduced-motion`)                |
+| Motion tokens      | Sourced from Sprint 12 design tokens                                  |
+
+**Excluded:** Photobooth animation (Sprint 14).
+
+**Deliverable:** Celebrate feels like an **experience**, not a traditional website.
+
+---
+
+## Sprint 14 — Experience Components
+
+> **Status:** 📋 Planned
+
+**Objective:** Premium experience components — **Photobooth redesign** (primary scope). **Single sprint** — internal implementation phases permitted; sprint numbering unchanged.
+
+Photobooth belongs to the **experience layer**, not the backend layer. **Photobooth images remain client-only — never stored** (Founder Decision — unchanged).
+
+### Founder-approved layouts
+
+| Layout       | Format      | Photos | Recommended for                               |
+| ------------ | ----------- | ------ | --------------------------------------------- |
+| **Layout B** | 6 × 2 Strip | 3      | Couples, Best Friends, Small Groups           |
+| **Layout K** | 6 × 4 (4R)  | 2      | Graduation, Farewell, Family, Group Greetings |
+
+### Additional scope
+
+Countdown · Flash · Download · Frames · Stickers · Watermark
+
+---
+
+## Sprint 15 — Studio UX
+
+> **Status:** 📋 Planned
+
+**Objective:** Polish the **Studio admin surface** as an operational product. Studio is a **separate product surface** from the Recipient Experience.
+
+Sprint 00–10 made Studio **functional**. Before launch, Studio should become a **polished operational tool**. Operational excellence is part of product quality.
+
+| Scope                           | Detail                                      |
+| ------------------------------- | ------------------------------------------- |
+| Studio information architecture | Navigation clarity, workflow coherence      |
+| Dashboard usability             | Action queue effectiveness                  |
+| Form UX                         | Order editor, mode panels, publish workflow |
+| Order workflow                  | Create → edit → preview → publish flow      |
+| Visual consistency              | Align Studio with Sprint 12 Design System   |
+
+### Non-goals (Sprint 15)
+
+- **No** business logic changes
+- **No** permission / auth changes
+- **No** new backend features or migrations
+
+**Deliverable:** Studio feels as intentional as the recipient experience — UX only.
+
+---
+
+## Sprint 16 — Polish
+
+> **Status:** 📋 Planned
+
+**Objective:** **No new features** — quality improvements only.
+
+| Examples                   |
+| -------------------------- |
+| Micro interactions         |
+| Loading states             |
+| Skeleton UI                |
+| Empty states               |
+| Optional sound design      |
+| Performance optimization   |
+| Accessibility improvements |
+
+**Goal:** Deliver a **premium product feeling** across recipient and Studio surfaces.
+
+---
+
+# Phase C — Release Layer (Sprint 17–19)
+
+> **Status:** 📋 **Planned — not started.** **No new features** in this phase.
+
+---
+
+## Sprint 17 — QA
+
+> **Status:** 📋 Planned
+
+**Objective:** Comprehensive validation.
+
+| Scope                        |
+| ---------------------------- |
+| All four experience modes    |
+| Studio operational workflows |
+| Desktop + Mobile             |
+| Cross-browser                |
+| Regression testing           |
+| Usability review             |
+| Performance review           |
+| Security review              |
+| Accessibility review         |
+
+---
+
+## Sprint 18 — Production Readiness
+
+> **Status:** 📋 Planned
+
+**Objective:** Release preparation only. **No dedicated Landing/Marketing sprint** — landing readiness is included here.
+
+| Scope                                                         |
+| ------------------------------------------------------------- |
+| Documentation review                                          |
+| Final audits                                                  |
+| Backup strategy                                               |
+| Monitoring                                                    |
+| Analytics                                                     |
+| **Landing readiness** (four-mode positioning, copy alignment) |
+| **SEO**                                                       |
+| **Metadata**                                                  |
+| Release checklist                                             |
+| Deployment checklist                                          |
+
+**Explicit exclusions:** No feature development · No UI redesign · No architectural changes
+
+---
+
+## Sprint 19 — Launch
+
+> **Status:** 📋 Planned
+
+**Objective:** Official **V1 Release**.
+
+| Scope                              |
+| ---------------------------------- |
+| Production deployment              |
+| Monitoring                         |
+| Critical production bug fixes only |
+
+**Explicit exclusions:** No major feature work
 
 ---
 
@@ -643,9 +893,11 @@ Mirror Sprint 08R Connection pattern:
 | 07           | **Moments** full delivery + Memory Code grace period              |
 | 08           | Moments + **Connection** (with templates; original flow)          |
 | 08R          | Connection **game-first journey** — gate/reward architecture      |
-| 09A          | + **Memories** (Phases 1–5.5 complete; Phase 6A+ in progress)     |
-| 09B          | All **four modes**                                                |
-| 10           | Launch-polished **four modes** + marketing                        |
+| 09A          | + **Memories** (complete)                                         |
+| 09B          | All **four modes** (complete)                                     |
+| 10           | CF-R2 Treasures replay reset (complete)                           |
+| 11–16        | Phase B — Experience Layer + Studio UX + polish (planned)         |
+| 17–19        | Phase C — Release Layer → **V1 Launch** (planned)                 |
 
 ---
 
