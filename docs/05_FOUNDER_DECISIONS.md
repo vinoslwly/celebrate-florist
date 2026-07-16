@@ -270,6 +270,201 @@ Each decision includes the **what**, the **why**, and where it is **enforced** i
 
 **Permanent engineering guideline:** Favor product simplicity over technical sophistication. Future experience modes must evaluate against CF-R1 and CF-R2 before shipping.
 
+---
+
+## Sprint 11 — Experience Architecture (Founder Approved)
+
+> **Status:** **Architecture complete** — **implementation NOT authorized**  
+> **Core architecture approval:** 2026-07-15 (FD-S11-01–06)  
+> **Mode docs:** [sprint-11/README.md](./sprint-11/README.md)  
+> **Specification:** [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md)
+
+Sprint 11 is an **architecture planning sprint only**. No production code, backend changes, database changes, animation implementation, UI redesign, or implementation spikes.
+
+### FD-S11-01 — Wrap Architecture ✅ APPROVED
+
+|                      |                                                                                                                                          |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision**         | **Option A — Wrap.** Scene Engine MUST wrap the existing ExperienceFlow architecture. It is a **presentation orchestration layer only**. |
+| **Must NOT replace** | Repositories, services, server actions, gate/reward logic, business state, existing payload contracts.                                   |
+| **ADR**              | [adr/S11-001-wrap-architecture.md](./adr/S11-001-wrap-architecture.md)                                                                   |
+
+### FD-S11-02 — Treasures Navigation ✅ APPROVED
+
+|              |                                                                                                                                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | **Back Edge.** Treasures is the **only** mode allowed to navigate Envelope Content → Envelope Grid. Preserves FD-T3 while keeping the overall journey forward-only. No other mode gains backward navigation after reward. |
+| **ADR**      | [adr/S11-005-treasures-back-edge.md](./adr/S11-005-treasures-back-edge.md)                                                                                                                                                |
+
+### FD-S11-03 — Persistent Shell ✅ APPROVED
+
+|              |                                                                                                                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Persistent Shell architecture. Theme, layout frame, and global UI remain **mounted** while individual scenes mount/unmount inside the shell. Minimizes rerenders; stable foundation for Sprint 13 Motion System. |
+| **ADR**      | [adr/S11-002-persistent-shell.md](./adr/S11-002-persistent-shell.md)                                                                                                                                             |
+
+### FD-S11-04 — Parameterized Scene Graph ✅ APPROVED
+
+|              |                                                                                                                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Scene graphs MUST support parameterized structures (e.g., Treasures with 2–6 envelopes) without changing the Scene Engine. New modes require only a new scene graph + registry entry. |
+| **ADR**      | [adr/S11-004-parameterized-scene-graph.md](./adr/S11-004-parameterized-scene-graph.md)                                                                                                |
+
+### FD-S11-05 — Initial Scene Ownership ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | The **server** determines the initial scene. Scene Engine MUST never guess. Server state (existing Phase A contracts) determines progress, unlock status, reward availability, and initial scene. Keeps SSR/RSC deterministic. |
+| **ADR**      | [adr/S11-003-initial-scene-server-owned.md](./adr/S11-003-initial-scene-server-owned.md)                                                                                                                                       |
+
+### FD-S11-06 — Scene Contract ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Every scene (Quiz, Match, Envelope, Letter, Gallery, Photobooth, future scenes) MUST implement the same architecture contract from the Scene Engine perspective: equivalent of **onEnter**, **onExit**, **canLeave**, **onComplete**. Exact API naming flexible. New scene types MUST NOT require Scene Engine modification. |
+| **ADR**      | [adr/S11-006-scene-contract.md](./adr/S11-006-scene-contract.md) — dedicated ADR per architectural review (consolidates lifecycle, hooks, type contracts)                                                                                                                                                                    |
+
+**CF-R2 at Photobooth scene:** [adr/S11-007-cf-r2-photobooth-scene.md](./adr/S11-007-cf-r2-photobooth-scene.md)
+
+### FD-S11-DOC — Incremental Documentation Strategy ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                      |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Sprint 11 Experience Architecture is documented **incrementally, one mode at a time** — not as one monolithic document. Order: Moments → Connection → Memories → Treasures → Cross-mode Review → Final SSOT merge. Each mode locked independently before continuing. |
+| **Why**      | Easier founder review, easier audit, less document complexity.                                                                                                                                                                                                       |
+| **Index**    | [sprint-11/README.md](./sprint-11/README.md)                                                                                                                                                                                                                         |
+
+### FD-S11-07 — Moments Scene Flow ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | Official Moments presentation scene graph: Scenes 0–10 (QR Access outside engine; Celebrate Loading → Gift Box → Gift Opening → Letter Confirmation → Letter Transition → Letter → Album Unlock Transition → Gallery → Gallery Ending → Photobooth). Gift Opening: letter **physically appears** from gift box; sender revealed before full letter read. Gallery skipped when zero photos. |
+| **Spec**     | [sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md](./sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md)                                                                                                                                                                                                                                                                                                 |
+| **Note**     | Doc 13 business journey (Letter → Gallery → Photobooth) preserved; intro/transition scenes are presentation layer only.                                                                                                                                                                                                                                                                    |
+
+### FD-S11-08 — Connection Scene Flow ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Official Connection presentation scene graph: Scenes 0–14 (Celebrate Loading → Gift Introduction → Locked Gift → Challenge Invitation → Quiz Transition → Quiz Introduction → parameterized Quiz questions → Score Calculation → Score Reveal → Celebration Transition → Letter Reveal → Gallery Unlock → Gallery → Gallery Ending → Photobooth). Locked Gift reveals nothing (CF-4). One question per screen; no back navigation; batch submit after last answer. Use **"gift"** not **"letter"** until Letter Reveal. Score tone warm/celebratory (CF-1). |
+| **Spec**     | [sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md](./sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **Note**     | Doc 13 business journey (Quiz → Submit → Score + Band → Letter → Gallery → Photobooth) preserved; ceremony scenes are presentation layer only. Unlock restore → Scene 8 via sessionStorage (CF-2).                                                                                                                                                                                                                                                                                                                                                          |
+
+### FD-S11-09 — Memories Presentation Reversal ✅ APPROVED
+
+|              |                                                                                                                                                                            |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Reverse match game presentation: **Photo first → choose Story** (Phase A was Story → choose Photo). Submit payload `{ storySortOrder, selectedPhotoSortOrder }` unchanged. |
+| **Spec**     | [sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md](./sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md)                                                                               |
+
+### FD-S11-10 — One Memory per Scene ✅ APPROVED
+
+|              |                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------- |
+| **Decision** | Each memory pair is one Scene (`gate-dynamic`). Scene-based progression — not all memories on one page. |
+| **Spec**     | [sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md](./sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md)            |
+
+### FD-S11-11 — 20-Second Countdown per Memory ✅ APPROVED
+
+|              |                                                                                                      |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| **Decision** | Each memory scene has a 20-second countdown. Presentation-layer emotional pressure — not punishment. |
+| **Spec**     | [sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md](./sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md)         |
+
+### FD-S11-12 — Progressive Photo Reveal ✅ APPROVED
+
+|              |                                                                                                                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Photo starts ~10% visible; every 5 seconds increases clarity (~15% → 20% → 25% → 30%). Photo **never** fully visible during gameplay. Presentation only — extends FD-M2 principle. |
+| **Spec**     | [sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md](./sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md)                                                                                       |
+
+### FD-S11-13 — Timer Expiration Auto-Advance ✅ APPROVED
+
+|              |                                                                                                                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Timer reaching zero auto-advances to next memory. No restart, no reset, no backend changes. Implicit story selection when no tap (Sprint 12 default: first story option) preserves batch submit contract. |
+| **Spec**     | [sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md](./sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md)                                                                                                              |
+
+### FD-S11-14 — Treasures Scene Flow ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | Official Treasures presentation scene graph: Scenes 0–13 (Celebrate Loading → Welcome → Locked Gift → Gift Locked → Transition → Gift Explosion → Gift Grid ⇄ Individual Gift → Final Gift Unlock → Final Letter → Gallery Transition → Gallery → Gallery Ending → Photobooth). Pre-grid ceremony (Scenes 0–5) mirrors Moments/Connection locked-gift pattern. Gallery skipped when zero photos. |
+| **Spec**     | [sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md](./sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md)                                                                                                                                                                                                                                                                                                   |
+| **Note**     | Doc 13 business journey (Grid → Open any → All opened → Letter → Gallery → Photobooth) preserved; ceremony and explosion scenes are presentation layer only.                                                                                                                                                                                                                                     |
+
+### FD-S11-15 — Gift Presentation Icon ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | **Gift** replaces **envelope icon** during Treasures gameplay. Envelope icon MUST NOT appear during gameplay. Letter **object** appears only after opening a gift (Scene 7 micro-reveal). Three visual states: Closed / Opened / Final Gold. Business layer remains `experience_envelopes` + `openEnvelopeAction`. |
+| **Spec**     | [sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md](./sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md)                                                                                                                                                                                                                     |
+
+### FD-S11-16 — Gift Explosion Transition ✅ APPROVED
+
+|              |                                                                                                                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Scene 5 replaces balloon transition. One mysterious gift becomes **N** discoverable gifts (parameterized **2–6**, not hard-coded 6). Max duration **3 seconds**. Presentation only — no gameplay. |
+| **Spec**     | [sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md](./sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md)                                                                                                    |
+
+### FD-S11-17 — Final Gold Gift Rules ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                        |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Final Gold gift (`isFinal`) is **presentation-locked** on grid until all non-final gifts opened. Elegant premium reveal on open — no fireworks or confetti. Scene 7 letter object is envelope micro-content (FD-T5); primary reward letter remains Scene 9. FD-T1 API order preserved. |
+| **Spec**     | [sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md](./sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md)                                                                                                                                                                                         |
+
+---
+
+## Global Experience Rules (GER)
+
+> **Status:** **LOCKED** — 2026-07-16 · Cross-mode presentation standards · **Revised 2026-07-16** (gameplay timers → Memories only)  
+> **ADR:** [adr/S11-008-global-experience-rules.md](./adr/S11-008-global-experience-rules.md)  
+> **Applies to:** All modes for GER-01/GER-06; GER-02/03/05 per mode (V1: Memories Match only)
+
+### GER-01 — Transition Duration ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | All **`transition`** scenes use consistent logical duration: approximately **1.0–1.5 seconds** (Preparing…, Calculating…, Opening…, etc.). Presentation only — not gameplay. Mode-specific overrides allowed for cinematic bridges (e.g., binder 2–3 s). |
+| **ADR**      | [S11-008](./adr/S11-008-global-experience-rules.md)                                                                                                                                                                                                      |
+
+### GER-02 — Gameplay Countdown ✅ APPROVED (Revised 2026-07-16)
+
+|              |                                                                                                                                                                                                                                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | Gameplay countdown is **NOT a global rule**. It applies only to modes intentionally designed as time-based challenges. **V1: Memories Match only** (20 seconds per memory, FD-S11-11). **Connection Quiz: no countdown.** Moments and Treasures: no gameplay timer. Future modes require explicit Founder Decision to enable timers. |
+| **Why**      | Connection is reflective — longer questions need unhurried reading. Memories is a lightweight mini-game where countdown enhances pacing without harming the emotional arc.                                                                                                                                                           |
+| **ADR**      | [S11-008](./adr/S11-008-global-experience-rules.md)                                                                                                                                                                                                                                                                                  |
+
+### GER-03 — Timer Expiration Behavior ✅ APPROVED (Revised 2026-07-16)
+
+|              |                                                                                                                                                                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | **Memories Match only.** On gameplay timer expiry: show short message (e.g., _Time's up._) for ~**0.8–1 second**, then auto-continue. No restart, popup, blocking dialog, or progress reset. Connection: N/A (no timer). |
+| **ADR**      | [S11-008](./adr/S11-008-global-experience-rules.md)                                                                                                                                                                      |
+
+### GER-04 — Backend Preservation ✅ APPROVED
+
+|              |                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Timer expiration MUST NOT change Phase A business logic: no schema, payload, submit action, scoring, unlock, or sessionStorage redesign. |
+| **ADR**      | [S11-008](./adr/S11-008-global-experience-rules.md)                                                                                      |
+
+### GER-05 — Auto Selection Strategy ✅ APPROVED (Revised 2026-07-16)
+
+|              |                                                                                                                                                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | **Memories Match only.** If timer expires before story selection: client auto-selects **first story option by `sortOrder`**. No randomization. Invisible to business logic — included in existing batch submit payload. Grades incorrect if wrong. Connection: N/A (no timer). |
+| **ADR**      | [S11-008](./adr/S11-008-global-experience-rules.md)                                                                                                                                                                                                                            |
+
+### GER-06 — UX Philosophy ✅ APPROVED
+
+|              |                                                                                                                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Gameplay timers create **pacing**, not punishment. No fail screen, restart, lost progress, or penalty animation. Celebrate is an emotional experience, not a competitive game. Aligns with CF-1 / FD-M5. |
+| **ADR**      | [S11-008](./adr/S11-008-global-experience-rules.md)                                                                                                                                                      |
+
 ### Treasures Envelope Limit
 
 |              |                                                              |
@@ -753,4 +948,7 @@ AI assistants must **never** unilaterally override a decision listed here.
 - [12_STUDIO_UX.md](./12_STUDIO_UX.md) — Studio admin UX (order-centric, unified editor)
 - [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md) — Product Revision V2 decisions
 - [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) — Experience Journey SSOT (CF-1–CF-5, FD-M1–FD-M5)
+- [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) — Sprint 11 Scene Engine core (FD-S11-01–06)
+- [sprint-11/README.md](./sprint-11/README.md) — Sprint 11 incremental mode docs + GER
+- [adr/S11-008-global-experience-rules.md](./adr/S11-008-global-experience-rules.md) — Global Experience Rules (GER-01–06)
 - [07_AI_GUIDE.md](./07_AI_GUIDE.md) — how AI assistants must respect these decisions

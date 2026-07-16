@@ -43,17 +43,17 @@
 
 ## Roadmap V1 — Post Sprint 10 (Founder Approved)
 
-> **Engineering freeze remains in effect.** Sprint 11 has **not** started. This section is the **official long-term roadmap** after Phase A closure (post–audit revision — Founder 2026-07-14). It **replaces** the previous placeholder _"Sprint 10+ → Polish / Marketing / Analytics"_.
+> **Engineering freeze remains in effect for Scene Engine implementation.** Sprint 11 **architecture is complete** (2026-07-16). This section is the **official long-term roadmap** after Phase A closure (post–audit revision — Founder 2026-07-14). It **replaces** the previous placeholder _"Sprint 10+ → Polish / Marketing / Analytics"_.
 
 Celebrate has entered a new development stage. Sprint 00–10 delivered the **functional platform core**. Remaining work transforms that core into a **premium emotional experience** ready for public V1 launch — not additional backend feature development.
 
 ### Phase structure
 
-| Phase                            | Sprints | Status          | Purpose                                                                                                                                                             |
-| -------------------------------- | ------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Phase A — Product Foundation** | 00–10   | ✅ **Complete** | Engineering foundation, architecture, security, four experience modes, replayability (CF-R1/CF-R2), platform core. **No additional core product features planned.** |
-| **Phase B — Experience Layer**   | 11–16   | 📋 Planned      | Premium recipient experience + Studio operational UX + polish. **No backend redesign** unless a critical production bug is discovered.                              |
-| **Phase C — Release Layer**      | 17–19   | 📋 Planned      | QA, production readiness, and official V1 launch. **No new features.**                                                                                              |
+| Phase                            | Sprints | Status          | Purpose                                                                                                                                                                                            |
+| -------------------------------- | ------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase A — Product Foundation** | 00–10   | ✅ **Complete** | Engineering foundation, architecture, security, four experience modes, replayability (CF-R1/CF-R2), platform core. **No additional core product features planned.**                                |
+| **Phase B — Experience Layer**   | 11–16   | 🔄 In progress  | Sprint 11 **architecture complete**; Sprints 12–16 planned. Premium recipient experience + Studio operational UX + polish. **No backend redesign** unless a critical production bug is discovered. |
+| **Phase C — Release Layer**      | 17–19   | 📋 Planned      | QA, production readiness, and official V1 launch. **No new features.**                                                                                                                             |
 
 ### Dependency philosophy
 
@@ -621,7 +621,7 @@ Mirror Sprint 08R Connection pattern:
 
 # Phase B — Experience Layer (Sprint 11–16)
 
-> **Status:** 📋 **Planned — not started.** Engineering freeze until founder explicitly clears Sprint 11.
+> **Status:** 📋 **Sprint 11 architecture complete** — **implementation NOT authorized** · Engineering freeze active until explicit implementation clearance
 
 Transforms the existing platform into a **premium emotional product** and a **polished operational Studio**. **No backend redesign** unless a critical production bug is discovered.
 
@@ -635,9 +635,14 @@ Today these are ordinary page transitions. Phase B defines and implements the ex
 
 ---
 
-## Sprint 11 — Experience Architecture
+## Sprint 11 — Experience Architecture ✅ COMPLETE (Architecture)
 
-> **Status:** 📋 Planned — **not started**
+> **Status:** ✅ **Complete — Architecture** · **Ready for Sprint 12** · **implementation NOT authorized**  
+> **Architecture closure:** 2026-07-16  
+> **Core spec:** [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md)  
+> **Mode docs:** [sprint-11/README.md](./sprint-11/README.md)  
+> **Cross-mode review:** [sprint-11/05_CROSS_MODE_REVIEW.md](./sprint-11/05_CROSS_MODE_REVIEW.md)  
+> **Founder decisions:** FD-S11-01 through FD-S11-17, FD-S11-DOC, **GER-01–06** in [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md#sprint-11--experience-architecture-founder-approved)
 
 **Objective:** Design the Scene Engine architecture. **This sprint is NOT about visual polish.** **Architecture-first only — no implementation spikes.**
 
@@ -654,13 +659,17 @@ Today these are ordinary page transitions. Phase B defines and implements the ex
 
 **Scene Engine must support all recipient journeys in [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)** — Moments, Connection, Memories, and Treasures. **Not Treasures-only.**
 
-### Architecture constraints (Founder — post-audit)
+### Architecture constraints (Founder — FD-S11-01 through FD-S11-06)
 
-| Rule                    | Detail                                                                                                                                                    |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Wrap, don't replace** | Scene Engine **wraps** existing Gate/Reward architecture (`*ExperienceFlow` orchestrators, gate/reward payloads). It must **not** replace business logic. |
-| **CF-R2 protected**     | CF-R2 replay timing (Photobooth trigger → silent reset) remains a **protected contract**. Scene lifecycle must preserve CF-R2-A/B/C.                      |
-| **Mode-pluggable**      | Each mode registers its own scene graph alongside `mode-registry.tsx` patterns.                                                                           |
+| Rule                               | Detail                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **FD-S11-01 Wrap**                 | Scene Engine **wraps** `*ExperienceFlow`; presentation only — no replacement of repos, services, actions, gate/reward, payloads |
+| **FD-S11-02 Back edge**            | Treasures only: Gift Content → Gift Grid (business: Envelope Content → Envelope Grid); forward-only elsewhere                   |
+| **FD-S11-03 Persistent Shell**     | Theme/layout frame stays mounted; scenes mount/unmount inside                                                                   |
+| **FD-S11-04 Parameterized graphs** | Treasures 2–6 envelopes; new modes = graph + registry only                                                                      |
+| **FD-S11-05 Server initial scene** | Server determines initial scene; engine never guesses                                                                           |
+| **FD-S11-06 Scene Contract**       | Universal onEnter/onExit/canLeave/onComplete for all scene types                                                                |
+| **CF-R2 protected**                | Photobooth scene entry preserves CF-R2-A/B/C — [ADR S11-007](./adr/S11-007-cf-r2-photobooth-scene.md)                           |
 
 ### Non-goals (Sprint 11)
 
@@ -674,7 +683,21 @@ Scene Engine must **NOT** modify:
 - Reward gate / grading logic
 - Gate Payload or Reward Payload contracts
 
-**Deliverable:** Scene Engine **specification + ADRs** that will later power cinematic transitions. **No premium animations implemented in this sprint. No implementation spikes.**
+**Deliverables (planning only — incremental):**
+
+| Artifact                                                                          | Status      |
+| --------------------------------------------------------------------------------- | ----------- |
+| Core engine spec + ADRs (doc 16, `docs/adr/S11-*`)                                | ✅ Locked   |
+| [adr/S11-008](./adr/S11-008-global-experience-rules.md) — Global Experience Rules | ✅          |
+| [sprint-11/README.md](./sprint-11/README.md) — documentation strategy             | ✅          |
+| [sprint-11/01_MOMENTS](./sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md)              | ✅ Locked   |
+| [sprint-11/02_CONNECTION](./sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md)        | ✅ Locked   |
+| [sprint-11/03_MEMORIES](./sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md)            | ✅ Locked   |
+| [sprint-11/04_TREASURES](./sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md)          | ✅ Locked   |
+| [sprint-11/05_CROSS_MODE_REVIEW](./sprint-11/05_CROSS_MODE_REVIEW.md)             | ✅ Complete |
+| Final SSOT merge (doc 16 §7)                                                      | ✅ Complete |
+
+**No premium animations. No implementation spikes. No production code until explicit implementation clearance.**
 
 ---
 
@@ -886,18 +909,19 @@ Sprint 00–10 made Studio **functional**. Before launch, Studio should become a
 
 ## Deployability Matrix
 
-| After sprint | What works in production                                          |
-| ------------ | ----------------------------------------------------------------- |
-| 05.5         | Landing + Studio login (unchanged)                                |
-| 06           | Studio order-centric IA + unified editor + action-queue dashboard |
-| 07           | **Moments** full delivery + Memory Code grace period              |
-| 08           | Moments + **Connection** (with templates; original flow)          |
-| 08R          | Connection **game-first journey** — gate/reward architecture      |
-| 09A          | + **Memories** (complete)                                         |
-| 09B          | All **four modes** (complete)                                     |
-| 10           | CF-R2 Treasures replay reset (complete)                           |
-| 11–16        | Phase B — Experience Layer + Studio UX + polish (planned)         |
-| 17–19        | Phase C — Release Layer → **V1 Launch** (planned)                 |
+| After sprint | What works in production                                                 |
+| ------------ | ------------------------------------------------------------------------ |
+| 05.5         | Landing + Studio login (unchanged)                                       |
+| 06           | Studio order-centric IA + unified editor + action-queue dashboard        |
+| 07           | **Moments** full delivery + Memory Code grace period                     |
+| 08           | Moments + **Connection** (with templates; original flow)                 |
+| 08R          | Connection **game-first journey** — gate/reward architecture             |
+| 09A          | + **Memories** (complete)                                                |
+| 09B          | All **four modes** (complete)                                            |
+| 10           | CF-R2 Treasures replay reset (complete)                                  |
+| 11           | Scene Engine architecture (complete — planning)                          |
+| 11–16        | Phase B — Experience Layer implementation + Studio UX + polish (planned) |
+| 17–19        | Phase C — Release Layer → **V1 Launch** (planned)                        |
 
 ---
 

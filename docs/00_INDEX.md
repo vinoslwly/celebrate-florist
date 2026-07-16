@@ -12,17 +12,19 @@ This folder is the **single source of truth** for the Celebrate Florist project.
 
 **Before Sprint 06 implementation**, read the Product Revision V2 package. Celebrate evolved from a Digital Greeting Website into an **Interactive Digital Experience Platform** with four experience modes (Moments, Connection, Memories, Treasures).
 
-| #   | Document                                                                   | Purpose                                                                      |
-| --- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| 7   | [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)                   | Why the product changed, positioning, founder amendments                     |
-| 8   | [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md)                         | Per-mode product specification                                               |
-| 9   | [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)                   | Engineering impact matrix (no code)                                          |
-| 10  | [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)             | Schema recommendations (no SQL)                                              |
-| 11  | [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)       | **Sprint 06+ roadmap — supersedes pre-revision plan**                        |
-| 12  | [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                       | **Studio admin UX — mandatory for Sprint 06 Studio work**                    |
-| 13  | [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)                     | **Experience Journey SSOT — recipient & buyer-preview ordering (all modes)** |
-| 14  | [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md)               | **CF-R1 + CF-R2 — Replayable Experience SSOT (locked)**                      |
-| 15  | [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md) | **Sprint 10 — CF-R2 Treasures replay reset (✅ complete)**                   |
+| #   | Document                                                                             | Purpose                                                                                      |
+| --- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| 7   | [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)                             | Why the product changed, positioning, founder amendments                                     |
+| 8   | [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md)                                   | Per-mode product specification                                                               |
+| 9   | [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)                             | Engineering impact matrix (no code)                                                          |
+| 10  | [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)                       | Schema recommendations (no SQL)                                                              |
+| 11  | [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)                 | **Sprint 06+ roadmap — supersedes pre-revision plan**                                        |
+| 12  | [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                                 | **Studio admin UX — mandatory for Sprint 06 Studio work**                                    |
+| 13  | [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)                               | **Experience Journey SSOT — recipient & buyer-preview ordering (all modes)**                 |
+| 14  | [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md)                         | **CF-R1 + CF-R2 — Replayable Experience SSOT (locked)**                                      |
+| 15  | [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md)           | **Sprint 10 — CF-R2 Treasures replay reset (✅ complete)**                                   |
+| 16  | [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) | **Sprint 11 — Scene Engine core spec + GER (✅ architecture complete; impl NOT authorized)** |
+| —   | [sprint-11/README.md](./sprint-11/README.md)                                         | **Sprint 11 mode docs index — incremental documentation strategy**                           |
 
 Sprint 05.5 was **documentation only** — no code, no migrations. Sprints 00–05 remain valid.
 
@@ -34,13 +36,13 @@ Founder approved **CF-R1** and **CF-R2** (CF-R2-A/B/C). **Sprint 10 is officiall
 
 Sprint 00–10 = **Phase A — Product Foundation** ✅ complete. Platform core is shipped. Official long-term roadmap:
 
-| Phase                            | Sprints | Status      | Purpose                                                                  |
-| -------------------------------- | ------- | ----------- | ------------------------------------------------------------------------ |
-| **Phase A — Product Foundation** | 00–10   | ✅ Complete | Engineering, 4 modes, replayability, platform core                       |
-| **Phase B — Experience Layer**   | 11–16   | 📋 Planned  | Scene architecture, UI system, motion, photobooth, **Studio UX**, polish |
-| **Phase C — Release Layer**      | 17–19   | 📋 Planned  | QA, production readiness (incl. landing/SEO), **V1 Launch**              |
+| Phase                            | Sprints | Status         | Purpose                                                                                                 |
+| -------------------------------- | ------- | -------------- | ------------------------------------------------------------------------------------------------------- |
+| **Phase A — Product Foundation** | 00–10   | ✅ Complete    | Engineering, 4 modes, replayability, platform core                                                      |
+| **Phase B — Experience Layer**   | 11–16   | 🔄 In progress | Sprint 11 architecture ✅; Sprints 12–16 planned — UI system, motion, photobooth, **Studio UX**, polish |
+| **Phase C — Release Layer**      | 17–19   | 📋 Planned     | QA, production readiness (incl. landing/SEO), **V1 Launch**                                             |
 
-**Sprint 11 has not started.** Full detail: [11_IMPLEMENTATION_ROADMAP_V2.md — Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved).
+**Sprint 11 architecture is complete** (2026-07-16). All four modes locked; cross-mode review passed. **Implementation has NOT started.** [16](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) · [sprint-11/](./sprint-11/README.md) · [05 — Cross-Mode Review](./sprint-11/05_CROSS_MODE_REVIEW.md) · [11 — Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved).
 
 ## ✅ Sprint 05.5 — CLOSED (Official Implementation Baseline)
 
@@ -102,15 +104,16 @@ Read these documents in order. Each file builds on the previous one.
 
 ### Product Revision V2 (Sprint 05.5) — read before Sprint 06
 
-| #   | Document                                                             | Purpose                                                             |
-| --- | -------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| 7   | [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)             | Product vision revision                                             |
-| 8   | [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md)                   | Four experience modes in detail                                     |
-| 9   | [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)             | What changes vs what stays                                          |
-| 10  | [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)       | Planned schema extensions (no SQL)                                  |
-| 11  | [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md) | Future sprint breakdown                                             |
-| 12  | [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                 | Studio IA, workflow, unified editor                                 |
-| 13  | [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)               | **Experience Journey SSOT** — all mode recipient & preview ordering |
+| #   | Document                                                                             | Purpose                                                                     |
+| --- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| 7   | [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)                             | Product vision revision                                                     |
+| 8   | [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md)                                   | Four experience modes in detail                                             |
+| 9   | [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)                             | What changes vs what stays                                                  |
+| 10  | [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)                       | Planned schema extensions (no SQL)                                          |
+| 11  | [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)                 | Future sprint breakdown                                                     |
+| 12  | [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                                 | Studio IA, workflow, unified editor                                         |
+| 13  | [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)                               | **Experience Journey SSOT** — all mode recipient & preview ordering         |
+| 16  | [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) | **Sprint 11 Scene Engine spec + ADRs** — read before Phase B implementation |
 
 ### AI Coding Rules
 
@@ -127,7 +130,7 @@ Read these documents in order. Each file builds on the previous one.
 | Area                        | Status                                                                                                                                                                      |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Development phase**       | **Engineering freeze** — Phase A (Sprint 00–10) complete; Phase B/C planned per [Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved) |
-| **Current sprint**          | **None active** — next planned: **Sprint 11** (Experience Architecture) — **not started**                                                                                   |
+| **Current sprint**          | **Sprint 12 (planned)** — Sprint 11 **architecture complete**; Scene Engine **implementation NOT authorized** ([sprint-11/](./sprint-11/README.md))                         |
 | **Latest completed sprint** | **Sprint 10** — CF-R2 replay reset (10A–10C) + CRIT-01 `service_role` DELETE hotfix                                                                                         |
 | **Deployment**              | Vercel project linked; Studio + recipient `/e/[token]` + buyer `/preview/[token]` routes deployable                                                                         |
 | **Database**                | **21** migrations in repo; all Sprint 09A–10 migrations applied on remote — see [03_DATABASE.md](./03_DATABASE.md)                                                          |
@@ -159,14 +162,14 @@ Read these documents in order. Each file builds on the previous one.
 
 ### Planned Roadmap (Phase B — Experience Layer)
 
-| Sprint        | Status     | Summary                                                                                          |
-| ------------- | ---------- | ------------------------------------------------------------------------------------------------ |
-| **Sprint 11** | 📋 Planned | Experience Architecture — multi-mode Scene Engine spec; wraps Gate/Reward; **not visual polish** |
-| **Sprint 12** | 📋 Planned | UI System — design tokens, components, layout (feeds Motion System)                              |
-| **Sprint 13** | 📋 Planned | Motion System — cinematic transitions; reduced-motion; photobooth excluded                       |
-| **Sprint 14** | 📋 Planned | Experience Components — Photobooth redesign (Layout B, Layout K)                                 |
-| **Sprint 15** | 📋 Planned | **Studio UX** — operational polish; UX only; no backend changes                                  |
-| **Sprint 16** | 📋 Planned | Polish — micro interactions, loading states, a11y, performance                                   |
+| Sprint        | Status                         | Summary                                                                                                                |
+| ------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| **Sprint 11** | ✅ **Complete (Architecture)** | Scene Engine spec, ADRs, four mode docs, cross-mode review — [sprint-11/](./sprint-11/README.md) · impl NOT authorized |
+| **Sprint 12** | 📋 Planned                     | UI System — design tokens, components, layout (feeds Motion System)                                                    |
+| **Sprint 13** | 📋 Planned                     | Motion System — cinematic transitions; reduced-motion; photobooth excluded                                             |
+| **Sprint 14** | 📋 Planned                     | Experience Components — Photobooth redesign (Layout B, Layout K)                                                       |
+| **Sprint 15** | 📋 Planned                     | **Studio UX** — operational polish; UX only; no backend changes                                                        |
+| **Sprint 16** | 📋 Planned                     | Polish — micro interactions, loading states, a11y, performance                                                         |
 
 ### Planned Roadmap (Phase C — Release Layer)
 
@@ -184,7 +187,7 @@ Every AI assistant working on this repository **MUST**:
 
 1. **Read this file first**, then follow the reading order above.
 2. **Read the Product Revision V2 package (docs 07–12) before Sprint 07 code** — especially [12_STUDIO_UX.md](./12_STUDIO_UX.md) for Studio work.
-3. **Follow [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)** — Phase A complete; Roadmap V1 (Sprint 11–19) is the official post–Sprint 10 plan. Do not start Sprint 11 without founder approval.
+3. **Follow [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)** — Phase A complete; Roadmap V1 (Sprint 11–19) is the official post–Sprint 10 plan. Sprint 11 uses **incremental mode documentation** ([sprint-11/](./sprint-11/README.md)); do not implement Scene Engine without explicit founder implementation clearance.
 4. **Consult [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)** for recipient and buyer-preview journey ordering — **SSOT for all modes**.
 5. **Never modify architecture** without explicit founder approval.
 6. **Respect [Founder Decisions](./05_FOUNDER_DECISIONS.md)** — they override convenience.
