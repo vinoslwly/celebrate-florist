@@ -1,4 +1,4 @@
-# 11 — Implementation Roadmap V2
+np# 11 — Implementation Roadmap V2
 
 > **Sprint:** 05.5 — Product Revision V2 (documentation only)  
 > **Status:** **Supersedes** pre-revision Sprint 06–09 scope in [00_INDEX.md](./00_INDEX.md)  
@@ -703,27 +703,40 @@ Scene Engine must **NOT** modify:
 
 ## Sprint 12 — UI System
 
-> **Status:** 📋 Planned
+> **Status:** ✅ **CLOSED — Documentation / UI System Baseline** (Founder 2026-07-19) · Core UI **IMPLEMENTED AND APPROVED** · Bloom Moments 🔒 **APPROVED AND LOCKED** (2026-07-20)  
+> **Phases 1–9:** ✅ **APPROVED AND CLOSED** · Bible = **OFFICIAL INDEXED BASELINE**  
+> **Implementation:** ✅ Closed — [sprint-12-implementation/](./sprint-12-implementation/README.md)  
+> **Bloom Moments:** 🔒 [sprint-12-5/README.md](./sprint-12-5/README.md) · Connection **READY — NOT STARTED** · Sprint 13 / 14 **NOT STARTED**  
+> **Docs:** [sprint-12/README.md](./sprint-12/README.md) · [Bible](./sprint-12/CELEBRATE_UI_SYSTEM_BIBLE.md) · [DDR-S12-034](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)
 
-**Objective:** Build the Design System.
+**Objective (docs — complete):** Define the Celebrate UI System — how every screen feels unmistakably Celebrate — through nine planning phases ending in Design QA and the UI System Bible. **Not** a zero-based redesign; landing page is the visual baseline. Diagnosis: **one Celebrate family, uneven expression.**
 
-| Scope             | Detail                                  |
-| ----------------- | --------------------------------------- |
-| Typography        | Shared type scale and hierarchy         |
-| Color System      | Mode-aware palette rules                |
-| Radius, Shadow    | Consistent elevation and shape language |
-| Component Library | Reusable UI primitives                  |
-| Layout Rules      | Grid, containers, section rhythm        |
-| Spacing Rules     | Consistent spacing tokens               |
-| Responsive Rules  | Breakpoint behavior                     |
+| Phase     | Name                 | Status                                                                                         |
+| --------- | -------------------- | ---------------------------------------------------------------------------------------------- |
+| 1–9       | Baseline → Design QA | ✅ All **APPROVED AND CLOSED** — [sprint-12/](./sprint-12/README.md)                           |
+| Bible     | Indexed baseline     | ✅ [OFFICIAL](./sprint-12/CELEBRATE_UI_SYSTEM_BIBLE.md)                                        |
+| Impl plan | Batches 1–7          | 📋 [Planning](./sprint-12-implementation/00_UI_SYSTEM_IMPLEMENTATION_PLAN.md) — coding blocked |
 
-**Deliverable:** Every Celebrate mode shares **one consistent visual language**. Design tokens produced here become the **foundation for Sprint 13 Motion System**.
+**Founder decisions (locked):** Sage = botanical supporting · Celebration Frame · Studio ~35–40% · Gift language · Decision Register · North Star · [DDR-S12-018](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) closure.
+
+| Scope             | Detail                                      |
+| ----------------- | ------------------------------------------- |
+| Typography        | Shared type scale and hierarchy             |
+| Color System      | Mode-aware palette rules (incl. Sage roles) |
+| Radius, Shadow    | Elevation + **Celebration Frame** token     |
+| Component Library | Reusable UI primitives + **Gift system**    |
+| Layout Rules      | Grid, containers, section rhythm            |
+| Spacing Rules     | Consistent spacing tokens                   |
+| Responsive Rules  | Breakpoint behavior                         |
+| Studio Language   | Calm workspace (~35–40% landing emotion)    |
+
+**Deliverable (docs):** Specification baseline closed. **Next:** Founder review of implementation plan; coding only after separate authorization. Tokens remain the foundation for Sprint 13 Motion when that sprint starts.
 
 ---
 
 ## Sprint 13 — Motion System
 
-> **Status:** 📋 Planned
+> **Status:** 📋 Planned — **NOT STARTED**
 
 **Objective:** Transform the recipient experience into an emotional presentation.
 
@@ -747,7 +760,7 @@ Scene Engine must **NOT** modify:
 
 ## Sprint 14 — Experience Components
 
-> **Status:** 📋 Planned
+> **Status:** 📋 Planned — **NOT STARTED**
 
 **Objective:** Premium experience components — **Photobooth redesign** (primary scope). **Single sprint** — internal implementation phases permitted; sprint numbering unchanged.
 

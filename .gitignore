@@ -43,3 +43,17 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# local agent / inspection artifacts (not product)
+.playwright-mcp/
+.tmp/
+.cursor/
+
+# local screenshots / visual QA dumps at repo root
+/*.png
+/gallery-upgrade-*.png
+/bloom-moments-*.png
+/gift-box-*.png
+/scene-*.png
+/phase2a-*.png
+/anticelebrate-*.png

@@ -1,0 +1,253 @@
+"use client";
+
+import { useState } from "react";
+
+import { cn } from "@/lib/utils";
+
+import type { Theme } from "@/types/theme";
+
+import { LetterView } from "@/features/experience/components/letter-view";
+import { PhotoGallery } from "@/features/experience/components/photo-gallery";
+import { MomentsSceneHost } from "@/features/experience/scene-engine/moments/moments-scene-host";
+import {
+  PreviewContextNote,
+  PreviewReviewFrame,
+} from "@/features/preview/components/preview-review-frame";
+import {
+  BLOOM_MOMENTS_LAB_EXPERIENCE,
+  BLOOM_MOMENTS_LAB_PHOTOS,
+} from "@/features/theme-lab/config/bloom-moments-fixtures";
+import { ThemePageAtmosphere } from "@/features/themes/components/theme-page-atmosphere";
+import {
+  bloomMomentsLabAccentTextOptions,
+  bloomMomentsLabTheme,
+} from "@/features/themes/config/bloom-moments-lab-theme";
+import { themeCompletionArtwork } from "@/features/themes/config/theme-assets";
+import {
+  themeAccent,
+  themeAccentText,
+} from "@/features/themes/config/theme-surfaces";
+
+type ModeTab = "moments" | "connection" | "memories" | "treasures";
+type SurfaceTab = "recipient" | "preview";
+
+function withAccentText(theme: Theme, accentText: string): Theme {
+  return {
+    ...theme,
+    presentation: {
+      ...theme.presentation,
+      accentText,
+    },
+  };
+}
+
+export function BloomThemeLabPage() {
+  const [mode, setMode] = useState<ModeTab>("moments");
+  const [surface, setSurface] = useState<SurfaceTab>("recipient");
+  const [accentOption, setAccentOption] = useState(0);
+
+  const selectedAccent =
+    bloomMomentsLabAccentTextOptions[accentOption] ??
+    bloomMomentsLabAccentTextOptions[0];
+  const theme = withAccentText(bloomMomentsLabTheme, selectedAccent.className);
+  const completionSrc = themeCompletionArtwork(theme);
+  const immersiveJourney = mode === "moments" && surface === "recipient";
+
+  return (
+    <div
+      className={cn(
+        "bg-background",
+        immersiveJourney
+          ? "flex h-[100svh] flex-col overflow-hidden"
+          : "min-h-screen",
+      )}
+    >
+      <header
+        className={cn(
+          "z-50 shrink-0 border-b border-border bg-card/95 backdrop-blur-sm",
+          immersiveJourney ? "px-3 py-2 sm:px-4" : "px-4 py-4 sm:px-6",
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto max-w-5xl",
+            immersiveJourney
+              ? "flex flex-wrap items-center gap-2"
+              : "space-y-3",
+          )}
+        >
+          {!immersiveJourney ? (
+            <>
+              <p className="font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+                Theme Lab · Sprint 12.5
+              </p>
+              <h1 className="font-serif text-2xl font-semibold text-foreground">
+                Bloom Theme Lab
+              </h1>
+              <p className="max-w-2xl text-sm text-muted-foreground">
+                Moments Scene Engine — Founder art one scene at a time. Scene 1
+                locked; later scenes pending. Production{" "}
+                <span className="font-mono">/e/</span> unchanged until approval.
+              </p>
+            </>
+          ) : (
+            <p className="font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+              Theme Lab · Bloom Moments
+            </p>
+          )}
+
+          <div
+            className="flex flex-wrap gap-2"
+            role="tablist"
+            aria-label="Experience mode"
+          >
+            {(
+              [
+                ["moments", "Moments"],
+                ["connection", "Connection"],
+                ["memories", "Memories"],
+                ["treasures", "Treasures"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={mode === id}
+                disabled={id !== "moments"}
+                onClick={() => setMode(id)}
+                className={cn(
+                  "rounded-lg border px-3 py-1.5 text-xs font-medium",
+                  mode === id
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border text-muted-foreground",
+                  id !== "moments" && "cursor-not-allowed opacity-50",
+                )}
+              >
+                {label}
+                {id !== "moments" && !immersiveJourney
+                  ? " · Not implemented"
+                  : ""}
+              </button>
+            ))}
+          </div>
+
+          {mode === "moments" ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <div
+                className="flex flex-wrap gap-2"
+                role="tablist"
+                aria-label="Surface"
+              >
+                {(
+                  [
+                    ["recipient", "Scene journey"],
+                    ["preview", "Preview (static)"],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={surface === id}
+                    onClick={() => setSurface(id)}
+                    className={cn(
+                      "rounded-lg border px-3 py-1.5 text-xs font-medium",
+                      surface === id
+                        ? "border-primary bg-primary/10"
+                        : "border-border text-muted-foreground",
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {!immersiveJourney ? (
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="text-muted-foreground">accentText:</span>
+                  {bloomMomentsLabAccentTextOptions.map((option, index) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setAccentOption(index)}
+                      className={cn(
+                        "rounded-md border px-2 py-1",
+                        accentOption === index
+                          ? "border-primary bg-primary/10"
+                          : "border-border",
+                        option.className,
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                  <span
+                    className={cn(
+                      "inline-block h-3 w-3 rounded-full border border-border",
+                      themeAccent(theme),
+                    )}
+                    aria-hidden
+                  />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </header>
+
+      {mode !== "moments" ? (
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+          <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
+            {mode} is not implemented in this pilot. Complete Bloom Moments
+            Founder review before the next mode.
+          </p>
+        </div>
+      ) : surface === "recipient" ? (
+        <div className="min-h-0 flex-1">
+          <MomentsSceneHost
+            experience={BLOOM_MOMENTS_LAB_EXPERIENCE}
+            photos={BLOOM_MOMENTS_LAB_PHOTOS}
+            theme={theme}
+            showLabChrome
+            className="flex h-full min-h-0 flex-col"
+          />
+        </div>
+      ) : (
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+          <ThemePageAtmosphere theme={theme} surface="preview">
+            <PreviewReviewFrame
+              receiverName={BLOOM_MOMENTS_LAB_EXPERIENCE.greeting_name}
+            >
+              <PreviewContextNote>
+                Static preview surface — Scene Engine runs under “Scene
+                journey”.
+              </PreviewContextNote>
+              <LetterView
+                experience={BLOOM_MOMENTS_LAB_EXPERIENCE}
+                theme={theme}
+              />
+              <PhotoGallery
+                photos={BLOOM_MOMENTS_LAB_PHOTOS}
+                theme={theme}
+                tone="preview"
+              />
+              {completionSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={completionSrc}
+                  alt=""
+                  className="mx-auto max-h-28 w-full max-w-sm object-contain opacity-80"
+                  loading="lazy"
+                />
+              ) : null}
+              <p className={cn("text-center text-xs", themeAccentText(theme))}>
+                Photobooth remains the terminal scene in the live journey.
+              </p>
+            </PreviewReviewFrame>
+          </ThemePageAtmosphere>
+        </div>
+      )}
+    </div>
+  );
+}

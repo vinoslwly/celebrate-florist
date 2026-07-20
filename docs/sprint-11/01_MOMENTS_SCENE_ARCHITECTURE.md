@@ -239,11 +239,11 @@ flowchart TD
 | **Type**           | `transition`                      |
 | **Scene Contract** | Minimal — auto-advance only       |
 
-**Target duration:** 0.8–1.2 seconds (maximum 1.5 seconds).
+**Target duration:** Founder 3-keyframe sequence in **≤2 seconds** total (closed → half-open → fully open + screen light burst). Auto-advance when sequence completes.
 
-**Purpose:** Bridge only — album opens and transitions into Gallery.
+**Purpose:** Bridge only — album unlocks and transitions into Gallery.
 
-**This is NOT a destination scene.** Sprint 11 defines existence only. Animation belongs to **Sprint 13**.
+**Presentation:** Living HTML/CSS/Framer Motion from Founder keyframe art (Theme Lab first). Not a destination scene.
 
 **Transition trigger:** Duration complete → Scene 8 (if photos exist) or Scene 10 (if gallery skipped).
 

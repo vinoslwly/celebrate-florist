@@ -416,6 +416,140 @@ Sprint 11 is an **architecture planning sprint only**. No production code, backe
 
 ---
 
+## Sprint 12 — UI System (Founder Approved)
+
+> **Status:** ✅ **CLOSED — Documentation / UI System Baseline** (2026-07-19)  
+> **Phases 1–9:** ✅ **APPROVED AND CLOSED** · Bible = **OFFICIAL INDEXED BASELINE**  
+> **Implementation:** Planning authorized — [sprint-12-implementation/00_UI_SYSTEM_IMPLEMENTATION_PLAN.md](./sprint-12-implementation/00_UI_SYSTEM_IMPLEMENTATION_PLAN.md) · **coding NOT YET AUTHORIZED**  
+> **Bloom / Sprint 13 / Sprint 14:** **NOT STARTED**  
+> **Plan:** [sprint-12/00_SPRINT_12_UI_SYSTEM_PLAN.md](./sprint-12/00_SPRINT_12_UI_SYSTEM_PLAN.md)  
+> **Living register:** [sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · **DDR-S12-018**
+
+Sprint 12 documentation baseline is **closed**. Closure means design rules and implementation gaps are approved — **not** that the UI System is already built. No production code, styling changes, component refactors, or commits until Founder authorizes coding separately.
+
+### FD-S12-01 — Sage Palette Role ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | **Keep Sage.** Sage is a **supporting botanical color**, not a primary Celebrate color. Usage: natural accents, leaves, eucalyptus, subtle supporting surfaces, premium botanical sections, success-adjacent accents where appropriate, decorative florist elements. Sage must **not** compete visually with pink, peach, or cream. **Pink remains the emotional identity**; Sage supports the florist identity. |
+| **Phase**    | 3 — Design Foundations                                                                                                                                                                                                                                                                                                                                                                                           |
+| **Register** | [DDR-S12-001](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-001--sage-palette-role)                                                                                                                                                                                                                                                                                                                  |
+
+### FD-S12-02 — Hero / Celebration Frame Radius ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | **Do NOT normalize** hero custom radius into the standard card radius scale. Promote to an official brand design token (working names: **Celebration Frame**, **Hero Frame**, or **Signature Radius** — final name flexible). Landing hero intentionally feels different from ordinary cards. |
+| **Phase**    | 4 — Surface Language                                                                                                                                                                                                                                                                          |
+| **Register** | [DDR-S12-002](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-002--hero--celebration-frame-radius)                                                                                                                                                                                  |
+
+### FD-S12-03 — Studio Emotional Intensity ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Studio targets **~35–40%** of Landing emotional intensity. Studio is primarily a workspace — warm, premium, calm, welcoming, guided. Must avoid: overly decorative, visually exhausting, illustration-heavy, marketing-like surfaces. Expression via hierarchy, framing, copywriting, spacing, and subtle visual language — not excessive decoration. Landing inspires; Recipient Experience delivers emotion; Studio **prepares** the celebration. |
+| **Phase**    | 7 — Studio Experience                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **Register** | [DDR-S12-003](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-003--studio-emotional-intensity)                                                                                                                                                                                                                                                                                                                                            |
+
+### FD-S12-04 — Gift Product Language ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | **Gift** is official product language (extends FD-S11-15). Envelope is **one presentation** of a Gift, not the primary UI metaphor. Current envelope UI (`EnvelopeGrid`, ✉️/📬 icons) = **Refine / Replace Later**, not Preserve. Future gifts may include bouquet, voucher, ticket, QR experience, photo, memory object, collectible, digital reward. Component specs move toward a **generalized Gift system**. |
+| **Phase**    | 5 — Component System                                                                                                                                                                                                                                                                                                                                                                                              |
+| **Register** | [DDR-S12-004](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-004--gift-product-language-treasures--beyond)                                                                                                                                                                                                                                                                                             |
+
+### FD-S12-05 — Celebrate Design Decision Register ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Maintain a living append-only document: **Celebrate Design Decision Register**. Records every founder-approved visual decision (color roles, typography, Studio intensity, hero radius, token naming, theme boundaries, anti-patterns, surface rules, component classification, founder exceptions). Each entry: Decision ID, Date, Status, Decision, Reasoning, Impact, Related Sprint Phase. Becomes an appendix of the Celebrate UI System Bible. |
+| **Register** | [CELEBRATE_DESIGN_DECISION_REGISTER.md](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-009](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-009--celebrate-design-decision-register-living-document)                                                                                                                                                                                                                        |
+
+### FD-S12-06 — Sprint 12 Roadmap & North Star ✅ APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                               |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Nine-phase UI System roadmap approved. **North Star:** Celebrate UI System exists so every future screen — marketing, Studio, Preview, Recipient Experience — feels **unmistakably Celebrate** without designers or engineers inventing new visual rules. Evaluate uncertainty against North Star before personal preference. |
+| **Plan**     | [00_SPRINT_12_UI_SYSTEM_PLAN.md](./sprint-12/00_SPRINT_12_UI_SYSTEM_PLAN.md)                                                                                                                                                                                                                                                  |
+| **Register** | [DDR-S12-005](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-005--sprint-12-north-star)                                                                                                                                                                                                                            |
+
+### FD-S12-07 — Sprint 12 Documentation Closure ✅ APPROVED
+
+|               |                                                                                                                                                                                                                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision**  | Phase 9 approved; Sprint 12 **CLOSED** as Documentation / UI System Baseline; Bible official; Phases 1–9 closed; implementation **planning** authorized; **coding blocked**; Bloom deferred until Core UI System implemented. Diagnosis unchanged: **one Celebrate family, uneven expression.** |
+| **Impl plan** | [00_UI_SYSTEM_IMPLEMENTATION_PLAN.md](./sprint-12-implementation/00_UI_SYSTEM_IMPLEMENTATION_PLAN.md)                                                                                                                                                                                           |
+| **Register**  | [DDR-S12-018](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-018--sprint-12-documentation-closure)                                                                                                                                                                                   |
+
+### FD-S12-08 — Implementation Plan Approved; Batch 1 Only ✅ APPROVED AND CLOSED
+
+|              |                                                                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Implementation plan approved. **Batch 1 only** authorized for coding. Batches 2–7 not authorized. B3→B4→B5 order confirmed. Batch 1 approved and closed. |
+| **Register** | [DDR-S12-019](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-019--implementation-plan-approved-batch-1-authorized-and-complete)               |
+
+### FD-S12-09 — Batch 2 Studio Foundation ✅ APPROVED AND CLOSED
+
+|              |                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Batch 2 only authorized. Studio form migration + Order Editor grouping approved and closed after Founder visual review.         |
+| **Register** | [DDR-S12-020](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-020--batch-2-studio-foundation-authorized-and-complete) |
+
+### FD-S12-10 — Batch 3 Recipient/Preview ✅ APPROVED AND CLOSED
+
+|              |                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Decision** | Batch 3 approved and closed. Warmer Recipient, calmer Preview, shared shells, typography and surface rules per Founder review. |
+| **Register** | [DDR-S12-022](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-022--batch-3-approved-and-closed-batch-4-authorized)   |
+
+### FD-S12-11 — Batch 4 Gift Family ✅ APPROVED AND CLOSED
+
+|              |                                                                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Batch 4 approved and closed. Gift family, CSS motif fallback, Final Gift hierarchy, Gift terminology. Final Gift vs Final Reward wording carry-forward. |
+| **Register** | [DDR-S12-024](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-024--batch-4-approved-and-closed-batch-5-authorized)                            |
+
+### FD-S12-12 — Batch 5 Theme Infrastructure ✅ APPROVED AND CLOSED
+
+|              |                                                                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Batch 5 approved and closed. Theme presentation contract, atmosphere separation, safe fallbacks. V1 scope reduced to four active themes; Pure frozen. |
+| **Register** | [DDR-S12-026](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-026--batch-5-approved-and-closed-batch-6-authorized-v1-four-theme-scope)      |
+
+### FD-S12-14 — Batch 7 Implementation QA ✅ APPROVED AND CLOSED
+
+|              |                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Batch 7 QA approved and closed. Verdict **PASS WITH FOLLOW-UP**.                                                 |
+| **Register** | [DDR-S12-029](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-029--batch-7-implementation-qa-complete) |
+
+### FD-S12-15 — Core UI System Closed; Sprint 12.5 Bloom Planning Authorized ✅ APPROVED
+
+|               |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision**  | Core UI System **IMPLEMENTED AND APPROVED**. Sprint 12 Implementation Pass **CLOSED**. Locked baseline: Landing identity reference; Studio operational/restrained; Recipient immersive; Preview evaluative; Poppins body; selective Fraunces; Gift language; four active V1 themes; Pure frozen; interim theme tokens; Production Pending safe fallbacks. Sprint 12.5 Bloom Theme Validation Pilot **authorized for planning only** — implementation **not authorized**. S13 Motion and S14 Photobooth **not started**. |
+| **Register**  | [DDR-S12-030](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-030--core-ui-system-closed-sprint-125-bloom-pilot-planning-authorized)                                                                                                                                                                                                                                                                                                                                                                          |
+| **Follow-up** | Bloom pilot validation list · Create Order field errors · broader a11y · contrast review · final four-theme art · Motion · Photobooth — **non-blocking**                                                                                                                                                                                                                                                                                                                                                                |
+
+### FD-S12-16 — Bloom Moments One-Mode Pilot ✅ APPROVED
+
+|              |                                                                                                                                                                                                                               |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Decision** | Bloom Pilot proceeds **one mode at a time**. First mode: **Bloom Moments** only. Canva access confirmed. Moments Theme Lab at `/theme-lab/bloom`. Connection, Memories, Treasures, and production rollout **not authorized**. |
+| **Register** | [DDR-S12-031](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md#ddr-s12-031--bloom-moments-one-mode-pilot-authorized)                                                                                                         |
+
+### FD-S12-17 — Bloom Moments Approved and Locked 🔒 APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Date**     | 2026-07-20                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Decision** | Bloom Moments is **APPROVED AND LOCKED**. Audit, stabilization, technical gate, mobile/desktop journey validation, and Founder visual review are complete. Moments is the reference Bloom mode. Production Scene Engine and `/e/[token]` wiring remain **NOT AUTHORIZED**. Bloom Connection is **READY — NOT STARTED**; Memories and Treasures **NOT STARTED**. Locked Moments journey/design/scene order/contract may change only for confirmed regression, shared infrastructure compatibility, security, accessibility, or explicit Founder instruction. |
+| **Register** | [DDR-S12-034](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **Docs**     | [sprint-12-5/README.md](./sprint-12-5/README.md) · [03 Stabilization & Lessons](./sprint-12-5/03_BLOOM_MOMENTS_STABILIZATION_AND_LESSONS.md)                                                                                                                                                                                                                                                                                                                                                                                                                |
+
+---
+
 ## Global Experience Rules (GER)
 
 > **Status:** **LOCKED** — 2026-07-16 · Cross-mode presentation standards · **Revised 2026-07-16** (gameplay timers → Memories only)  
@@ -950,5 +1084,8 @@ AI assistants must **never** unilaterally override a decision listed here.
 - [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md) — Experience Journey SSOT (CF-1–CF-5, FD-M1–FD-M5)
 - [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) — Sprint 11 Scene Engine core (FD-S11-01–06)
 - [sprint-11/README.md](./sprint-11/README.md) — Sprint 11 incremental mode docs + GER
+- [sprint-12/README.md](./sprint-12/README.md) — Sprint 12 UI System (docs closed; FD-S12-01–07)
+- [sprint-12-implementation/00_UI_SYSTEM_IMPLEMENTATION_PLAN.md](./sprint-12-implementation/00_UI_SYSTEM_IMPLEMENTATION_PLAN.md) — Implementation Pass (planning only)
+- [sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) — Living visual decision register (DDR-S12-XXX)
 - [adr/S11-008-global-experience-rules.md](./adr/S11-008-global-experience-rules.md) — Global Experience Rules (GER-01–06)
 - [07_AI_GUIDE.md](./07_AI_GUIDE.md) — how AI assistants must respect these decisions
