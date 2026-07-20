@@ -30,7 +30,7 @@ export const EXPERIENCE_MODES: ExperienceModeConfig[] = [
   {
     value: "treasures",
     label: "Treasures",
-    description: "Secret envelopes — each holds a complete memory surprise.",
+    description: "Gifts — each holds a complete memory surprise.",
     editorSprint: null,
   },
 ];

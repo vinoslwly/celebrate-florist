@@ -92,7 +92,9 @@ export function PhotosUploadPanel({
 
   return (
     <section className="rounded-2xl border border-border bg-card p-6">
-      <h2 className="text-sm font-semibold text-foreground">Memory photos</h2>
+      <h2 className="font-serif text-base font-semibold text-foreground">
+        Memory photos
+      </h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Up to 6 photos per experience. Images are resized and saved as WebP.
       </p>

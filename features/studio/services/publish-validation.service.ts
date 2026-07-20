@@ -14,6 +14,7 @@ import { getExperienceModeConfig } from "@/features/studio/config/experience-mod
 import { isMemoryKeyHashVerifiable } from "@/features/studio/config/memory-code-sentinel";
 import type { PublishChecklistItem } from "@/features/studio/config/publish-checklist";
 import { ExperiencePhotosRepository } from "@/features/studio/repositories/experience-photos.repository";
+import { mapEnvelopeValidationMessage } from "@/features/treasures/components/envelope-draft";
 import { ExperienceEnvelopesRepository } from "@/features/treasures/repositories/experience-envelopes.repository";
 import { evaluateExperienceEnvelopes } from "@/features/treasures/services/validate-envelope-config.service";
 import type { EnvelopeStudioConfig } from "@/features/treasures/types";
@@ -150,12 +151,12 @@ function appendTreasuresEnvelopeChecklistItems(
 ): void {
   items.push({
     id: "envelope_count",
-    label: "Envelopes saved",
+    label: "Gifts saved",
     status: envelopes.envelopes.length >= 2 ? "pass" : "fail",
     message:
       envelopes.envelopes.length >= 2
         ? undefined
-        : "Save at least 2 envelopes before publishing.",
+        : "Save at least 2 gifts before publishing.",
   });
 
   const validation = evaluateExperienceEnvelopes(
@@ -165,9 +166,11 @@ function appendTreasuresEnvelopeChecklistItems(
 
   items.push({
     id: "envelope_validation",
-    label: "Envelope configuration valid",
+    label: "Gift configuration valid",
     status: validation.ok ? "pass" : "fail",
-    message: validation.ok ? undefined : validation.message,
+    message: validation.ok
+      ? undefined
+      : mapEnvelopeValidationMessage(validation.message),
   });
 }
 

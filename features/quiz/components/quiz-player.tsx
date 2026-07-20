@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import type { ConnectionQuizSubmitResult } from "@/features/experience/types/connection-gate.types";
 import { submitQuizAnswersAction } from "@/features/quiz/actions/recipient-quiz";
@@ -118,7 +120,12 @@ export function QuizPlayer({
                   <label
                     key={label}
                     htmlFor={inputId}
-                    className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                    className={cn(
+                      "flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-3 text-sm transition-colors min-h-11",
+                      answers[question.sortOrder] === optionIndex
+                        ? "border-primary bg-primary/10 ring-1 ring-primary/30"
+                        : "border-border bg-background",
+                    )}
                   >
                     <input
                       id={inputId}
@@ -146,6 +153,8 @@ export function QuizPlayer({
           type="button"
           onClick={() => void handleSubmit()}
           disabled={busy || sortedQuestions.length === 0}
+          aria-busy={busy}
+          className="min-h-11"
         >
           {busy ? "Submitting…" : "Submit answers"}
         </Button>

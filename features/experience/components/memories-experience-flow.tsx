@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 
+import { ExperienceSurfaceCard } from "@/features/experience/components/experience-surface-card";
+import { FinalRewardHeading } from "@/features/experience/components/final-reward-heading";
 import { LetterView } from "@/features/experience/components/letter-view";
 import { PhotoGallery } from "@/features/experience/components/photo-gallery";
+import { RecipientExperienceShell } from "@/features/experience/components/recipient-experience-shell";
 import { rewardLetterToExperienceRow } from "@/features/experience/lib/memories-letter-adapter";
 import {
   readMemoriesUnlockSession,
@@ -43,23 +46,10 @@ export function MemoriesExperienceFlow({
   const isUnlocked = unlock !== null;
 
   return (
-    <div className="relative mx-auto max-w-3xl space-y-8 px-4 py-10">
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-40 opacity-15 ${theme.accentClassName}`}
-        aria-hidden
-      />
-      <header className="relative text-center">
-        <p className="text-4xl" aria-hidden>
-          {theme.emoji}
-        </p>
-        <p className="mt-2 text-sm uppercase tracking-widest text-muted-foreground">
-          {theme.name} · A gift for you
-        </p>
-        <h1 className="mt-2 font-serif text-3xl font-semibold">
-          {experience.greeting_name}
-        </h1>
-      </header>
-
+    <RecipientExperienceShell
+      theme={theme}
+      greetingName={experience.greeting_name}
+    >
       {!isUnlocked ? (
         <MatchGamePanel
           experienceToken={experienceToken}
@@ -71,19 +61,17 @@ export function MemoriesExperienceFlow({
       {isUnlocked ? (
         <>
           <MatchScoreResult result={unlock.result} />
+          <FinalRewardHeading />
 
           {unlock.reward.unlockMessage.trim() ? (
-            <section
-              aria-live="polite"
-              className="rounded-2xl border border-border bg-card p-6 text-center space-y-3"
-            >
+            <ExperienceSurfaceCard tone="highlight" aria-live="polite">
               <h2 className="font-serif text-2xl font-semibold">
                 A message for you
               </h2>
               <p className="text-base leading-relaxed whitespace-pre-wrap">
                 {unlock.reward.unlockMessage}
               </p>
-            </section>
+            </ExperienceSurfaceCard>
           ) : null}
 
           <LetterView
@@ -97,6 +85,6 @@ export function MemoriesExperienceFlow({
           />
         </>
       ) : null}
-    </div>
+    </RecipientExperienceShell>
   );
 }

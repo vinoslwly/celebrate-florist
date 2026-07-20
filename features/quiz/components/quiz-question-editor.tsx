@@ -1,4 +1,7 @@
-import { QUIZ_INPUT_CLASS } from "@/features/quiz/components/quiz-draft";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 import type { QuizQuestionInput } from "@/schemas/studio-quiz";
 
@@ -43,34 +46,31 @@ export function QuizQuestionEditor({
         </button>
       </div>
 
-      <div className="space-y-2">
-        <label htmlFor={`${fieldId}-prompt`} className="text-sm font-medium">
-          Question text
-        </label>
-        <textarea
+      <Field>
+        <Label htmlFor={`${fieldId}-prompt`}>Question text</Label>
+        <Textarea
           id={`${fieldId}-prompt`}
           rows={2}
           value={question.prompt}
           onChange={(event) =>
             onChange({ ...question, prompt: event.target.value })
           }
-          className={QUIZ_INPUT_CLASS}
           disabled={disabled}
           placeholder="Write your question here"
         />
-      </div>
+      </Field>
 
       <fieldset className="space-y-3" disabled={disabled}>
         <legend className="text-sm font-medium">Answer choices</legend>
         {OPTION_LABELS.map((label, optionIndex) => (
-          <div key={label} className="space-y-1">
-            <label
+          <Field key={label} className="space-y-1">
+            <Label
               htmlFor={`${fieldId}-option-${label}`}
               className="text-xs font-medium text-muted-foreground"
             >
               Choice {label}
-            </label>
-            <input
+            </Label>
+            <Input
               id={`${fieldId}-option-${label}`}
               type="text"
               value={question.options[optionIndex]}
@@ -83,11 +83,10 @@ export function QuizQuestionEditor({
                 options[optionIndex] = event.target.value;
                 onChange({ ...question, options });
               }}
-              className={QUIZ_INPUT_CLASS}
               disabled={disabled}
               placeholder={`Option ${label}`}
             />
-          </div>
+          </Field>
         ))}
       </fieldset>
 

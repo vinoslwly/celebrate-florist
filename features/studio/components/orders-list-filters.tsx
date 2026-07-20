@@ -4,6 +4,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import type { OrderStatus } from "@/types/database";
 
+import { Field, FieldGroup } from "@/components/ui/field";
+import { formControlClassName } from "@/components/ui/form-control-styles";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { EXPERIENCE_MODES } from "@/features/studio/config/experience-modes";
 import { experienceModeSchema } from "@/schemas/experience-mode";
 
@@ -16,9 +20,6 @@ const ORDER_STATUSES: { value: OrderStatus; label: string }[] = [
   { value: "delivered", label: "Delivered" },
   { value: "completed", label: "Completed" },
 ];
-
-const inputClass =
-  "rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 export function OrdersListFilters() {
   const router = useRouter();
@@ -49,90 +50,92 @@ export function OrdersListFilters() {
 
   return (
     <form
-      className="flex flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4"
+      className="rounded-xl border border-border bg-card p-4"
       onSubmit={(event) => event.preventDefault()}
     >
-      <div className="space-y-1">
-        <label
-          htmlFor="status"
-          className="text-xs font-medium text-muted-foreground"
-        >
-          Status
-        </label>
-        <select
-          id="status"
-          value={status}
-          onChange={(e) => updateFilters({ status: e.target.value })}
-          className={inputClass}
-        >
-          <option value="">All</option>
-          {ORDER_STATUSES.map((entry) => (
-            <option key={entry.value} value={entry.value}>
-              {entry.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <FieldGroup className="flex flex-wrap items-end gap-3">
+        <Field className="space-y-1">
+          <Label
+            htmlFor="status"
+            className="text-xs font-medium text-muted-foreground"
+          >
+            Status
+          </Label>
+          <select
+            id="status"
+            value={status}
+            onChange={(e) => updateFilters({ status: e.target.value })}
+            className={formControlClassName("w-auto min-w-[8rem]")}
+          >
+            <option value="">All</option>
+            {ORDER_STATUSES.map((entry) => (
+              <option key={entry.value} value={entry.value}>
+                {entry.label}
+              </option>
+            ))}
+          </select>
+        </Field>
 
-      <div className="space-y-1">
-        <label
-          htmlFor="mode"
-          className="text-xs font-medium text-muted-foreground"
-        >
-          Mode
-        </label>
-        <select
-          id="mode"
-          value={mode}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (!value) {
-              updateFilters({ mode: "" });
-              return;
+        <Field className="space-y-1">
+          <Label
+            htmlFor="mode"
+            className="text-xs font-medium text-muted-foreground"
+          >
+            Mode
+          </Label>
+          <select
+            id="mode"
+            value={mode}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (!value) {
+                updateFilters({ mode: "" });
+                return;
+              }
+              const parsed = experienceModeSchema.safeParse(value);
+              if (parsed.success) {
+                updateFilters({ mode: parsed.data });
+              }
+            }}
+            className={formControlClassName("w-auto min-w-[8rem]")}
+          >
+            <option value="">All</option>
+            {EXPERIENCE_MODES.map((entry) => (
+              <option key={entry.value} value={entry.value}>
+                {entry.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field className="space-y-1">
+          <Label
+            htmlFor="deliveryDate"
+            className="text-xs font-medium text-muted-foreground"
+          >
+            Delivery date
+          </Label>
+          <Input
+            id="deliveryDate"
+            type="date"
+            value={deliveryDate}
+            onChange={(e) => updateFilters({ deliveryDate: e.target.value })}
+            className="w-auto"
+          />
+        </Field>
+
+        {(status || mode || deliveryDate) && (
+          <button
+            type="button"
+            onClick={() =>
+              updateFilters({ status: "", mode: "", deliveryDate: "" })
             }
-            const parsed = experienceModeSchema.safeParse(value);
-            if (parsed.success) {
-              updateFilters({ mode: parsed.data });
-            }
-          }}
-          className={inputClass}
-        >
-          <option value="">All</option>
-          {EXPERIENCE_MODES.map((entry) => (
-            <option key={entry.value} value={entry.value}>
-              {entry.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="space-y-1">
-        <label
-          htmlFor="deliveryDate"
-          className="text-xs font-medium text-muted-foreground"
-        >
-          Delivery date
-        </label>
-        <input
-          id="deliveryDate"
-          type="date"
-          value={deliveryDate}
-          onChange={(e) => updateFilters({ deliveryDate: e.target.value })}
-          className={inputClass}
-        />
-      </div>
-
-      {(status || mode || deliveryDate) && (
-        <button
-          type="button"
-          onClick={() =>
-            updateFilters({ status: "", mode: "", deliveryDate: "" })
-          }
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          Clear filters
-        </button>
-      )}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Clear filters
+          </button>
+        )}
+      </FieldGroup>
     </form>
   );
 }

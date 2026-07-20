@@ -12,7 +12,9 @@ export function QuizScoreResult({ result }: QuizScoreResultProps) {
       className="rounded-2xl border border-border bg-card p-6 space-y-4 text-center"
     >
       <h2 className="font-serif text-2xl font-semibold">Your score</h2>
-      <p className="text-5xl font-semibold tabular-nums">{result.percent}%</p>
+      <p className="text-5xl font-semibold tabular-nums text-pink-ink">
+        {result.percent}%
+      </p>
       <p className="text-sm text-muted-foreground">
         {result.correctCount} of {result.totalQuestions} correct
       </p>

@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
 import type { ExperiencePhotoRow } from "@/types/database";
 
 import { Button } from "@/components/ui/button";
+import { Field, FieldHelper } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { saveMatchConfigAction } from "@/features/match/actions/match-config";
 import {
-  MATCH_INPUT_CLASS,
   matchStudioConfigToDraft,
   type MatchDraftState,
 } from "@/features/match/components/match-draft";
@@ -32,6 +34,7 @@ export function MatchBuilderPanel({
   disabled = false,
 }: MatchBuilderPanelProps) {
   const router = useRouter();
+  const unlockHelperId = useId();
   const [draft, setDraft] = useState<MatchDraftState>(() =>
     matchStudioConfigToDraft(initialMatch),
   );
@@ -66,8 +69,8 @@ export function MatchBuilderPanel({
   return (
     <section className="rounded-2xl border border-border bg-card p-6 space-y-6">
       <header className="space-y-1">
-        <h2 className="text-sm font-semibold text-foreground">
-          Memories — Match The Memory
+        <h2 className="font-serif text-base font-semibold text-foreground">
+          Mode experience — Match The Memory
         </h2>
         <p className="text-sm text-muted-foreground">
           Pair each story with the correct photo slot. Recipients match stories
@@ -97,14 +100,9 @@ export function MatchBuilderPanel({
         onChange={(pairs) => setDraft((current) => ({ ...current, pairs }))}
       />
 
-      <div className="space-y-2 border-t border-border pt-4">
-        <label
-          htmlFor="match-final-unlock-message"
-          className="text-sm font-medium"
-        >
-          Final unlock message
-        </label>
-        <textarea
+      <Field className="border-t border-border pt-4">
+        <Label htmlFor="match-final-unlock-message">Final unlock message</Label>
+        <Textarea
           id="match-final-unlock-message"
           rows={4}
           value={draft.finalUnlockMessage ?? ""}
@@ -116,15 +114,15 @@ export function MatchBuilderPanel({
                 : null,
             }))
           }
-          className={MATCH_INPUT_CLASS}
           disabled={disabled || busy}
           placeholder="Message shown when the recipient matches every story correctly"
+          aria-describedby={unlockHelperId}
         />
-        <p className="text-xs text-muted-foreground">
+        <FieldHelper id={unlockHelperId}>
           Shown only after a perfect match. Required before publish (validated
           on publish).
-        </p>
-      </div>
+        </FieldHelper>
+      </Field>
 
       <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
         <Button

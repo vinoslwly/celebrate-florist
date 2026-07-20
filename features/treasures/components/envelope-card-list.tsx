@@ -73,9 +73,9 @@ export function EnvelopeCardList({
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold">Your surprise envelopes</h3>
+          <h3 className="text-sm font-semibold">Your gifts</h3>
           <p className="text-xs text-muted-foreground">
-            Arrange up to {ENVELOPE_MAX_COUNT} envelopes in your gift box.
+            Arrange up to {ENVELOPE_MAX_COUNT} gifts in this experience.
             Recipients can open them in any order — each reveal is a complete
             memory.
           </p>
@@ -88,14 +88,13 @@ export function EnvelopeCardList({
           disabled={disabled || !canAdd}
           aria-disabled={disabled || !canAdd}
         >
-          Add envelope
+          Add gift
         </Button>
       </div>
 
       {sortedEnvelopes.length === 0 ? (
         <p className="rounded-lg border border-dashed border-border px-3 py-4 text-sm text-muted-foreground">
-          No envelopes yet. Upload photos above, then add your first surprise
-          envelope.
+          No gifts yet. Upload photos above, then add your first surprise gift.
         </p>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
@@ -116,16 +115,16 @@ export function EnvelopeCardList({
 
       <div className="rounded-lg border border-border bg-muted/30 px-3 py-3 text-xs text-muted-foreground space-y-1">
         <p>
-          Publish requires at least {ENVELOPE_MIN_COUNT} envelopes, each with a
+          Publish requires at least {ENVELOPE_MIN_COUNT} gifts, each with a
           message, a photo, or both.
         </p>
         <p>
-          Exactly one envelope should be marked Final — this is your creator
-          note, not the unlock trigger.
+          Exactly one gift should be marked Final — this is your creator note,
+          not the unlock trigger.
         </p>
         {finalCount > 1 ? (
           <p className="text-amber-800 dark:text-amber-200">
-            Exactly one envelope must be marked as Final.
+            Exactly one gift must be marked as Final.
           </p>
         ) : null}
       </div>

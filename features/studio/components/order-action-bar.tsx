@@ -140,9 +140,7 @@ export function OrderActionBar({
     : null;
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 space-y-4">
-      <h2 className="text-sm font-semibold">Workflow actions</h2>
-
+    <div className="space-y-4" aria-live="polite" aria-busy={busy !== null}>
       {error ? (
         <div
           role="alert"
@@ -275,6 +273,6 @@ export function OrderActionBar({
           void handlePublish(true);
         }}
       />
-    </section>
+    </div>
   );
 }

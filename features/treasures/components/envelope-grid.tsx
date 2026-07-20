@@ -1,3 +1,12 @@
+import type { Theme } from "@/types/theme";
+
+import {
+  giftAccessibleName,
+  giftDisplayName,
+  GiftFinalBadge,
+  GiftMotif,
+  GiftStateLabel,
+} from "@/features/treasures/components/gift-presentation";
 import type { RecipientEnvelopeShell } from "@/features/treasures/types";
 
 type EnvelopeGridProps = {
@@ -5,18 +14,16 @@ type EnvelopeGridProps = {
   activeSortOrder: number | null;
   loadingSortOrder: number | null;
   disabled?: boolean;
+  theme?: Theme;
   onOpen: (sortOrder: number) => void;
 };
-
-function envelopeLabel(index: number): string {
-  return `Envelope ${index + 1}`;
-}
 
 export function EnvelopeGrid({
   envelopes,
   activeSortOrder,
   loadingSortOrder,
   disabled = false,
+  theme,
   onOpen,
 }: EnvelopeGridProps) {
   const sortedEnvelopes = [...envelopes].sort(
@@ -24,20 +31,25 @@ export function EnvelopeGrid({
   );
 
   return (
-    <section aria-label="Secret envelopes" className="space-y-4">
-      <div className="text-center space-y-1">
-        <h2 className="font-serif text-2xl font-semibold">Your envelopes</h2>
+    <section aria-label="Your gifts" className="space-y-4">
+      <div className="space-y-1 text-center">
+        <h2 className="font-serif text-2xl font-semibold">Your gifts</h2>
         <p className="text-sm text-muted-foreground">
-          Open any envelope in any order — each one holds a surprise memory.
+          Open any gift in any order — each one holds a surprise memory.
         </p>
       </div>
 
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {sortedEnvelopes.map((envelope, index) => {
+          const displayNumber = index + 1;
           const isActive = activeSortOrder === envelope.sortOrder;
           const isLoading = loadingSortOrder === envelope.sortOrder;
-          const icon = envelope.isOpened ? "📬" : "✉️";
-          const label = envelopeLabel(index);
+          const tileState = isLoading
+            ? "loading"
+            : envelope.isOpened
+              ? "opened"
+              : "closed";
+          const kind = envelope.isFinal ? "final" : "standard";
 
           return (
             <li key={envelope.sortOrder}>
@@ -47,34 +59,36 @@ export function EnvelopeGrid({
                 disabled={disabled || isLoading}
                 aria-pressed={isActive}
                 aria-busy={isLoading}
-                aria-label={
-                  envelope.isOpened
-                    ? `${label} — opened, tap to view again`
-                    : `${label} — closed, tap to open`
-                }
+                aria-label={giftAccessibleName({
+                  displayNumber,
+                  isOpened: envelope.isOpened,
+                  isFinal: envelope.isFinal,
+                  isLoading,
+                })}
                 className={[
-                  "flex w-full flex-col items-center rounded-xl border px-3 py-5 text-center transition-colors",
+                  "flex w-full flex-col items-center rounded-xl border px-3 py-5 text-center transition-colors min-h-[5.5rem]",
                   isActive
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-card hover:bg-muted/40",
+                    ? "border-primary bg-primary/10 shadow-sm"
+                    : envelope.isOpened
+                      ? "border-border bg-card hover:bg-muted/30"
+                      : "border-border bg-card hover:bg-muted/40",
+                  envelope.isFinal && !isActive
+                    ? "ring-1 ring-pink-ink/20"
+                    : "",
                   disabled || isLoading ? "opacity-60" : "",
                 ].join(" ")}
               >
-                <span className="text-3xl" aria-hidden>
-                  {icon}
+                <GiftMotif state={tileState} kind={kind} theme={theme} />
+                <span className="mt-3 text-sm font-medium">
+                  {giftDisplayName(index)}
                 </span>
-                <span className="mt-2 text-sm font-medium">{label}</span>
-                <span className="mt-1 text-xs text-muted-foreground">
-                  {isLoading
-                    ? "Opening…"
-                    : envelope.isOpened
-                      ? "Opened"
-                      : "Closed"}
-                </span>
+                <GiftStateLabel
+                  state={tileState}
+                  kind={kind}
+                  className="mt-1"
+                />
                 {envelope.isFinal ? (
-                  <span className="mt-2 rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                    Final
-                  </span>
+                  <GiftFinalBadge className="mt-2" theme={theme} />
                 ) : null}
               </button>
             </li>

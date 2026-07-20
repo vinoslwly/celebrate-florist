@@ -1,4 +1,7 @@
-import { QUIZ_INPUT_CLASS } from "@/features/quiz/components/quiz-draft";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 import type { QuizScoreBandInput } from "@/schemas/studio-quiz";
 
@@ -41,12 +44,10 @@ export function QuizScoreBandEditor({
         </button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor={`${fieldId}-min`} className="text-sm font-medium">
-            Minimum %
-          </label>
-          <input
+      <FieldGroup className="grid gap-4 sm:grid-cols-2">
+        <Field>
+          <Label htmlFor={`${fieldId}-min`}>Minimum %</Label>
+          <Input
             id={`${fieldId}-min`}
             type="number"
             min={0}
@@ -58,15 +59,12 @@ export function QuizScoreBandEditor({
                 minPercent: Number(event.target.value),
               })
             }
-            className={QUIZ_INPUT_CLASS}
             disabled={disabled}
           />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor={`${fieldId}-max`} className="text-sm font-medium">
-            Maximum %
-          </label>
-          <input
+        </Field>
+        <Field>
+          <Label htmlFor={`${fieldId}-max`}>Maximum %</Label>
+          <Input
             id={`${fieldId}-max`}
             type="number"
             min={0}
@@ -78,28 +76,26 @@ export function QuizScoreBandEditor({
                 maxPercent: Number(event.target.value),
               })
             }
-            className={QUIZ_INPUT_CLASS}
             disabled={disabled}
           />
-        </div>
-      </div>
+        </Field>
+      </FieldGroup>
 
-      <div className="space-y-2">
-        <label htmlFor={`${fieldId}-message`} className="text-sm font-medium">
+      <Field>
+        <Label htmlFor={`${fieldId}-message`}>
           Message shown for this score
-        </label>
-        <textarea
+        </Label>
+        <Textarea
           id={`${fieldId}-message`}
           rows={3}
           value={band.message}
           onChange={(event) =>
             onChange({ ...band, message: event.target.value })
           }
-          className={QUIZ_INPUT_CLASS}
           disabled={disabled}
           placeholder="Write the message recipients see for this score range"
         />
-      </div>
+      </Field>
     </article>
   );
 }

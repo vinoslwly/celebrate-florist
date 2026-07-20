@@ -63,7 +63,7 @@ export function StudioShell({ children }: StudioShellProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted"
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted min-h-11 inline-flex items-center"
               >
                 {item.label}
               </Link>

@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { Field, FieldHelper } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   applyQuizTemplateAction,
   saveQuizConfigAction,
@@ -14,7 +17,6 @@ import {
   createEmptyQuestion,
   experienceQuizToDraft,
   hasQuizContent,
-  QUIZ_INPUT_CLASS,
   type QuizDraftState,
 } from "@/features/quiz/components/quiz-draft";
 import { QuizQuestionList } from "@/features/quiz/components/quiz-question-list";
@@ -62,6 +64,7 @@ export function QuizBuilderPanel({
   disabled = false,
 }: QuizBuilderPanelProps) {
   const router = useRouter();
+  const quizTitleHelperId = useId();
   const [quizTitle, setQuizTitle] = useState(initialQuizTitle);
   const [draft, setDraft] = useState<QuizDraftState>(() =>
     createInitialDraft(initialQuiz),
@@ -138,8 +141,8 @@ export function QuizBuilderPanel({
   return (
     <section className="rounded-2xl border border-border bg-card p-6 space-y-6">
       <header className="space-y-1">
-        <h2 className="text-sm font-semibold text-foreground">
-          Connection — couple quiz
+        <h2 className="font-serif text-base font-semibold text-foreground">
+          Mode experience — Connection quiz
         </h2>
         <p className="text-sm text-muted-foreground">
           Build a personal quiz with up to six multiple-choice questions and
@@ -162,23 +165,21 @@ export function QuizBuilderPanel({
         </div>
       ) : null}
 
-      <div className="space-y-2">
-        <label htmlFor="quiz-builder-title" className="text-sm font-medium">
-          Quiz title
-        </label>
-        <input
+      <Field>
+        <Label htmlFor="quiz-builder-title">Quiz title</Label>
+        <Input
           id="quiz-builder-title"
           type="text"
           value={quizTitle}
           onChange={(event) => setQuizTitle(event.target.value)}
-          className={QUIZ_INPUT_CLASS}
           disabled={disabled || busy !== null}
           placeholder="How well do you know me?"
+          aria-describedby={quizTitleHelperId}
         />
-        <p className="text-xs text-muted-foreground">
+        <FieldHelper id={quizTitleHelperId}>
           Optional heading shown above the quiz for recipients.
-        </p>
-      </div>
+        </FieldHelper>
+      </Field>
 
       <QuizQuestionList
         questions={draft.questions}

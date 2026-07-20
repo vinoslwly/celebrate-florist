@@ -34,7 +34,9 @@ export function MatchScoreResult({ result }: MatchScoreResultProps) {
       className="rounded-2xl border border-border bg-card p-6 space-y-4 text-center"
     >
       <h2 className="font-serif text-2xl font-semibold">Your score</h2>
-      <p className="text-5xl font-semibold tabular-nums">{percent}%</p>
+      <p className="text-5xl font-semibold tabular-nums text-pink-ink">
+        {percent}%
+      </p>
       <p className="text-sm text-muted-foreground">
         {result.correctCount} correct · {incorrectCount} incorrect
       </p>

@@ -1,3 +1,4 @@
+import { ExperienceSurfaceCard } from "@/features/experience/components/experience-surface-card";
 import type { PreviewMatchView } from "@/features/match/types";
 import type { BuyerPreviewPhoto } from "@/features/preview/types";
 
@@ -25,12 +26,11 @@ export function BuyerPreviewMatch({ match, photos }: BuyerPreviewMatchProps) {
   );
 
   return (
-    <section className="space-y-6 rounded-2xl border border-border bg-card p-6">
+    <ExperienceSurfaceCard tone="preview" className="space-y-6">
       <header className="space-y-1">
-        <h2 className="font-serif text-xl font-semibold">Match the memory</h2>
+        <h2 className="font-serif text-lg font-semibold">Match the memory</h2>
         <p className="text-sm text-muted-foreground">
-          Buyer preview — story and photo pairings are hidden from recipients
-          until they play.
+          Preview structure — pairings stay hidden until recipients play.
         </p>
         <p className="text-sm text-muted-foreground">
           {match.pairCount} memory {match.pairCount === 1 ? "pair" : "pairs"}
@@ -48,7 +48,7 @@ export function BuyerPreviewMatch({ match, photos }: BuyerPreviewMatchProps) {
           {sortedStories.map((story, index) => (
             <article
               key={story.sortOrder}
-              className="rounded-xl border border-border bg-muted/20 p-4 space-y-2"
+              className="rounded-xl border border-border/70 bg-muted/15 p-4 space-y-2"
             >
               <h4 className="text-sm font-semibold">Memory {index + 1}</h4>
               <p className="text-sm leading-relaxed">{story.storyText}</p>
@@ -95,6 +95,6 @@ export function BuyerPreviewMatch({ match, photos }: BuyerPreviewMatchProps) {
           </div>
         </div>
       ) : null}
-    </section>
+    </ExperienceSurfaceCard>
   );
 }

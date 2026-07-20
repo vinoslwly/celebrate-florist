@@ -43,20 +43,21 @@ export function nextEnvelopeSortOrder(envelopes: EnvelopeItemInput[]): number {
   return 6;
 }
 
-export const ENVELOPE_INPUT_CLASS =
-  "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50";
-
 const FRIENDLY_VALIDATION_MESSAGES: Record<string, string> = {
   "Each envelope must include a message, a photo, or both":
-    "This envelope is empty. Add a message, a photo, or both.",
+    "This gift is empty. Add a message, a photo, or both.",
   "Exactly one envelope must be marked as final":
-    "Exactly one envelope must be marked as Final.",
+    "Exactly one gift must be marked as Final.",
   "At least 2 envelopes are required":
-    "At least two envelopes are required before publish.",
+    "At least two gifts are required before publish.",
 };
 
 function friendlyMessage(message: string): string {
   return FRIENDLY_VALIDATION_MESSAGES[message] ?? message;
+}
+
+export function mapEnvelopeValidationMessage(message: string): string {
+  return friendlyMessage(message);
 }
 
 export function getEnvelopeCardValidation(
@@ -69,9 +70,7 @@ export function getEnvelopeCardValidation(
   }
 
   const issue = result.error.issues[0];
-  return issue
-    ? friendlyMessage(issue.message)
-    : "This envelope needs attention.";
+  return issue ? friendlyMessage(issue.message) : "This gift needs attention.";
 }
 
 export function getEnvelopeDraftValidation(
@@ -84,9 +83,7 @@ export function getEnvelopeDraftValidation(
   }
 
   const issue = result.error.issues[0];
-  return issue
-    ? friendlyMessage(issue.message)
-    : "Please review your envelopes.";
+  return issue ? friendlyMessage(issue.message) : "Please review your gifts.";
 }
 
 export function countFinalEnvelopes(envelopes: EnvelopeItemInput[]): number {

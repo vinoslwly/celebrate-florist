@@ -28,7 +28,7 @@ export function EnvelopePhotoSelector({
       <legend className="text-sm font-medium">Memory photo</legend>
       <p className="text-xs text-muted-foreground">
         Optional — add a photo, a message, or both. The recipient discovers this
-        only after opening the envelope.
+        only after opening this gift.
       </p>
       <div
         className="grid grid-cols-3 gap-2 sm:grid-cols-4"
@@ -36,7 +36,7 @@ export function EnvelopePhotoSelector({
         aria-labelledby={`${fieldId}-photo-legend`}
       >
         <span id={`${fieldId}-photo-legend`} className="sr-only">
-          Photo for this envelope
+          Photo for this gift
         </span>
 
         <label

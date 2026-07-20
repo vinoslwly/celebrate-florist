@@ -6,7 +6,7 @@ export default function ExperienceLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/40">
+    <div className="min-h-screen bg-gradient-to-b from-background via-warmwhite to-muted/50">
       <main>{children}</main>
     </div>
   );

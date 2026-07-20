@@ -10,9 +10,20 @@ import { cn } from "@/lib/utils";
 import type { EventType, ExperienceMode, ThemeRow } from "@/types/database";
 
 import { Button } from "@/components/ui/button";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { formControlClassName } from "@/components/ui/form-control-styles";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { createOrderAction } from "@/features/studio/actions/orders";
 import { EXPERIENCE_MODES } from "@/features/studio/config/experience-modes";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
+import { getThemeStudioDisplayLabel } from "@/features/themes/config/active-themes";
+import { resolveThemeTokens } from "@/features/themes/config/resolve-theme";
+import {
+  themeAccent,
+  themeAccentText,
+} from "@/features/themes/config/theme-surfaces";
 import { eventTypeSchema } from "@/schemas/common";
 
 type CreateOrderFormProps = {
@@ -42,6 +53,9 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   const selectedTheme = themes.find((theme) => theme.id === themeId);
+  const selectedThemeVisual = selectedTheme
+    ? resolveThemeTokens(selectedTheme)
+    : null;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,9 +96,6 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
     }
   }
 
-  const inputClass =
-    "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50";
-
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-2xl space-y-6">
       {error ? (
@@ -96,7 +107,7 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
         </div>
       ) : null}
 
-      <div className="space-y-3">
+      <FieldGroup>
         <p className="text-sm font-medium text-foreground">Experience mode</p>
         <div className="grid gap-3 sm:grid-cols-2">
           {EXPERIENCE_MODES.map((mode) => (
@@ -118,61 +129,68 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
             </button>
           ))}
         </div>
-      </div>
+      </FieldGroup>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor="senderName" className="text-sm font-medium">
-            Sender name
-          </label>
-          <input
+      <FieldGroup className="grid gap-4 sm:grid-cols-2">
+        <Field>
+          <Label htmlFor="senderName">Sender name</Label>
+          <Input
             id="senderName"
             required
             value={senderName}
             onChange={(e) => setSenderName(e.target.value)}
-            className={inputClass}
             disabled={isLoading}
           />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="receiverName" className="text-sm font-medium">
-            Recipient name
-          </label>
-          <input
+        </Field>
+        <Field>
+          <Label htmlFor="receiverName">Recipient name</Label>
+          <Input
             id="receiverName"
             required
             value={receiverName}
             onChange={(e) => setReceiverName(e.target.value)}
-            className={inputClass}
             disabled={isLoading}
           />
-        </div>
-      </div>
+        </Field>
+      </FieldGroup>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor="theme" className="text-sm font-medium">
-            Theme
-          </label>
+      <FieldGroup className="grid gap-4 sm:grid-cols-2">
+        <Field>
+          <Label htmlFor="theme">Theme</Label>
           <select
             id="theme"
             required
             value={themeId}
             onChange={(e) => setThemeId(e.target.value)}
-            className={inputClass}
+            className={formControlClassName()}
             disabled={isLoading}
           >
             {themes.map((theme) => (
               <option key={theme.id} value={theme.id}>
-                {theme.name}
+                {getThemeStudioDisplayLabel(theme.slug, theme.name)}
               </option>
             ))}
           </select>
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="eventType" className="text-sm font-medium">
-            Event type
-          </label>
+          {selectedThemeVisual ? (
+            <p
+              className="flex items-center gap-2 text-xs text-muted-foreground"
+              aria-label={`Theme preview: ${getThemeStudioDisplayLabel(selectedThemeVisual.id, selectedThemeVisual.name)}`}
+            >
+              <span
+                className={cn(
+                  "inline-block h-3 w-3 shrink-0 rounded-full border border-border",
+                  themeAccent(selectedThemeVisual),
+                )}
+                aria-hidden
+              />
+              <span className={themeAccentText(selectedThemeVisual)}>
+                {selectedThemeVisual.feeling} · {selectedThemeVisual.flower}
+              </span>
+            </p>
+          ) : null}
+        </Field>
+        <Field>
+          <Label htmlFor="eventType">Event type</Label>
           <select
             id="eventType"
             required
@@ -183,7 +201,7 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
                 setEventType(parsed.data);
               }
             }}
-            className={inputClass}
+            className={formControlClassName()}
             disabled={isLoading}
           >
             {EVENT_TYPES.map((type) => (
@@ -192,50 +210,43 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
               </option>
             ))}
           </select>
-        </div>
-      </div>
+        </Field>
+      </FieldGroup>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label htmlFor="buyerWhatsapp" className="text-sm font-medium">
-            Buyer WhatsApp (optional)
-          </label>
-          <input
+      <FieldGroup className="grid gap-4 sm:grid-cols-2">
+        <Field>
+          <Label htmlFor="buyerWhatsapp">Buyer WhatsApp (optional)</Label>
+          <Input
             id="buyerWhatsapp"
             value={buyerWhatsapp}
             onChange={(e) => setBuyerWhatsapp(e.target.value)}
-            className={inputClass}
             disabled={isLoading}
           />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="scheduledDeliveryAt" className="text-sm font-medium">
+        </Field>
+        <Field>
+          <Label htmlFor="scheduledDeliveryAt">
             Scheduled delivery (optional)
-          </label>
-          <input
+          </Label>
+          <Input
             id="scheduledDeliveryAt"
             type="datetime-local"
             value={scheduledDeliveryAt}
             onChange={(e) => setScheduledDeliveryAt(e.target.value)}
-            className={inputClass}
             disabled={isLoading}
           />
-        </div>
-      </div>
+        </Field>
+      </FieldGroup>
 
-      <div className="space-y-2">
-        <label htmlFor="adminNotes" className="text-sm font-medium">
-          Admin notes (optional)
-        </label>
-        <textarea
+      <Field>
+        <Label htmlFor="adminNotes">Admin notes (optional)</Label>
+        <Textarea
           id="adminNotes"
           rows={3}
           value={adminNotes}
           onChange={(e) => setAdminNotes(e.target.value)}
-          className={inputClass}
           disabled={isLoading}
         />
-      </div>
+      </Field>
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={isLoading}>

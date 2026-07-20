@@ -1,26 +1,74 @@
+import { cn } from "@/lib/utils";
+
+import type { Theme } from "@/types/theme";
+
+import { ExperienceSurfaceCard } from "@/features/experience/components/experience-surface-card";
+import {
+  GiftFinalBadge,
+  GiftMotif,
+  giftDisplayName,
+} from "@/features/treasures/components/gift-presentation";
 import type { RecipientEnvelopeContent } from "@/features/treasures/types";
 
 type EnvelopeContentViewProps = {
   content: RecipientEnvelopeContent;
   displayNumber: number;
+  tone?: "recipient" | "preview";
+  isFinal?: boolean;
+  theme?: Theme;
 };
 
-/** FD-T5 — message, photo, or both; presence-based rendering only. */
+/** FD-T5 — opened gift content: message, photo, or both. */
 export function EnvelopeContentView({
   content,
   displayNumber,
+  tone = "recipient",
+  isFinal = false,
+  theme,
 }: EnvelopeContentViewProps) {
   const hasMessage = Boolean(content.messageText?.trim());
   const hasPhoto = content.photo !== null;
+  const isPreview = tone === "preview";
 
   return (
-    <section
+    <ExperienceSurfaceCard
+      tone={isPreview ? "preview" : "recipient"}
+      theme={theme}
       aria-live="polite"
-      className="rounded-2xl border border-border bg-card p-6 space-y-4"
+      aria-label={
+        isFinal
+          ? `${giftDisplayName(displayNumber - 1)}, final gift, opened`
+          : `${giftDisplayName(displayNumber - 1)}, opened gift`
+      }
+      className={cn(
+        !isPreview && "border-l-4 border-l-primary/40 pl-5",
+        isFinal && !isPreview && "ring-1 ring-pink-ink/15",
+      )}
     >
-      <h2 className="font-serif text-xl font-semibold">
-        Envelope {displayNumber}
-      </h2>
+      <div className="flex items-start gap-3">
+        <GiftMotif
+          state="opened"
+          kind={isFinal ? "final" : "standard"}
+          size="sm"
+          theme={theme}
+        />
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2
+              className={cn(
+                "font-serif font-semibold",
+                isPreview ? "text-lg" : "text-2xl",
+              )}
+            >
+              {giftDisplayName(displayNumber - 1)}
+            </h2>
+            {isFinal ? <GiftFinalBadge theme={theme} /> : null}
+          </div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Opened gift
+          </p>
+        </div>
+      </div>
 
       {hasMessage ? (
         <div className="space-y-2">
@@ -47,6 +95,6 @@ export function EnvelopeContentView({
           ) : null}
         </div>
       ) : null}
-    </section>
+    </ExperienceSurfaceCard>
   );
 }

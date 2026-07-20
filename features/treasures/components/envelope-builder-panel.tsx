@@ -65,24 +65,23 @@ export function EnvelopeBuilderPanel({
     }
 
     setDraft(envelopeStudioConfigToDraft(saveResult.data.envelopes));
-    setMessage("Envelope configuration saved.");
+    setMessage("Gift configuration saved.");
     router.refresh();
   }
 
   return (
     <section className="rounded-2xl border border-border bg-card p-6 space-y-6">
       <header className="space-y-2">
-        <h2 className="text-sm font-semibold text-foreground">
-          Treasures — Secret Envelopes
+        <h2 className="font-serif text-base font-semibold text-foreground">
+          Mode experience — Gifts
         </h2>
         <p className="text-sm text-muted-foreground">
-          Prepare each envelope as a complete surprise inside the gift box.
-          Recipients see every envelope closed at first, then open them in any
-          order they choose.
+          Prepare each gift as a complete surprise. Recipients see every gift
+          closed at first, then open them in any order they choose.
         </p>
         <p className="text-xs text-muted-foreground">
-          After all envelopes are opened, the letter and photo gallery unlock.
-          No forced sequence — just closed and opened states.
+          After all gifts are opened, the letter and photo gallery unlock. No
+          forced sequence — just closed and opened states.
         </p>
       </header>
 
@@ -114,7 +113,7 @@ export function EnvelopeBuilderPanel({
           onClick={() => void handleSave()}
           disabled={disabled || busy}
         >
-          {busy ? "Saving envelopes…" : "Save envelopes"}
+          {busy ? "Saving gifts…" : "Save gifts"}
         </Button>
         {busy ? (
           <span className="text-xs text-muted-foreground" aria-live="polite">

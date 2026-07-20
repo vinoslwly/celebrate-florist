@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { FinalRewardHeading } from "@/features/experience/components/final-reward-heading";
 import { LetterView } from "@/features/experience/components/letter-view";
 import { PhotoGallery } from "@/features/experience/components/photo-gallery";
+import { RecipientExperienceShell } from "@/features/experience/components/recipient-experience-shell";
 import { rewardLetterToExperienceRow } from "@/features/experience/lib/treasures-letter-adapter";
 import type {
   TreasuresGatePayload,
@@ -122,6 +124,17 @@ export function TreasuresExperienceFlow({
     return displayNumberForSortOrder(gateView.envelopes, activeSortOrder);
   }, [activeSortOrder, gateView.envelopes]);
 
+  const activeIsFinal = useMemo(() => {
+    if (activeSortOrder === null) {
+      return false;
+    }
+
+    return (
+      gateView.envelopes.find((shell) => shell.sortOrder === activeSortOrder)
+        ?.isFinal ?? false
+    );
+  }, [activeSortOrder, gateView.envelopes]);
+
   async function loadReward() {
     setRewardLoading(true);
     setError(null);
@@ -175,7 +188,7 @@ export function TreasuresExperienceFlow({
       setError(
         openError instanceof Error
           ? openError.message
-          : "Something went wrong opening this envelope.",
+          : "Something went wrong opening this gift.",
       );
     } finally {
       setLoadingSortOrder(null);
@@ -185,23 +198,10 @@ export function TreasuresExperienceFlow({
   const showReward = gateView.rewardEligible && reward !== null;
 
   return (
-    <div className="relative mx-auto max-w-3xl space-y-8 px-4 py-10">
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-40 opacity-15 ${theme.accentClassName}`}
-        aria-hidden
-      />
-      <header className="relative text-center">
-        <p className="text-4xl" aria-hidden>
-          {theme.emoji}
-        </p>
-        <p className="mt-2 text-sm uppercase tracking-widest text-muted-foreground">
-          {theme.name} · A gift for you
-        </p>
-        <h1 className="mt-2 font-serif text-3xl font-semibold">
-          {experience.greeting_name}
-        </h1>
-      </header>
-
+    <RecipientExperienceShell
+      theme={theme}
+      greetingName={experience.greeting_name}
+    >
       {error ? (
         <div
           role="alert"
@@ -216,6 +216,7 @@ export function TreasuresExperienceFlow({
         activeSortOrder={activeSortOrder}
         loadingSortOrder={loadingSortOrder}
         disabled={rewardLoading}
+        theme={theme}
         onOpen={(sortOrder) => void handleOpenEnvelope(sortOrder)}
       />
 
@@ -223,6 +224,8 @@ export function TreasuresExperienceFlow({
         <EnvelopeContentView
           content={activeContent}
           displayNumber={displayNumber}
+          isFinal={activeIsFinal}
+          theme={theme}
         />
       ) : null}
 
@@ -231,12 +234,13 @@ export function TreasuresExperienceFlow({
           className="text-center text-sm text-muted-foreground"
           aria-live="polite"
         >
-          Unlocking your letter…
+          Unlocking your final reward…
         </p>
       ) : null}
 
       {showReward ? (
         <>
+          <FinalRewardHeading />
           <LetterView
             experience={rewardLetterToExperienceRow(reward.letter)}
             theme={theme}
@@ -249,6 +253,6 @@ export function TreasuresExperienceFlow({
           />
         </>
       ) : null}
-    </div>
+    </RecipientExperienceShell>
   );
 }

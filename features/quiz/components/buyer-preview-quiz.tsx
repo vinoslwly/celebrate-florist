@@ -1,3 +1,4 @@
+import { ExperienceSurfaceCard } from "@/features/experience/components/experience-surface-card";
 import type { PreviewQuizView } from "@/features/quiz/types";
 
 type BuyerPreviewQuizProps = {
@@ -13,13 +14,13 @@ export function BuyerPreviewQuiz({ quiz }: BuyerPreviewQuizProps) {
   );
 
   return (
-    <section className="space-y-6 rounded-2xl border border-border bg-card p-6">
+    <ExperienceSurfaceCard tone="preview" className="space-y-6">
       <header className="space-y-1">
-        <h2 className="font-serif text-xl font-semibold">
+        <h2 className="font-serif text-lg font-semibold">
           {quiz.quizTitle?.trim() || "Connection quiz"}
         </h2>
         <p className="text-sm text-muted-foreground">
-          Buyer preview — correct answers are hidden.
+          Preview structure — correct answers are hidden from buyers.
         </p>
       </header>
 
@@ -34,7 +35,7 @@ export function BuyerPreviewQuiz({ quiz }: BuyerPreviewQuizProps) {
         {sortedQuestions.map((question, index) => (
           <article
             key={question.sortOrder}
-            className="rounded-xl border border-border bg-muted/20 p-4 space-y-2"
+            className="rounded-xl border border-border/70 bg-muted/15 p-4 space-y-2"
           >
             <h3 className="text-sm font-semibold">Question {index + 1}</h3>
             <p className="text-sm">{question.prompt}</p>
@@ -55,7 +56,7 @@ export function BuyerPreviewQuiz({ quiz }: BuyerPreviewQuizProps) {
           {sortedBands.map((band, index) => (
             <div
               key={`band-${index}`}
-              className="rounded-lg border border-border px-3 py-2 text-sm"
+              className="rounded-lg border border-border/70 px-3 py-2 text-sm"
             >
               <p className="font-medium">
                 {band.minPercent}% – {band.maxPercent}%
@@ -65,6 +66,6 @@ export function BuyerPreviewQuiz({ quiz }: BuyerPreviewQuizProps) {
           ))}
         </div>
       ) : null}
-    </section>
+    </ExperienceSurfaceCard>
   );
 }

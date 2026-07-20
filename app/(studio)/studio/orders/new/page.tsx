@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { CreateOrderForm } from "@/features/studio/components/create-order-form";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
+import { filterThemesForNewOrderSelection } from "@/features/themes/config/active-themes";
 
 export const metadata = {
   title: "New Order — Celebrate Florist Studio",
@@ -17,7 +18,9 @@ export default async function NewOrderPage() {
 
   const supabase = await createClient();
   const themesRepo = new ThemesRepository(supabase);
-  const themes = await themesRepo.findAllActive();
+  const themes = filterThemesForNewOrderSelection(
+    await themesRepo.findAllActive(),
+  );
 
   return (
     <div className="space-y-6">

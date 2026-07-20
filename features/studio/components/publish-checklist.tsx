@@ -29,7 +29,9 @@ function statusLabel(status: PublishChecklistItem["status"]): string {
 export function PublishChecklist({ items }: PublishChecklistProps) {
   return (
     <section className="rounded-2xl border border-border bg-card p-6">
-      <h2 className="text-sm font-semibold">Pre-publish checklist</h2>
+      <h2 className="font-serif text-base font-semibold text-foreground">
+        Readiness — pre-publish checklist
+      </h2>
       <p className="mt-1 text-sm text-muted-foreground">
         All items must be ready before Publish is enabled.
       </p>

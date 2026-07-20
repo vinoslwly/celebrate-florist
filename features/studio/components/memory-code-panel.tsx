@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldHelper } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   generateMemoryCodeAction,
   setMemoryCodeAction,
@@ -28,25 +31,28 @@ export function MemoryCodePanel({
   disabled = false,
 }: MemoryCodePanelProps) {
   const router = useRouter();
+  const memoryCodeInputId = useId();
+  const memoryCodeHelperId = useId();
+  const memoryCodeErrorId = useId();
   const [memoryCode, setMemoryCode] = useState("");
   const [busy, setBusy] = useState<"save" | "generate" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const memoryCodeSet = !isPlaceholderMemoryKeyHash(memoryKeyHash);
   const displayedCode = adminMemoryCodeReference;
 
-  const inputClass =
-    "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50";
-
   async function handleSave() {
     if (!memoryCode.trim()) {
-      setError("Enter a Memory Code or use Generate.");
+      setFieldError("Enter a Memory Code or use Generate.");
+      setError(null);
       return;
     }
 
     setBusy("save");
     setError(null);
+    setFieldError(null);
     setMessage(null);
 
     const result = await setMemoryCodeAction({
@@ -70,6 +76,7 @@ export function MemoryCodePanel({
   async function handleGenerate() {
     setBusy("generate");
     setError(null);
+    setFieldError(null);
     setMessage(null);
 
     const result = await generateMemoryCodeAction({
@@ -89,10 +96,19 @@ export function MemoryCodePanel({
     router.refresh();
   }
 
+  const describedBy = [
+    memoryCodeHelperId,
+    fieldError ? memoryCodeErrorId : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <section className="rounded-2xl border border-border bg-card p-6 space-y-4">
       <div>
-        <h2 className="text-sm font-semibold">Memory Code</h2>
+        <h2 className="font-serif text-base font-semibold text-foreground">
+          Access — Memory Code
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Private key for the recipient after the 24-hour grace period. Required
           before publish. Saved here for admin reference during busy days.
@@ -131,9 +147,9 @@ export function MemoryCodePanel({
             Current Memory Code (admin reference)
           </p>
           <p className="font-mono text-2xl tracking-widest">{displayedCode}</p>
-          <p className="text-xs text-muted-foreground">
+          <FieldHelper>
             Studio-only note on this order. Share separately from the QR link.
-          </p>
+          </FieldHelper>
           <Button
             type="button"
             size="sm"
@@ -152,25 +168,33 @@ export function MemoryCodePanel({
 
       {!disabled ? (
         <>
-          <div className="space-y-2">
-            <label htmlFor="memoryCode" className="text-sm font-medium">
+          <Field>
+            <Label htmlFor={memoryCodeInputId}>
               {memoryCodeSet
                 ? "Set a new Memory Code"
                 : "Enter Memory Code manually"}
-            </label>
-            <input
-              id="memoryCode"
+            </Label>
+            <Input
+              id={memoryCodeInputId}
               type="text"
               autoComplete="off"
               value={memoryCode}
-              onChange={(event) =>
-                setMemoryCode(event.target.value.toUpperCase())
-              }
+              onChange={(event) => {
+                setMemoryCode(event.target.value.toUpperCase());
+                if (fieldError) {
+                  setFieldError(null);
+                }
+              }}
               placeholder="e.g. ABCD-EFGH"
-              className={inputClass}
               disabled={busy !== null}
+              aria-invalid={fieldError ? true : undefined}
+              aria-describedby={describedBy || undefined}
             />
-          </div>
+            <FieldHelper id={memoryCodeHelperId}>
+              Use Generate for a random code, or enter one manually.
+            </FieldHelper>
+            <FieldError id={memoryCodeErrorId}>{fieldError}</FieldError>
+          </Field>
 
           <div className="flex flex-wrap gap-3">
             <Button

@@ -12,8 +12,8 @@ export function ModePanelStub({ mode }: ModePanelStubProps) {
   if (!config.editorSprint) {
     return (
       <section className="rounded-2xl border border-border bg-card p-6">
-        <h2 className="text-sm font-semibold text-foreground">
-          Mode: {config.label}
+        <h2 className="font-serif text-base font-semibold text-foreground">
+          Mode experience — {config.label}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Core experience only — letter, photos, and Memory Code. No additional
@@ -25,7 +25,7 @@ export function ModePanelStub({ mode }: ModePanelStubProps) {
 
   return (
     <section className="rounded-2xl border border-dashed border-border bg-muted/30 p-6">
-      <h2 className="text-sm font-semibold text-foreground">
+      <h2 className="font-serif text-base font-semibold text-foreground">
         {config.label} configuration
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">{config.description}</p>

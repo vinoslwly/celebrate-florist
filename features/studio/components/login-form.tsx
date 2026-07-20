@@ -6,6 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import { Field, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { loginAction } from "@/features/studio/actions/auth";
 import { STUDIO_LOGIN_FAILURE_MESSAGE } from "@/features/studio/config/auth-messages";
 
@@ -15,6 +18,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const errorId = "studio-login-error";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,21 +38,17 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error ? (
-        <div
-          role="alert"
-          className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-        >
-          {error}
-        </div>
-      ) : null}
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <FieldError
+        id={errorId}
+        className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm"
+      >
+        {error}
+      </FieldError>
 
-      <div className="space-y-2">
-        <label htmlFor="email" className="text-sm font-medium text-foreground">
-          Email
-        </label>
-        <input
+      <Field>
+        <Label htmlFor="email">Email</Label>
+        <Input
           id="email"
           name="email"
           type="email"
@@ -57,18 +57,14 @@ export function LoginForm() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           disabled={isLoading}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
         />
-      </div>
+      </Field>
 
-      <div className="space-y-2">
-        <label
-          htmlFor="password"
-          className="text-sm font-medium text-foreground"
-        >
-          Password
-        </label>
-        <input
+      <Field>
+        <Label htmlFor="password">Password</Label>
+        <Input
           id="password"
           name="password"
           type="password"
@@ -77,11 +73,17 @@ export function LoginForm() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           disabled={isLoading}
-          className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
         />
-      </div>
+      </Field>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
+      <Button
+        type="submit"
+        className="w-full min-h-11"
+        disabled={isLoading}
+        aria-busy={isLoading}
+      >
         {isLoading ? "Signing in…" : "Sign in"}
       </Button>
 
