@@ -1,10 +1,12 @@
 # Sprint 11 — Connection Scene Architecture
 
-> **Status:** **Founder Approved — Locked**  
-> **Approval date:** 2026-07-16  
+> **Status:** **Founder Approved — Locked** (revised numbering 2026-07-21)  
+> **Approval date:** 2026-07-16 · **Scene 10 Letter Emergence inserted:** 2026-07-21  
 > **Mode:** `connection`  
-> **Sprint type:** Planning only — **no production code**  
+> **Sprint type:** Planning only — Theme Lab presentation may implement scenes ahead of production wiring  
 > **Parent:** [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](../16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) · [README](./README.md)
+
+**Revision (2026-07-21):** Founder added an emotional **Letter Emergence** transition (open gift + To/From head only, ~1.0–1.5 s, no tap CTA). Former Letter Reveal → Photobooth scenes renumbered **11–15**.
 
 ---
 
@@ -12,13 +14,13 @@
 
 [GER-01–06](../05_FOUNDER_DECISIONS.md#global-experience-rules-ger) · [ADR S11-008](../adr/S11-008-global-experience-rules.md)
 
-| GER    | Applies to Connection                                                                                                  |
-| ------ | ---------------------------------------------------------------------------------------------------------------------- |
-| GER-01 | Transition scenes 4, 7, 9 — ~1.0–1.5 s; Scene 11 gallery unlock 2–3 s (override)                                       |
-| GER-02 | ❌ **No gameplay timer** — reflective quiz; recipient reads and answers without pressure (founder revision 2026-07-16) |
-| GER-03 | N/A                                                                                                                    |
-| GER-05 | N/A                                                                                                                    |
-| GER-06 | N/A (no gameplay timer in this mode)                                                                                   |
+| GER    | Applies to Connection                                                                                                                           |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| GER-01 | Transition scenes 9, **10** — ~1.0–1.5 s; Scene **4** quiz bridge **2 s**; Scene **7** anticipation **~2 s**; Scene **12** gallery unlock 2–3 s |
+| GER-02 | ❌ **No gameplay timer** — reflective quiz; recipient reads and answers without pressure (founder revision 2026-07-16)                          |
+| GER-03 | N/A                                                                                                                                             |
+| GER-05 | N/A                                                                                                                                             |
+| GER-06 | N/A (no gameplay timer in this mode)                                                                                                            |
 
 **Founder rationale:** Connection questions may contain longer text. Countdown would create unnecessary anxiety and reduce the emotional experience.
 
@@ -30,31 +32,31 @@
 **Auditors:** Principal Software Architect · UX Architect · Creative Director · Devil's Advocate  
 **Outcome:** **PASSED** — no blocking issues
 
-| Check                           | Result                                                                                                               |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| FD-S11-01 Wrap                  | ✅ Presentation scenes wrap `ConnectionExperienceFlow`; gate/reward services and `submitQuizAnswersAction` unchanged |
-| FD-S11-02 Back edge             | ✅ Connection forward-only; no back navigation during or after quiz (Treasures-only back edge unchanged)             |
-| FD-S11-03 Persistent Shell      | ✅ Theme/layout frame mounted; scenes 0–14 mount/unmount inside shell                                                |
-| FD-S11-04 Parameterized graph   | ✅ Quiz questions = parameterized `gate-dynamic` scenes (one per question)                                           |
-| FD-S11-05 Server initial scene  | ✅ Server resolves gate entry; unlock restore via sessionStorage re-read (see §Unlock Restore)                       |
-| FD-S11-06 Scene Contract        | ✅ Destination scenes full contract; transitions minimal                                                             |
-| Doc 13 business journey         | ✅ Quiz → Submit → Score + Band → Letter → Gallery → Photobooth preserved                                            |
-| CF-1 (any submit unlocks)       | ✅ Score tone warm/celebratory; never blocks letter                                                                  |
-| CF-2 (sessionStorage)           | ✅ Unlock blob unchanged; same-tab refresh restores reward path                                                      |
-| CF-3 / CF-4 (gate/reward split) | ✅ Locked Gift reveals nothing; letter/sender withheld until Scene 10                                                |
-| Phase A implementation          | ✅ Wraps existing `QuizPlayer` logic via scene slots; submit remains batch server action                             |
-| Sprint 13 boundary              | ✅ Durations are logical hints only                                                                                  |
-| Sprint 14 boundary              | ✅ Photobooth scene placement only                                                                                   |
+| Check                           | Result                                                                                                                  |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| FD-S11-01 Wrap                  | ✅ Presentation scenes wrap `ConnectionExperienceFlow`; gate/reward services and `submitQuizAnswersAction` unchanged    |
+| FD-S11-02 Back edge             | ✅ Connection forward-only; no back navigation during or after quiz (Treasures-only back edge unchanged)                |
+| FD-S11-03 Persistent Shell      | ✅ Theme/layout frame mounted; scenes 0–15 mount/unmount inside shell                                                   |
+| FD-S11-04 Parameterized graph   | ✅ Quiz questions = parameterized `gate-dynamic` scenes (one per question)                                              |
+| FD-S11-05 Server initial scene  | ✅ Server resolves gate entry; unlock restore via sessionStorage re-read (see §Unlock Restore)                          |
+| FD-S11-06 Scene Contract        | ✅ Destination scenes full contract; transitions minimal                                                                |
+| Doc 13 business journey         | ✅ Quiz → Submit → Score + Band → Letter → Gallery → Photobooth preserved                                               |
+| CF-1 (any submit unlocks)       | ✅ Score tone warm/celebratory; never blocks letter                                                                     |
+| CF-2 (sessionStorage)           | ✅ Unlock blob unchanged; same-tab refresh restores reward path                                                         |
+| CF-3 / CF-4 (gate/reward split) | ✅ Locked Gift reveals nothing; full letter body withheld until Scene 11; Scene 10 shows To/From head only after unlock |
+| Phase A implementation          | ✅ Wraps existing `QuizPlayer` logic via scene slots; submit remains batch server action                                |
+| Sprint 13 boundary              | ✅ Durations are logical hints only                                                                                     |
+| Sprint 14 boundary              | ✅ Photobooth scene placement only                                                                                      |
 
 ### Devil's Advocate — Reviewed Risks (Non-Blocking)
 
 | Risk                                                                  | Verdict                                   | Mitigation                                                                                                                 |
 | --------------------------------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Quiz UX differs from Phase A (one question/screen vs all-on-one-page) | Accepted — Sprint 12+ presentation change | Client accumulates answers; **single** `submitQuizAnswersAction` after last answer — no backend change                     |
-| Submit async during Scene 7                                           | Expected                                  | Scene 7 (`Calculating...`) covers network latency; Scene 8 requires submit result                                          |
+| Submit async during Scene 7                                           | Expected                                  | Scene 7 anticipation beat covers network latency; Scene 8 requires submit result                                           |
 | sessionStorage not visible to SSR                                     | Known Phase A pattern                     | Server resolves gate entry scene; client re-reads `cf_connection_unlock_*` on mount and transitions to Scene 8 if unlocked |
 | Mid-quiz refresh loses in-progress answers                            | Same as Phase A                           | Only completed submit persists; acceptable per CF-2                                                                        |
-| Gallery empty                                                         | Must skip                                 | Scenes 12–13 omitted when `photos.length === 0` (same guard as Moments)                                                    |
+| Gallery empty                                                         | Must skip                                 | Scenes 13–14 omitted when `photos.length === 0` (same guard as Moments)                                                    |
 
 ---
 
@@ -75,9 +77,10 @@ This document defines the **presentation-layer** scene graph — emotional cerem
 | **Gate — Quiz**               | Scene 6 (parameterized: one question per screen) |
 | Submit + score prep           | End of Scene 6 → Scene 7                         |
 | **Score + Band feedback**     | Scene 8 (+ Scene 9 celebration bridge)           |
-| **Reward — Letter**           | Scene 10                                         |
-| **Continuation — Gallery**    | Scenes 11–12 (+ Scene 13 ending)                 |
-| **Continuation — Photobooth** | Scene 14                                         |
+| **Reward — Letter head**      | Scene 10 (emergence transition — To/From only)   |
+| **Reward — Letter**           | Scene 11                                         |
+| **Continuation — Gallery**    | Scenes 12–13 (+ Scene 14 ending)                 |
+| **Continuation — Photobooth** | Scene 15                                         |
 
 **CF-4 preserved:** Initial load delivers **Connection Gate Payload** only. Reward payload fetched via `submitQuizAnswersAction` when the last quiz answer is selected — before Scene 8 displays score.
 
@@ -97,17 +100,18 @@ flowchart TD
     S6 --> S7[Scene 7: Score Calculation]
     S7 --> S8[Scene 8: Score Reveal]
     S8 --> S9[Scene 9: Celebration Transition]
-    S9 --> S10[Scene 10: Letter Reveal]
-    S10 --> S11[Scene 11: Gallery Unlock]
-    S11 --> S12[Scene 12: Gallery]
-    S11 --> S14[Scene 14: Photobooth]
-    S12 --> S13[Scene 13: Gallery Ending]
-    S13 --> S14
+    S9 --> S10[Scene 10: Letter Emergence]
+    S10 --> S11[Scene 11: Letter Reveal]
+    S11 --> S12[Scene 12: Gallery Unlock]
+    S12 --> S13[Scene 13: Gallery]
+    S12 --> S15[Scene 15: Photobooth]
+    S13 --> S14[Scene 14: Gallery Ending]
+    S14 --> S15
 
     AG -.->|outside Scene Engine| SE[Scene Engine begins at Scene 0]
 ```
 
-**Gallery skip:** When `photos.length === 0`, Scenes 12 and 13 are omitted. Scene 11 transitions directly to Scene 14.
+**Gallery skip:** When `photos.length === 0`, Scenes 13 and 14 are omitted. Scene 12 transitions directly to Scene 15.
 
 **Unlock restore:** When `cf_connection_unlock_${experienceId}` exists in sessionStorage, client resolves to Scene 8 (Score Reveal) — skipping Scenes 0–6. See §Unlock Restore.
 
@@ -173,7 +177,7 @@ Unchanged from Phase A.
 | **Type**           | `gate`                   |
 | **Scene Contract** | Full                     |
 
-**Behavior:** Gift box appears. Recipient naturally attempts to open it. The gift **does NOT open**.
+**Behavior:** Gift box appears. Recipient naturally attempts to open it. The gift **does NOT open**. Three failed open attempts (shake + stay locked) before advancing — so the lock feels real, not a single-tap acknowledge.
 
 **Withheld intentionally (CF-4):**
 
@@ -185,7 +189,7 @@ Unchanged from Phase A.
 
 **Purpose:** Curiosity — establishes the locked gift metaphor before the quiz gate.
 
-**Transition trigger:** User interaction (attempt to open / acknowledge) → Scene 3.
+**Transition trigger:** Third failed open attempt → Scene 3.
 
 ---
 
@@ -221,12 +225,14 @@ Unchanged from Phase A.
 
 **Display:**
 
-- Quiz Time
 - ♡
+- Quiz Time! (large hero)
+- Soft petal burst frame + sakura corners — fills the viewport
+- Soft romantic energy (same blush atmosphere as Scenes 2–3; celebratory, not scrapbook/game-show)
 
-**Target duration:** 1.0–1.5 seconds (GER-01).
+**Target duration:** **2.0 seconds** (cinematic override of GER-01 — keep emotional continuity into the quiz).
 
-**Purpose:** Transition only. No interaction. Animation belongs to Sprint 13.
+**Purpose:** Transition only. No interaction. **No buttons / CTA chrome.** Opening should feel exciting so the quiz feels fun — big scale + burst, still Bloom romance.
 
 **Transition trigger:** Duration complete → Scene 5.
 
@@ -299,13 +305,14 @@ Unchanged from Phase A.
 
 **Display:**
 
-- _Calculating..._
 - ♡
-- _Your score is being prepared..._
+- Ajar glowing gift (anticipation — gift motif continuity)
+- _Almost there…_
+- _Something sweet is gathering for you…_
 
-**Target duration:** 0.8–1.5 seconds (extends if submit still pending).
+**Target duration:** **~2.0 seconds** in Theme Lab (cinematic). Production may extend while `submitQuizAnswersAction` is still pending.
 
-**Purpose:** Transition while `submitQuizAnswersAction` completes.
+**Purpose:** Emotional bridge while submit completes — **not** an admin “calculating / preparing score” screen.
 
 **Transition trigger:** Submit success → Scene 8. Submit failure → error handling (Sprint 12 UX; retry allowed).
 
@@ -359,7 +366,32 @@ Unchanged from Phase A.
 
 ---
 
-### Scene 10 — Letter Reveal
+### Scene 10 — Letter Emergence
+
+| Field              | Value                         |
+| ------------------ | ----------------------------- |
+| **Scene ID**       | `connection.letter-emergence` |
+| **Type**           | `transition`                  |
+| **Scene Contract** | Minimal — auto-advance        |
+
+**Display (emotional bridge only):**
+
+- Locked gift **finally opens** (lid rests aside; warm glow from inside)
+- Letter card rises showing **To** (recipient) + **From** (buyer) only — same head beat as Moments Scene 3 keyframe 2
+- Floating petals / soft sparkles allowed
+- ❌ **No** “Tap the letter to continue” (or any continue CTA)
+
+**Target duration:** 1.0–1.5 seconds (GER-01). No interaction.
+
+**Purpose:** Emotional payoff that the challenge unlocked the gift — before full letter body.
+
+**Data source:** `greeting_name` / `closing_name` from reward (or lab fixture). Full `letter_content` stays for Scene 11.
+
+**Transition trigger:** Duration complete → Scene 11.
+
+---
+
+### Scene 11 — Letter Reveal
 
 | Field              | Value                      |
 | ------------------ | -------------------------- |
@@ -367,26 +399,26 @@ Unchanged from Phase A.
 | **Type**           | `reward`                   |
 | **Scene Contract** | Full                       |
 
-**Behavior (Sprint 13 animates; Sprint 11 defines architecture only):**
+**Presentation (Theme Lab / Founder):** **Same as Moments Scene 6** (`moments.letter`) — reuse locked letter living scene (sentence-by-sentence reveal + **Unlock Memories** CTA).
 
-- Gift box **finally opens**
-- Letter slowly emerges, gradually unfolds
-- Contents appear progressively with emotional pacing
-- Reward **finally revealed**
+**Behavior:**
+
+- Full reward letter body readable (greeting, body, closing)
+- Emotional pacing matches Moments letter
 
 **Button:** **Unlock Memories**
 
 **Purpose:** Emotional payoff of the entire challenge (doc 13 reward phase).
 
-**Data source:** `ConnectionQuizSubmitResult.reward.letter` via existing reward payload adapter.
+**Data source:** `ConnectionQuizSubmitResult.reward.letter` via existing reward payload adapter (lab: experience letter fields on fixture).
 
 **Note:** "Unlock Memories" is storytelling language — not a security gate.
 
-**Transition trigger:** User CTA → Scene 11.
+**Transition trigger:** User CTA → Scene 12.
 
 ---
 
-### Scene 11 — Gallery Unlock
+### Scene 12 — Gallery Unlock
 
 | Field              | Value                       |
 | ------------------ | --------------------------- |
@@ -394,17 +426,19 @@ Unchanged from Phase A.
 | **Type**           | `transition`                |
 | **Scene Contract** | Minimal — auto-advance      |
 
+**Presentation (Theme Lab / Founder):** **Same as Moments Scene 7** (`moments.album-unlock-transition`).
+
 **Behavior:** Album remains closed, then gradually opens. Photos become visible.
 
-**Target duration:** 2–3 seconds. No interaction.
+**Target duration:** ~3 seconds (Moments unlock sequence). No interaction.
 
 **Purpose:** Pure cinematic bridge into Gallery.
 
-**Transition trigger:** Duration complete → Scene 12 (if photos) or Scene 14 (if gallery skipped).
+**Transition trigger:** Duration complete → Scene 13 (if photos) or Scene 15 (if gallery skipped).
 
 ---
 
-### Scene 12 — Gallery
+### Scene 13 — Gallery
 
 | Field              | Value                |
 | ------------------ | -------------------- |
@@ -412,17 +446,19 @@ Unchanged from Phase A.
 | **Type**           | `continuation`       |
 | **Scene Contract** | Full                 |
 
+**Presentation (Theme Lab / Founder):** **Same as Moments Scene 8** (`moments.gallery`).
+
 **Content:** Scrollable gallery — photos, titles, descriptions.
 
 **Guard:** `photos.length > 0`
 
 **Business layer:** Same as Phase A `PhotoGallery` — signed URLs from reward payload.
 
-**Transition trigger:** User continue → Scene 13.
+**Transition trigger:** User continue → Scene 14.
 
 ---
 
-### Scene 13 — Gallery Ending
+### Scene 14 — Gallery Ending
 
 | Field              | Value                       |
 | ------------------ | --------------------------- |
@@ -430,21 +466,23 @@ Unchanged from Phase A.
 | **Type**           | `continuation-ending`       |
 | **Scene Contract** | Full                        |
 
+**Presentation (Theme Lab / Founder):** **Same as Moments Scene 9** (`moments.gallery-ending`).
+
 **Display:**
 
 - _Thank you for sharing these memories._
 - ♡
 - _Celebrate this moment._
 
-**Button:** **Continue to Photobooth**
+**Button:** **Continue to Photobooth** (or auto-advance beat matching Moments)
 
-**Guard:** Same as Scene 12.
+**Guard:** Same as Scene 13.
 
-**Transition trigger:** User CTA → Scene 14.
+**Transition trigger:** User CTA / duration → Scene 15.
 
 ---
 
-### Scene 14 — Photobooth
+### Scene 15 — Photobooth
 
 | Field              | Value                   |
 | ------------------ | ----------------------- |
@@ -452,9 +490,9 @@ Unchanged from Phase A.
 | **Type**           | `terminal`              |
 | **Scene Contract** | Full                    |
 
-**Sprint 11 scope:** Scene placement only.
+**Presentation (Theme Lab / Founder):** **Same as Moments Scene 10** (`moments.photobooth`) — reuse existing Photobooth wrapper.
 
-**Implementation:** Sprint 14 — no layouts, frames, or stickers in this spec.
+**Sprint 14:** Redesign deferred (layouts, frames, stickers) — same production-pending status as Moments.
 
 **CF-R2:** N/A (Connection unchanged).
 
@@ -467,12 +505,12 @@ Unchanged from Phase A.
 | `intro`               | 0, 1             | Full     | Yes                   |
 | `gate`                | 2, 3, 5          | Full     | Yes                   |
 | `gate-dynamic`        | 6 (per question) | Full     | Yes                   |
-| `transition`          | 4, 7, 9, 11      | Minimal  | **No**                |
+| `transition`          | 4, 7, 9, 10, 12  | Minimal  | **No**                |
 | `reward-partial`      | 8                | Full     | Yes (score/band only) |
-| `reward`              | 10               | Full     | Yes (letter payoff)   |
-| `continuation`        | 12               | Full     | Yes                   |
-| `continuation-ending` | 13               | Full     | Yes                   |
-| `terminal`            | 14               | Full     | Yes                   |
+| `reward`              | 11               | Full     | Yes (letter payoff)   |
+| `continuation`        | 13               | Full     | Yes                   |
+| `continuation-ending` | 14               | Full     | Yes                   |
+| `terminal`            | 15               | Full     | Yes                   |
 
 **New type `reward-partial`:** Presents post-submit feedback (score + band) before full reward reveal. Engine treats as standard destination scene; type aids Sprint 12 component taxonomy.
 
@@ -486,7 +524,7 @@ Unchanged from Phase A.
 | _(access granted)_                  | `connection.score-reveal`           | `JOURNEY_START`          | sessionStorage unlock present |
 | `connection.celebrate-loading`      | `connection.gift-introduction`      | Duration complete        | —                             |
 | `connection.gift-introduction`      | `connection.locked-gift`            | User tap flower          | —                             |
-| `connection.locked-gift`            | `connection.challenge-invitation`   | User acknowledge         | —                             |
+| `connection.locked-gift`            | `connection.challenge-invitation`   | 3rd failed open attempt  | —                             |
 | `connection.challenge-invitation`   | `connection.quiz-transition`        | I'm Ready                | —                             |
 | `connection.quiz-transition`        | `connection.quiz-introduction`      | Duration complete        | —                             |
 | `connection.quiz-introduction`      | `connection.quiz.question.0`        | Start                    | —                             |
@@ -494,7 +532,8 @@ Unchanged from Phase A.
 | `connection.quiz.question.{n}`      | `connection.score-calculation`      | Answer selected + submit | n = Q-1                       |
 | `connection.score-calculation`      | `connection.score-reveal`           | Submit success           | —                             |
 | `connection.score-reveal`           | `connection.celebration-transition` | Reveal My Gift           | —                             |
-| `connection.celebration-transition` | `connection.letter-reveal`          | Duration complete        | —                             |
+| `connection.celebration-transition` | `connection.letter-emergence`       | Duration complete        | —                             |
+| `connection.letter-emergence`       | `connection.letter-reveal`          | Duration complete        | —                             |
 | `connection.letter-reveal`          | `connection.gallery-unlock`         | Unlock Memories          | —                             |
 | `connection.gallery-unlock`         | `connection.gallery`                | Duration complete        | `photos.length > 0`           |
 | `connection.gallery-unlock`         | `connection.photobooth`             | Duration complete        | `photos.length === 0`         |
@@ -542,7 +581,7 @@ page.tsx (RSC)
         └── ConnectionExperienceFlow (wrapped)
               └── SceneEngineHost
                     └── PersistentShell
-                          └── Active Scene (0–14)
+                          └── Active Scene (0–15)
                                 └── QuizPlayer (scene slot) · QuizScoreResult · LetterView · ...
 ```
 

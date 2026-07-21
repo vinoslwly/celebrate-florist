@@ -74,7 +74,7 @@ Sprint 11 **architecture planning is complete**. Scene Engine **implementation**
 | **FD-S11-06**    | Scene Contract — universal onEnter/onExit/canLeave/onComplete for all scenes    | [S11-006](./adr/S11-006-scene-contract.md)                                 |
 | **FD-S11-DOC**   | Incremental documentation — one mode at a time                                  | [sprint-11/README.md](./sprint-11/README.md)                               |
 | **FD-S11-07**    | Moments scene flow (Scenes 0–10)                                                | [sprint-11/01_MOMENTS](./sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md)       |
-| **FD-S11-08**    | Connection scene flow (Scenes 0–14)                                             | [sprint-11/02_CONNECTION](./sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md) |
+| **FD-S11-08**    | Connection scene flow (Scenes 0–15)                                             | [sprint-11/02_CONNECTION](./sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md) |
 | **FD-S11-09–13** | Memories scene flow + presentation rules                                        | [sprint-11/03_MEMORIES](./sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md)     |
 | **FD-S11-14–17** | Treasures scene flow + gift presentation                                        | [sprint-11/04_TREASURES](./sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md)   |
 

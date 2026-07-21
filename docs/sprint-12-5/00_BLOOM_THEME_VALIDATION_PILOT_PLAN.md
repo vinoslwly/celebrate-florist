@@ -1,10 +1,10 @@
 # Sprint 12.5 — Bloom Theme Validation Pilot Plan
 
-> **Status:** ✅ **PLAN APPROVED** · Moments 🔒 **APPROVED AND LOCKED** · Connection **READY — NOT STARTED**  
-> **Date:** 2026-07-19 (plan) · **Lock:** 2026-07-20  
-> **Parent:** [DDR-S12-030](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-034](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [Core UI closure](../sprint-12-implementation/README.md)  
-> **Scene graph:** [Sprint 11 Moments Scene Architecture](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md)  
-> **Theme Lab:** `/theme-lab/bloom` (Moments only — locked)
+> **Status:** ✅ **PLAN APPROVED** · Moments 🔒 **LOCKED** · Connection 🔒 **LOCKED**  
+> **Date:** 2026-07-19 (plan) · **Moments lock:** 2026-07-20 · **Connection lock:** 2026-07-21  
+> **Parent:** [DDR-S12-030](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-034](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-035](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [Core UI closure](../sprint-12-implementation/README.md) · [Connection audit](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md)  
+> **Scene graph:** [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [Connection](../sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md)  
+> **Theme Lab:** `/theme-lab/bloom` (Moments + Connection locked · Memories/Treasures not started)
 
 ---
 

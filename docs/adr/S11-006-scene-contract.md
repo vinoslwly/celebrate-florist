@@ -111,7 +111,7 @@ Sprint 11: ENTERING/EXITING are **logical zero-duration phases** until Sprint 13
 | ------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------- |
 | Intro (Moments)                | User interaction or auto duration                                 | Gift Box: false until tap; Celebrate Loading: auto            |
 | Transition                     | Duration complete → auto edge                                     | N/A — not interactive; minimal contract                       |
-| Locked Gift (Connection)       | User acknowledge → challenge                                      | CF-4: nothing revealed                                        |
+| Locked Gift (Connection)       | 3 failed open attempts → challenge                                | CF-4: nothing revealed                                        |
 | Quiz intro (Connection)        | Start → first question                                            | Use "gift" not "letter"                                       |
 | Quiz question (Connection)     | Answer selected → next or submit                                  | One question per screen; no back; no per-answer feedback      |
 | Score calculation (Connection) | Submit success → score reveal                                     | Covers async submit                                           |

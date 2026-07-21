@@ -2,17 +2,31 @@
 
 import { useState } from "react";
 
+import { useSearchParams } from "next/navigation";
+
 import { cn } from "@/lib/utils";
 
 import type { Theme } from "@/types/theme";
 
 import { LetterView } from "@/features/experience/components/letter-view";
 import { PhotoGallery } from "@/features/experience/components/photo-gallery";
+import { ConnectionSceneHost } from "@/features/experience/scene-engine/connection/connection-scene-host";
+import {
+  CONNECTION_STATIC_SCENE_IDS,
+  isConnectionQuizQuestionScene,
+  type ConnectionSceneId,
+} from "@/features/experience/scene-engine/connection/graph";
 import { MomentsSceneHost } from "@/features/experience/scene-engine/moments/moments-scene-host";
 import {
   PreviewContextNote,
   PreviewReviewFrame,
 } from "@/features/preview/components/preview-review-frame";
+import {
+  BLOOM_CONNECTION_LAB_EXPERIENCE,
+  BLOOM_CONNECTION_LAB_PHOTOS,
+  BLOOM_CONNECTION_LAB_QUIZ,
+  BLOOM_CONNECTION_LAB_SCORE_RESULT,
+} from "@/features/theme-lab/config/bloom-connection-fixtures";
 import {
   BLOOM_MOMENTS_LAB_EXPERIENCE,
   BLOOM_MOMENTS_LAB_PHOTOS,
@@ -31,6 +45,26 @@ import {
 type ModeTab = "moments" | "connection" | "memories" | "treasures";
 type SurfaceTab = "recipient" | "preview";
 
+const IMPLEMENTED_MODES: ModeTab[] = ["moments", "connection"];
+
+const CONNECTION_STATIC_SCENE_SET = new Set<string>(
+  CONNECTION_STATIC_SCENE_IDS,
+);
+
+/** Lab-only deep-link: ?connectionScene=connection.celebration-transition */
+function parseConnectionLabScene(
+  raw: string | null,
+): ConnectionSceneId | undefined {
+  if (!raw) return undefined;
+  if (CONNECTION_STATIC_SCENE_SET.has(raw)) {
+    return raw as ConnectionSceneId;
+  }
+  if (isConnectionQuizQuestionScene(raw as ConnectionSceneId)) {
+    return raw as ConnectionSceneId;
+  }
+  return undefined;
+}
+
 function withAccentText(theme: Theme, accentText: string): Theme {
   return {
     ...theme,
@@ -42,7 +76,13 @@ function withAccentText(theme: Theme, accentText: string): Theme {
 }
 
 export function BloomThemeLabPage() {
-  const [mode, setMode] = useState<ModeTab>("moments");
+  const searchParams = useSearchParams();
+  const connectionJump = parseConnectionLabScene(
+    searchParams.get("connectionScene"),
+  );
+  const [mode, setMode] = useState<ModeTab>(
+    connectionJump ? "connection" : "moments",
+  );
   const [surface, setSurface] = useState<SurfaceTab>("recipient");
   const [accentOption, setAccentOption] = useState(0);
 
@@ -51,7 +91,8 @@ export function BloomThemeLabPage() {
     bloomMomentsLabAccentTextOptions[0];
   const theme = withAccentText(bloomMomentsLabTheme, selectedAccent.className);
   const completionSrc = themeCompletionArtwork(theme);
-  const immersiveJourney = mode === "moments" && surface === "recipient";
+  const immersiveJourney =
+    (mode === "moments" || mode === "connection") && surface === "recipient";
 
   return (
     <div
@@ -85,14 +126,14 @@ export function BloomThemeLabPage() {
                 Bloom Theme Lab
               </h1>
               <p className="max-w-2xl text-sm text-muted-foreground">
-                Moments Scene Engine — Founder art one scene at a time. Scene 1
-                locked; later scenes pending. Production{" "}
-                <span className="font-mono">/e/</span> unchanged until approval.
+                Moments locked. Connection Scene 0–15 living. Production{" "}
+                <span className="font-mono">/e/</span> unchanged.
               </p>
             </>
           ) : (
             <p className="font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-              Theme Lab · Bloom Moments
+              Theme Lab · Bloom{" "}
+              {mode === "connection" ? "Connection" : "Moments"}
             </p>
           )}
 
@@ -108,31 +149,39 @@ export function BloomThemeLabPage() {
                 ["memories", "Memories"],
                 ["treasures", "Treasures"],
               ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={mode === id}
-                disabled={id !== "moments"}
-                onClick={() => setMode(id)}
-                className={cn(
-                  "rounded-lg border px-3 py-1.5 text-xs font-medium",
-                  mode === id
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "border-border text-muted-foreground",
-                  id !== "moments" && "cursor-not-allowed opacity-50",
-                )}
-              >
-                {label}
-                {id !== "moments" && !immersiveJourney
-                  ? " · Not implemented"
-                  : ""}
-              </button>
-            ))}
+            ).map(([id, label]) => {
+              const enabled = IMPLEMENTED_MODES.includes(id);
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === id}
+                  disabled={!enabled}
+                  onClick={() => {
+                    setMode(id);
+                    setSurface("recipient");
+                  }}
+                  className={cn(
+                    "rounded-lg border px-3 py-1.5 text-xs font-medium",
+                    mode === id
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border text-muted-foreground",
+                    !enabled && "cursor-not-allowed opacity-50",
+                  )}
+                >
+                  {label}
+                  {id === "moments" && !immersiveJourney ? " · Locked" : ""}
+                  {id === "connection" && !immersiveJourney
+                    ? " · Scene 0–15"
+                    : ""}
+                  {!enabled && !immersiveJourney ? " · Not started" : ""}
+                </button>
+              );
+            })}
           </div>
 
-          {mode === "moments" ? (
+          {mode === "moments" || mode === "connection" ? (
             <div className="flex flex-wrap items-center gap-2">
               <div
                 className="flex flex-wrap gap-2"
@@ -163,7 +212,7 @@ export function BloomThemeLabPage() {
                 ))}
               </div>
 
-              {!immersiveJourney ? (
+              {!immersiveJourney && mode === "moments" ? (
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span className="text-muted-foreground">accentText:</span>
                   {bloomMomentsLabAccentTextOptions.map((option, index) => (
@@ -196,14 +245,13 @@ export function BloomThemeLabPage() {
         </div>
       </header>
 
-      {mode !== "moments" ? (
+      {mode === "memories" || mode === "treasures" ? (
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
           <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
-            {mode} is not implemented in this pilot. Complete Bloom Moments
-            Founder review before the next mode.
+            {mode} is not started. Complete Connection before the next mode.
           </p>
         </div>
-      ) : surface === "recipient" ? (
+      ) : surface === "recipient" && mode === "moments" ? (
         <div className="min-h-0 flex-1">
           <MomentsSceneHost
             experience={BLOOM_MOMENTS_LAB_EXPERIENCE}
@@ -212,6 +260,27 @@ export function BloomThemeLabPage() {
             showLabChrome
             className="flex h-full min-h-0 flex-col"
           />
+        </div>
+      ) : surface === "recipient" && mode === "connection" ? (
+        <div className="min-h-0 flex-1">
+          <ConnectionSceneHost
+            experience={BLOOM_CONNECTION_LAB_EXPERIENCE}
+            photos={BLOOM_CONNECTION_LAB_PHOTOS}
+            quiz={BLOOM_CONNECTION_LAB_QUIZ}
+            scoreResult={BLOOM_CONNECTION_LAB_SCORE_RESULT}
+            theme={theme}
+            showLabChrome
+            initialScene={connectionJump}
+            className="flex h-full min-h-0 flex-col"
+          />
+        </div>
+      ) : mode === "connection" ? (
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+          <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
+            Connection Preview (static) is not built yet. Use{" "}
+            <span className="font-medium text-foreground">Scene journey</span>{" "}
+            for Scene 0–15.
+          </p>
         </div>
       ) : (
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">

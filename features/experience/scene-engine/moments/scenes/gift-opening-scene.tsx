@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { BloomGiftBox } from "@/features/experience/scene-engine/shared/bloom-gift-box";
 
 type Stage = "wrapped" | "opening" | "letter";
 
@@ -102,141 +103,6 @@ function Petal({ className }: { className?: string }) {
         opacity="0.9"
       />
     </svg>
-  );
-}
-
-function GiftGradients() {
-  return (
-    <defs>
-      <linearGradient id="giftBody" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#F9C4D4" />
-        <stop offset="55%" stopColor="#F2A8BE" />
-        <stop offset="100%" stopColor="#E890A8" />
-      </linearGradient>
-      <linearGradient id="giftLid" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#FBD0DC" />
-        <stop offset="100%" stopColor="#F2A8BE" />
-      </linearGradient>
-      <linearGradient id="giftRibbon" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#F7B8CC" />
-        <stop offset="45%" stopColor="#E8799A" />
-        <stop offset="100%" stopColor="#D46888" />
-      </linearGradient>
-      <radialGradient id="giftGlow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#FFF6E8" stopOpacity="0.95" />
-        <stop offset="45%" stopColor="#FFD4A8" stopOpacity="0.75" />
-        <stop offset="100%" stopColor="#F2A8BE" stopOpacity="0" />
-      </radialGradient>
-      <filter id="giftShadow" x="-20%" y="-10%" width="140%" height="140%">
-        <feDropShadow
-          dx="10"
-          dy="14"
-          stdDeviation="10"
-          floodColor="#C45B7A"
-          floodOpacity="0.28"
-        />
-      </filter>
-    </defs>
-  );
-}
-
-function LidWithBow({ x, y }: { x: number; y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <rect x="0" y="20" width="120" height="32" rx="7" fill="url(#giftLid)" />
-      <rect x="46" y="20" width="28" height="32" fill="url(#giftRibbon)" />
-      <ellipse
-        cx="32"
-        cy="14"
-        rx="24"
-        ry="13"
-        fill="url(#giftRibbon)"
-        transform="rotate(-16 32 14)"
-      />
-      <ellipse
-        cx="88"
-        cy="14"
-        rx="24"
-        ry="13"
-        fill="url(#giftRibbon)"
-        transform="rotate(16 88 14)"
-      />
-      <ellipse cx="60" cy="16" rx="12" ry="10" fill="#E8799A" />
-      <path
-        d="M52 24 Q42 48 34 60"
-        stroke="#E8799A"
-        strokeWidth="9"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M68 24 Q78 48 86 60"
-        stroke="#D46888"
-        strokeWidth="9"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <g transform="translate(46 -2)">
-        {[0, 72, 144, 216, 288].map((deg) => (
-          <ellipse
-            key={deg}
-            cx="14"
-            cy="5"
-            rx="4.5"
-            ry="8"
-            fill="#F7A8BE"
-            transform={`rotate(${deg} 14 14)`}
-          />
-        ))}
-        <circle cx="14" cy="14" r="3.5" fill="#FFF4E8" />
-        <circle cx="14" cy="14" r="1.4" fill="#F0A84A" />
-      </g>
-    </g>
-  );
-}
-
-/** Closed gift — tap target for wrapped stage. */
-function ClosedGiftBox({ className }: { className?: string }) {
-  return (
-    <div className={className} aria-hidden>
-      <svg viewBox="0 0 220 240" className="h-full w-full" fill="none">
-        <GiftGradients />
-        <ellipse
-          cx="112"
-          cy="218"
-          rx="72"
-          ry="12"
-          fill="#E8A0B4"
-          opacity="0.22"
-        />
-        <g filter="url(#giftShadow)">
-          <rect
-            x="40"
-            y="110"
-            width="140"
-            height="100"
-            rx="10"
-            fill="url(#giftBody)"
-          />
-          <path d="M40 120h140v18H40z" fill="#FFFFFF" opacity="0.12" />
-          <rect
-            x="96"
-            y="110"
-            width="28"
-            height="100"
-            fill="url(#giftRibbon)"
-          />
-          <rect
-            x="40"
-            y="148"
-            width="140"
-            height="22"
-            fill="url(#giftRibbon)"
-          />
-        </g>
-        <LidWithBow x={50} y={68} />
-      </svg>
-    </div>
   );
 }
 
@@ -342,93 +208,64 @@ function OpenGiftReveal({
         </div>
       </motion.button>
 
-      {/* Open box base + lid resting on the left */}
+      {/* Open box base + lid resting on the left — shared Bloom gift */}
       <div
         className="relative z-10 -mt-8 flex justify-center sm:-mt-10"
         aria-hidden
       >
-        <svg
-          viewBox="0 0 280 160"
+        <BloomGiftBox
+          variant="open"
+          animateLid
           className="h-36 w-[18rem] sm:h-40 sm:w-[20rem]"
-          fill="none"
-        >
-          <GiftGradients />
-          <ellipse
-            cx="150"
-            cy="148"
-            rx="90"
-            ry="12"
-            fill="#C45B7A"
-            opacity="0.18"
-          />
-
-          {/* Inner glow in open box */}
-          <ellipse cx="150" cy="95" rx="58" ry="28" fill="url(#giftGlow)" />
-
-          {/* Box base */}
-          <g filter="url(#giftShadow)">
-            <rect
-              x="80"
-              y="70"
-              width="140"
-              height="72"
-              rx="8"
-              fill="url(#giftBody)"
-            />
-            <rect
-              x="80"
-              y="70"
-              width="140"
-              height="14"
-              rx="4"
-              fill="#FFFFFF"
-              opacity="0.18"
-            />
-            <rect
-              x="136"
-              y="70"
-              width="28"
-              height="72"
-              fill="url(#giftRibbon)"
-            />
-            <rect
-              x="80"
-              y="98"
-              width="140"
-              height="18"
-              fill="url(#giftRibbon)"
-            />
-          </g>
-
-          {/* Lid leaning left */}
-          <motion.g
-            initial={{ x: 80, y: 20, rotate: 0, opacity: 0.9 }}
-            animate={{ x: -8, y: 48, rotate: -28, opacity: 1 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            style={{ originX: "60px", originY: "36px" }}
-          >
-            <LidWithBow x={0} y={0} />
-          </motion.g>
-        </svg>
+        />
       </div>
     </div>
   );
 }
 
+/** Failed open attempts before Connection Scene 2 advances to the challenge. */
+const LOCKED_FAILS_BEFORE_ADVANCE = 3;
+
 /**
  * moments.gift-opening — living recreation of Founder Scene 3.
  * Wrapped: tap gift. Open: letter rises with To (recipient) + From (buyer).
+ *
+ * `lockedOnly` — Connection Scene 2 reuse: wrapped gift only (keyframe 1);
+ * three failed open attempts (shake, no letter), then advances via onComplete.
  */
-export function GiftOpeningScene({ payload, onComplete }: MomentsSceneProps) {
+export function GiftOpeningScene({
+  payload,
+  onComplete,
+  lockedOnly = false,
+}: MomentsSceneProps & { lockedOnly?: boolean }) {
   const toName = payload.experience.greeting_name;
   const fromName = payload.experience.closing_name;
   const [stage, setStage] = useState<Stage>("wrapped");
+  const [shaking, setShaking] = useState(false);
+  const [lockedFails, setLockedFails] = useState(0);
 
   function handleGiftTap() {
     if (stage !== "wrapped") return;
+    if (lockedOnly) {
+      if (shaking) return;
+      const nextFails = lockedFails + 1;
+      setLockedFails(nextFails);
+      setShaking(true);
+      const shakeMs = nextFails >= LOCKED_FAILS_BEFORE_ADVANCE ? 620 : 520;
+      window.setTimeout(() => {
+        setShaking(false);
+        if (nextFails >= LOCKED_FAILS_BEFORE_ADVANCE) onComplete();
+      }, shakeMs);
+      return;
+    }
     setStage("opening");
     window.setTimeout(() => setStage("letter"), 950);
   }
+
+  const wrappedHeadline =
+    lockedOnly && lockedFails >= 1
+      ? "Hmm… still locked"
+      : "Tap the gift to open";
 
   return (
     <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F8E4E7]">
@@ -568,20 +405,25 @@ export function GiftOpeningScene({ payload, onComplete }: MomentsSceneProps) {
 
       <div className="relative z-10 flex min-h-full flex-1 flex-col items-center px-4 pt-10 pb-8 sm:pt-14">
         <AnimatePresence mode="wait">
-          {stage === "wrapped" ? (
+          {stage === "wrapped" || lockedOnly ? (
             <motion.div
               key="wrapped"
               className="flex w-full flex-1 flex-col items-center"
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.35 }}
             >
-              <motion.p
-                className="mb-6 text-center font-serif text-sm font-semibold tracking-[0.28em] text-[#9E2A50] uppercase sm:mb-10 sm:text-base"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                Tap the gift to open
-              </motion.p>
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={wrappedHeadline}
+                  className="mb-6 text-center font-serif text-sm font-semibold tracking-[0.28em] text-[#9E2A50] uppercase sm:mb-10 sm:text-base"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  transition={{ duration: 0.28 }}
+                >
+                  {wrappedHeadline}
+                </motion.p>
+              </AnimatePresence>
 
               <div className="relative mt-auto mb-auto flex flex-col items-center">
                 <motion.div
@@ -604,7 +446,9 @@ export function GiftOpeningScene({ payload, onComplete }: MomentsSceneProps) {
 
                 <motion.button
                   type="button"
-                  aria-label="Tap the gift to open"
+                  aria-label={
+                    lockedOnly ? "Try to open the gift" : "Tap the gift to open"
+                  }
                   onClick={handleGiftTap}
                   className="relative z-10 focus-visible:ring-2 focus-visible:ring-[#C45B7A] focus-visible:outline-none"
                   initial={{ opacity: 0, scale: 0.92 }}
@@ -614,15 +458,38 @@ export function GiftOpeningScene({ payload, onComplete }: MomentsSceneProps) {
                 >
                   <motion.span
                     className="block"
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{
-                      duration: 3.2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.4,
-                    }}
+                    animate={
+                      shaking
+                        ? lockedFails >= LOCKED_FAILS_BEFORE_ADVANCE
+                          ? {
+                              x: [0, -14, 14, -12, 12, -6, 6, 0],
+                              rotate: [0, -3, 3, -2, 2, 0],
+                              y: 0,
+                            }
+                          : { x: [0, -10, 10, -8, 8, -4, 4, 0], y: 0 }
+                        : { y: [0, -8, 0], rotate: 0 }
+                    }
+                    transition={
+                      shaking
+                        ? {
+                            duration:
+                              lockedFails >= LOCKED_FAILS_BEFORE_ADVANCE
+                                ? 0.58
+                                : 0.48,
+                            ease: "easeInOut",
+                          }
+                        : {
+                            duration: 3.2,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: 0.4,
+                          }
+                    }
                   >
-                    <ClosedGiftBox className="h-[15.5rem] w-[14.5rem] sm:h-[18rem] sm:w-[16.5rem]" />
+                    <BloomGiftBox
+                      variant="closed"
+                      className="h-[15.5rem] w-[14.5rem] sm:h-[18rem] sm:w-[16.5rem]"
+                    />
                   </motion.span>
                 </motion.button>
               </div>
