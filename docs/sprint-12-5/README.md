@@ -3,7 +3,8 @@
 > **Bloom Moments:** 🔒 **APPROVED AND LOCKED**  
 > **Bloom Connection:** 🔒 **APPROVED AND LOCKED** (Theme Lab Scenes 0–15) — Photobooth = Moments placeholder (Sprint 14 redesign deferred)  
 > **Bloom Memories:** 🔒 **APPROVED AND LOCKED** (Theme Lab Scenes 0–15 · Scene 10 letter-emergence) — see [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md)  
-> **Bloom Treasures:** ⏸ **NOT STARTED**  
+> **Bloom Treasures:** 🔒 **APPROVED AND LOCKED** (Theme Lab Scenes 0–13 · Scene 9+ reuses Connection 11+) — see [06 fast gate](./06_BLOOM_TREASURES_FAST_GATE.md)  
+> **Next required step:** Full Bloom theme audit (all four modes)  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
 
@@ -43,7 +44,9 @@ A later change is allowed only for:
 
 **Exception (Memories Scene 0–3):** Founder instructed reuse of locked Connection living Scenes 0–3 (loading, welcome/flower, locked gift, challenge invitation / gift-locked) — Theme Lab living scenes as-is ([DDR-S12-036](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)).
 
-Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [Connection](../sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md) · [Memories](../sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md).
+**Exception (Treasures Scene 0–2):** Founder instructed reuse of locked Moments/Connection/Memories ceremony (loading, welcome/flower, locked gift) — Theme Lab living scenes as-is ([DDR-S12-037](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)).
+
+Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [Connection](../sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md) · [Memories](../sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md) · [Treasures](../sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md).
 
 ### Moments scene status (Theme Lab) — LOCKED
 
@@ -81,7 +84,7 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | 14 `connection.gallery-ending`        | 🔒 Living (reuses Moments Scene 9 ending · ~1.6s)                            |
 | 15 `connection.photobooth`            | 🔒 Living (reuses Moments Scene 10 photobooth · Sprint 14 redesign deferred) |
 
-### Memories scene status (Theme Lab) — IN PROGRESS
+### Memories scene status (Theme Lab) — LOCKED
 
 | Scene                           | Status                                                                       |
 | ------------------------------- | ---------------------------------------------------------------------------- |
@@ -102,28 +105,49 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | 14 `memories.gallery-ending`    | 🔒 Living (reuses Moments Scene 9 gallery ending)                            |
 | 15 `memories.photobooth`        | 🔒 Living (reuses Moments Scene 10 photobooth · Sprint 14 redesign deferred) |
 
+### Treasures scene status (Theme Lab) — LOCKED
+
+| Scene                            | Status                                                               |
+| -------------------------------- | -------------------------------------------------------------------- |
+| 0 `treasures.celebrate-loading`  | 🔒 Living (reuses Moments / Connection / Memories loading)           |
+| 1 `treasures.welcome`            | 🔒 Living (reuses Moments flower tap / Connection gift-introduction) |
+| 2 `treasures.locked-gift`        | 🔒 Living (reuses Moments locked gift · 3 failed opens)              |
+| 3 `treasures.gift-locked`        | 🔒 Living (SPECIAL MESSAGE card · Once you open it… · Yes ♥)         |
+| 4–5 `treasures.gift-explosion`   | 🔒 Living (one beat ~3.6s · open gift + mini gifts fountain)         |
+| 6 `treasures.gift-grid`          | 🔒 Living (5 pink + Final Gold · locked until non-finals opened)     |
+| 7 `treasures.gift-content.{n}`   | 🔒 Living (open gift + letter Message/Photo · back to grid)          |
+| 8 `treasures.final-gift-unlock`  | 🔒 Living (KF1 1.5s gold glow → KF2 2s To/From · 3.5s total)         |
+| 9 `treasures.final-letter`       | 🔒 Living (reuses Connection Scene 11 letter-reveal)                 |
+| 10 `treasures.binder-transition` | 🔒 Living (reuses Connection Scene 12 gallery-unlock)                |
+| 11 `treasures.gallery`           | 🔒 Living (reuses Connection Scene 13 gallery)                       |
+| 12 `treasures.gallery-ending`    | 🔒 Living (reuses Connection Scene 14 gallery-ending)                |
+| 13 `treasures.photobooth`        | 🔒 Living (reuses Connection Scene 15 photobooth · terminal)         |
+
 ### Mode / production gates
 
-| Item                              | Status                                                                                      |
-| --------------------------------- | ------------------------------------------------------------------------------------------- |
-| Bloom Pilot Plan                  | ✅ [00](./00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md)                                          |
-| Moments Theme Lab                 | 🔒 **APPROVED AND LOCKED**                                                                  |
-| Independent audit (Moments)       | ✅ [02](./02_BLOOM_MOMENTS_INDEPENDENT_AUDIT.md) — PASS WITH REQUIRED FIXES (resolved)      |
-| Stabilization + lessons (Moments) | ✅ [03](./03_BLOOM_MOMENTS_STABILIZATION_AND_LESSONS.md)                                    |
-| Bloom Connection                  | 🔒 **APPROVED AND LOCKED**                                                                  |
-| Connection audit + lock           | ✅ [04](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md)                                            |
-| Bloom Memories                    | 🔒 **APPROVED AND LOCKED** (Scenes 0–15) — [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md) |
-| Bloom Treasures                   | ⏸ **NOT STARTED**                                                                           |
-| Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                       |
+| Item                              | Status                                                                                       |
+| --------------------------------- | -------------------------------------------------------------------------------------------- |
+| Bloom Pilot Plan                  | ✅ [00](./00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md)                                           |
+| Moments Theme Lab                 | 🔒 **APPROVED AND LOCKED**                                                                   |
+| Independent audit (Moments)       | ✅ [02](./02_BLOOM_MOMENTS_INDEPENDENT_AUDIT.md) — PASS WITH REQUIRED FIXES (resolved)       |
+| Stabilization + lessons (Moments) | ✅ [03](./03_BLOOM_MOMENTS_STABILIZATION_AND_LESSONS.md)                                     |
+| Bloom Connection                  | 🔒 **APPROVED AND LOCKED**                                                                   |
+| Connection audit + lock           | ✅ [04](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md)                                             |
+| Bloom Memories                    | 🔒 **APPROVED AND LOCKED** (Scenes 0–15) — [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md)  |
+| Bloom Treasures                   | 🔒 **APPROVED AND LOCKED** (Scenes 0–13) — [06 fast gate](./06_BLOOM_TREASURES_FAST_GATE.md) |
+| Full Bloom theme audit            | ⏭ **NEXT** (all four modes locked in Theme Lab)                                              |
+| Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                        |
 
 ### Assets
 
-| Location                              | Role                                                                  |
-| ------------------------------------- | --------------------------------------------------------------------- |
-| `public/themes/bloom/moments/`        | **Runtime** Theme Lab assets (shared by Connection reuse)             |
-| `design-references/bloom/moments/`    | Founder Moments **reference** images (not deploy-facing)              |
-| `design-references/bloom/connection/` | Founder Connection **reference** images (~3.5 MB · not deploy-facing) |
-| `public/themes/bloom/connection/`     | **None** — Connection does not copy Moments runtime assets            |
+| Location                              | Role                                                                                     |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `public/themes/bloom/moments/`        | **Runtime** Theme Lab assets (shared by Connection / Memories / Treasures gallery reuse) |
+| `design-references/bloom/moments/`    | Founder Moments **reference** images (not deploy-facing)                                 |
+| `design-references/bloom/connection/` | Founder Connection **reference** images (~3.5 MB · not deploy-facing)                    |
+| `design-references/bloom/treasures/`  | Founder Treasures **reference** images (~2.21 MB · not deploy-facing)                    |
+| `public/themes/bloom/connection/`     | **None** — Connection does not copy Moments runtime assets                               |
+| `public/themes/bloom/treasures/`      | **None** — Treasures uses shared SVG gift + Moments gallery fixtures                     |
 
 ### Notes
 

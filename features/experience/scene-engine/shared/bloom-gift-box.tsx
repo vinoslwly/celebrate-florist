@@ -28,7 +28,50 @@ function useGiftPaintIds(): GiftPaintIds {
   };
 }
 
-function GiftPaintServers({ ids }: { ids: GiftPaintIds }) {
+export type BloomGiftTone = "bloom" | "gold";
+
+function GiftPaintServers({
+  ids,
+  tone = "bloom",
+}: {
+  ids: GiftPaintIds;
+  tone?: BloomGiftTone;
+}) {
+  if (tone === "gold") {
+    return (
+      <defs>
+        <linearGradient id={ids.body} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#F3E0A8" />
+          <stop offset="45%" stopColor="#E0C06A" />
+          <stop offset="100%" stopColor="#C9A227" />
+        </linearGradient>
+        <linearGradient id={ids.lid} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#F8EBC0" />
+          <stop offset="100%" stopColor="#D4AF37" />
+        </linearGradient>
+        <linearGradient id={ids.ribbon} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#F0D78A" />
+          <stop offset="45%" stopColor="#D4AF37" />
+          <stop offset="100%" stopColor="#A67C1A" />
+        </linearGradient>
+        <radialGradient id={ids.glow} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FFF8E0" stopOpacity="0.95" />
+          <stop offset="45%" stopColor="#F0D78A" stopOpacity="0.7" />
+          <stop offset="100%" stopColor="#C9A227" stopOpacity="0" />
+        </radialGradient>
+        <filter id={ids.shadow} x="-20%" y="-10%" width="140%" height="140%">
+          <feDropShadow
+            dx="10"
+            dy="14"
+            stdDeviation="10"
+            floodColor="#8B6914"
+            floodOpacity="0.32"
+          />
+        </filter>
+      </defs>
+    );
+  }
+
   return (
     <defs>
       <linearGradient id={ids.body} x1="0" y1="0" x2="0" y2="1">
@@ -68,11 +111,17 @@ function GiftLidWithBow({
   ids,
   x,
   y,
+  tone = "bloom",
 }: {
   ids: GiftPaintIds;
   x: number;
   y: number;
+  tone?: BloomGiftTone;
 }) {
+  const knot = tone === "gold" ? "#D4AF37" : "#E8799A";
+  const streamer = tone === "gold" ? "#B8860B" : "#D46888";
+  const petal = tone === "gold" ? "#F0D78A" : "#F7A8BE";
+
   return (
     <g transform={`translate(${x} ${y})`}>
       <rect
@@ -100,17 +149,17 @@ function GiftLidWithBow({
         fill={`url(#${ids.ribbon})`}
         transform="rotate(16 88 14)"
       />
-      <ellipse cx="60" cy="16" rx="12" ry="10" fill="#E8799A" />
+      <ellipse cx="60" cy="16" rx="12" ry="10" fill={knot} />
       <path
         d="M52 24 Q42 48 34 60"
-        stroke="#E8799A"
+        stroke={knot}
         strokeWidth="9"
         strokeLinecap="round"
         fill="none"
       />
       <path
         d="M68 24 Q78 48 86 60"
-        stroke="#D46888"
+        stroke={streamer}
         strokeWidth="9"
         strokeLinecap="round"
         fill="none"
@@ -123,12 +172,17 @@ function GiftLidWithBow({
             cy="5"
             rx="4.5"
             ry="8"
-            fill="#F7A8BE"
+            fill={petal}
             transform={`rotate(${deg} 14 14)`}
           />
         ))}
         <circle cx="14" cy="14" r="3.5" fill="#FFF4E8" />
-        <circle cx="14" cy="14" r="1.4" fill="#F0A84A" />
+        <circle
+          cx="14"
+          cy="14"
+          r="1.4"
+          fill={tone === "gold" ? "#C9A227" : "#F0A84A"}
+        />
       </g>
     </g>
   );
@@ -172,6 +226,8 @@ export type BloomGiftBoxProps = {
    * open — box open, lid resting left (letter emergence / gift opening)
    */
   variant?: "closed" | "ajar" | "open";
+  /** Bloom pink (default) or Final Gold (Treasures). */
+  tone?: BloomGiftTone;
   /** Animate lid from closed → open (open variant only). */
   animateLid?: boolean;
   reduceMotion?: boolean;
@@ -183,22 +239,25 @@ export type BloomGiftBoxProps = {
 export function BloomGiftBox({
   className,
   variant = "closed",
+  tone = "bloom",
   animateLid = false,
   reduceMotion = false,
 }: BloomGiftBoxProps) {
   const ids = useGiftPaintIds();
+  const shadowFill = tone === "gold" ? "#8B6914" : "#C45B7A";
+  const softShadow = tone === "gold" ? "#D4AF37" : "#E8A0B4";
 
   if (variant === "open") {
     return (
       <div className={className} aria-hidden>
         <svg viewBox="0 0 280 160" className="h-full w-full" fill="none">
-          <GiftPaintServers ids={ids} />
+          <GiftPaintServers ids={ids} tone={tone} />
           <ellipse
             cx="150"
             cy="148"
             rx="90"
             ry="12"
-            fill="#C45B7A"
+            fill={shadowFill}
             opacity="0.18"
           />
           <ellipse
@@ -264,11 +323,11 @@ export function BloomGiftBox({
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               style={{ originX: "60px", originY: "36px" }}
             >
-              <GiftLidWithBow ids={ids} x={0} y={0} />
+              <GiftLidWithBow ids={ids} x={0} y={0} tone={tone} />
             </motion.g>
           ) : (
             <g transform="translate(-8 48) rotate(-28 60 36)">
-              <GiftLidWithBow ids={ids} x={0} y={0} />
+              <GiftLidWithBow ids={ids} x={0} y={0} tone={tone} />
             </g>
           )}
         </svg>
@@ -280,13 +339,13 @@ export function BloomGiftBox({
     return (
       <div className={className} aria-hidden>
         <svg viewBox="0 0 220 240" className="h-full w-full" fill="none">
-          <GiftPaintServers ids={ids} />
+          <GiftPaintServers ids={ids} tone={tone} />
           <ellipse
             cx="112"
             cy="218"
             rx="72"
             ry="12"
-            fill="#E8A0B4"
+            fill={softShadow}
             opacity="0.22"
           />
           {/* Warm glow from the crack */}
@@ -307,7 +366,7 @@ export function BloomGiftBox({
           />
           <ClosedBody ids={ids} />
           <g transform="translate(0 -8) rotate(-5 110 90)">
-            <GiftLidWithBow ids={ids} x={50} y={68} />
+            <GiftLidWithBow ids={ids} x={50} y={68} tone={tone} />
           </g>
           {/* Soft sparkles at the crack */}
           <path
@@ -329,17 +388,17 @@ export function BloomGiftBox({
   return (
     <div className={className} aria-hidden>
       <svg viewBox="0 0 220 240" className="h-full w-full" fill="none">
-        <GiftPaintServers ids={ids} />
+        <GiftPaintServers ids={ids} tone={tone} />
         <ellipse
           cx="112"
           cy="218"
           rx="72"
           ry="12"
-          fill="#E8A0B4"
+          fill={softShadow}
           opacity="0.22"
         />
         <ClosedBody ids={ids} />
-        <GiftLidWithBow ids={ids} x={50} y={68} />
+        <GiftLidWithBow ids={ids} x={50} y={68} tone={tone} />
       </svg>
     </div>
   );

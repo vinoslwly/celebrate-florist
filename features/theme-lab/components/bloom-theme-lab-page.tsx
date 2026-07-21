@@ -25,6 +25,13 @@ import {
 import { MemoriesSceneHost } from "@/features/experience/scene-engine/memories/memories-scene-host";
 import { MomentsSceneHost } from "@/features/experience/scene-engine/moments/moments-scene-host";
 import {
+  TREASURES_STATIC_SCENE_IDS,
+  isTreasuresGiftContentScene,
+  parseTreasuresGiftContentSortOrder,
+  type TreasuresSceneId,
+} from "@/features/experience/scene-engine/treasures/graph";
+import { TreasuresSceneHost } from "@/features/experience/scene-engine/treasures/treasures-scene-host";
+import {
   PreviewContextNote,
   PreviewReviewFrame,
 } from "@/features/preview/components/preview-review-frame";
@@ -44,6 +51,10 @@ import {
   BLOOM_MOMENTS_LAB_EXPERIENCE,
   BLOOM_MOMENTS_LAB_PHOTOS,
 } from "@/features/theme-lab/config/bloom-moments-fixtures";
+import {
+  BLOOM_TREASURES_LAB_EXPERIENCE,
+  BLOOM_TREASURES_LAB_PHOTOS,
+} from "@/features/theme-lab/config/bloom-treasures-fixtures";
 import { ThemePageAtmosphere } from "@/features/themes/components/theme-page-atmosphere";
 import {
   bloomMomentsLabAccentTextOptions,
@@ -58,12 +69,18 @@ import {
 type ModeTab = "moments" | "connection" | "memories" | "treasures";
 type SurfaceTab = "recipient" | "preview";
 
-const IMPLEMENTED_MODES: ModeTab[] = ["moments", "connection", "memories"];
+const IMPLEMENTED_MODES: ModeTab[] = [
+  "moments",
+  "connection",
+  "memories",
+  "treasures",
+];
 
 const CONNECTION_STATIC_SCENE_SET = new Set<string>(
   CONNECTION_STATIC_SCENE_IDS,
 );
 const MEMORIES_STATIC_SCENE_SET = new Set<string>(MEMORIES_STATIC_SCENE_IDS);
+const TREASURES_STATIC_SCENE_SET = new Set<string>(TREASURES_STATIC_SCENE_IDS);
 
 /** Lab-only deep-link: ?connectionScene=connection.celebration-transition */
 function parseConnectionLabScene(
@@ -97,6 +114,24 @@ function parseMemoriesLabScene(
   return undefined;
 }
 
+/** Lab-only deep-link: ?treasuresScene=treasures.gift-content.1 */
+function parseTreasuresLabScene(
+  raw: string | null,
+): TreasuresSceneId | undefined {
+  if (!raw) return undefined;
+  if (TREASURES_STATIC_SCENE_SET.has(raw)) {
+    return raw as TreasuresSceneId;
+  }
+  const asScene = raw as TreasuresSceneId;
+  if (
+    isTreasuresGiftContentScene(asScene) &&
+    parseTreasuresGiftContentSortOrder(asScene) != null
+  ) {
+    return asScene;
+  }
+  return undefined;
+}
+
 function withAccentText(theme: Theme, accentText: string): Theme {
   return {
     ...theme,
@@ -113,8 +148,17 @@ export function BloomThemeLabPage() {
     searchParams.get("connectionScene"),
   );
   const memoriesJump = parseMemoriesLabScene(searchParams.get("memoriesScene"));
+  const treasuresJump = parseTreasuresLabScene(
+    searchParams.get("treasuresScene"),
+  );
   const [mode, setMode] = useState<ModeTab>(
-    connectionJump ? "connection" : memoriesJump ? "memories" : "moments",
+    connectionJump
+      ? "connection"
+      : memoriesJump
+        ? "memories"
+        : treasuresJump
+          ? "treasures"
+          : "moments",
   );
   const [surface, setSurface] = useState<SurfaceTab>("recipient");
   const [accentOption, setAccentOption] = useState(0);
@@ -125,7 +169,10 @@ export function BloomThemeLabPage() {
   const theme = withAccentText(bloomMomentsLabTheme, selectedAccent.className);
   const completionSrc = themeCompletionArtwork(theme);
   const immersiveJourney =
-    (mode === "moments" || mode === "connection" || mode === "memories") &&
+    (mode === "moments" ||
+      mode === "connection" ||
+      mode === "memories" ||
+      mode === "treasures") &&
     surface === "recipient";
 
   const immersiveModeLabel =
@@ -133,7 +180,9 @@ export function BloomThemeLabPage() {
       ? "Connection"
       : mode === "memories"
         ? "Memories"
-        : "Moments";
+        : mode === "treasures"
+          ? "Treasures"
+          : "Moments";
 
   return (
     <div
@@ -167,8 +216,9 @@ export function BloomThemeLabPage() {
                 Bloom Theme Lab
               </h1>
               <p className="max-w-2xl text-sm text-muted-foreground">
-                Moments + Connection + Memories locked. Treasures not started.
-                Production <span className="font-mono">/e/</span> unchanged.
+                Moments + Connection + Memories + Treasures locked. Full Bloom
+                audit next. Production <span className="font-mono">/e/</span>{" "}
+                unchanged.
               </p>
             </>
           ) : (
@@ -213,8 +263,9 @@ export function BloomThemeLabPage() {
                   {label}
                   {id === "moments" && !immersiveJourney ? " · Locked" : ""}
                   {id === "connection" && !immersiveJourney ? " · Locked" : ""}
-                  {id === "memories" && !immersiveJourney
-                    ? " · Scene 0–15"
+                  {id === "memories" && !immersiveJourney ? " · Locked" : ""}
+                  {id === "treasures" && !immersiveJourney
+                    ? " · Scene 0–5"
                     : ""}
                   {!enabled && !immersiveJourney ? " · Not started" : ""}
                 </button>
@@ -224,7 +275,8 @@ export function BloomThemeLabPage() {
 
           {mode === "moments" ||
           mode === "connection" ||
-          mode === "memories" ? (
+          mode === "memories" ||
+          mode === "treasures" ? (
             <div className="flex flex-wrap items-center gap-2">
               <div
                 className="flex flex-wrap gap-2"
@@ -288,13 +340,7 @@ export function BloomThemeLabPage() {
         </div>
       </header>
 
-      {mode === "treasures" ? (
-        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-          <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
-            Treasures is not started. Complete Memories before the next mode.
-          </p>
-        </div>
-      ) : surface === "recipient" && mode === "moments" ? (
+      {surface === "recipient" && mode === "moments" ? (
         <div className="min-h-0 flex-1">
           <MomentsSceneHost
             experience={BLOOM_MOMENTS_LAB_EXPERIENCE}
@@ -330,6 +376,17 @@ export function BloomThemeLabPage() {
             className="flex h-full min-h-0 flex-col"
           />
         </div>
+      ) : surface === "recipient" && mode === "treasures" ? (
+        <div className="min-h-0 flex-1">
+          <TreasuresSceneHost
+            experience={BLOOM_TREASURES_LAB_EXPERIENCE}
+            photos={BLOOM_TREASURES_LAB_PHOTOS}
+            theme={theme}
+            showLabChrome
+            initialScene={treasuresJump}
+            className="flex h-full min-h-0 flex-col"
+          />
+        </div>
       ) : mode === "connection" ? (
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
           <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
@@ -344,6 +401,14 @@ export function BloomThemeLabPage() {
             Memories Preview (static) is not built yet. Use{" "}
             <span className="font-medium text-foreground">Scene journey</span>{" "}
             for Scenes 0–15.
+          </p>
+        </div>
+      ) : mode === "treasures" ? (
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+          <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
+            Treasures Preview (static) is not built yet. Use{" "}
+            <span className="font-medium text-foreground">Scene journey</span>{" "}
+            for Scenes 0–13.
           </p>
         </div>
       ) : (

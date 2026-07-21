@@ -1,10 +1,10 @@
 # Sprint 11 — Treasures Scene Architecture
 
-> **Status:** **Founder Approved — Locked**  
+> **Status:** **Founder Approved — Locked** · **Theme Lab living presentation started 2026-07-21** (Scenes 0–13)  
 > **Approval date:** 2026-07-16  
 > **Mode:** `treasures`  
-> **Sprint type:** Planning only — **no production code**  
-> **Parent:** [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](../16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) · [README](./README.md)
+> **Sprint type:** Planning + Theme Lab presentation (Sprint 12.5) — **production `/e/[token]` Scene Engine still NOT AUTHORIZED**  
+> **Parent:** [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](../16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) · [README](./README.md) · [Sprint 12.5](../sprint-12-5/README.md) · [DDR-S12-037](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)
 
 ---
 
@@ -132,6 +132,30 @@ flowchart TD
 
 ---
 
+## Theme Lab Living Presentation (Sprint 12.5)
+
+Founder-authorized reuse for Theme Lab at `/theme-lab/bloom` (wrappers only; Moments + Connection + Memories remain locked). Production Scene Engine wiring remains **NOT AUTHORIZED**.
+
+| Treasures scene        | Theme Lab living source                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 0 `celebrate-loading`  | Moments / Connection / Memories loading                                                                       |
+| 1 `welcome`            | Moments gift-box (flower tap) — same as Connection / Memories                                                 |
+| 2 `locked-gift`        | Moments gift-opening + `lockedOnly` (3 failed taps) — same as Connection / Memories                           |
+| 3 `gift-locked`        | **New** SPECIAL MESSAGE card · Yes ♥ (Founder Treasures reference)                                            |
+| 4–5 `gift-explosion`   | **New** one Theme Lab beat (~3.6s): preparing + open gift + N mini gifts fountain (architecture 4+5 combined) |
+| 6 `gift-grid`          | **New** N gifts (5 pink + Final Gold); Final Gold presentation-locked until all non-final opened (FD-S11-17)  |
+| 7 `gift-content.{n}`   | **New** open gift + letter object (message/photo); click outside → back to grid (FD-S11-02)                   |
+| 8 `final-gift-unlock`  | **New** two keyframes: KF1 open gold glow → KF2 To/From emergence (gold gift motif)                           |
+| 9 `final-letter`       | Reuses Connection Scene 11 letter-reveal (Moments letter)                                                     |
+| 10 `binder-transition` | Reuses Connection Scene 12 gallery-unlock (Moments album-unlock)                                              |
+| 11 `gallery`           | Reuses Connection Scene 13 gallery                                                                            |
+| 12 `gallery-ending`    | Reuses Connection Scene 14 gallery-ending                                                                     |
+| 13 `photobooth`        | Reuses Connection Scene 15 photobooth (terminal)                                                              |
+
+Code SSOT: `features/experience/scene-engine/treasures/`.
+
+---
+
 ## Scene Inventory
 
 ### Access Gate (Outside Scene Engine)
@@ -238,6 +262,8 @@ Single **Gift Box** appears — NOT envelope, NOT letter. Recipient taps; gift *
 
 **Transition:** Complete → Scene 6.
 
+**Theme Lab (Bloom):** Scenes 4 + 5 are presented as **one living beat** `treasures.gift-explosion` (~3.6s total) — preparing line → lid open → mini-gift fountain — per Founder direction 2026-07-21.
+
 ---
 
 ### Scene 6 — Treasures Grid
@@ -266,7 +292,9 @@ Single **Gift Box** appears — NOT envelope, NOT letter. Recipient taps; gift *
 
 **Business layer:** `RecipientEnvelopeGateView` / `EnvelopeGrid` slot — `openEnvelopeAction` on tap.
 
-**Transition:** Gift selected → Scene 7 (regular) or Scene 8 (final gold when eligible).
+**Theme Lab (Bloom):** Interactive grid with lab-local open state (no `openEnvelopeAction`). Headline counts remaining non-final gifts. Final Gold shows padlock and is unclickable until all pink gifts opened. Tap gift → `treasures.gift-content.{sortOrder}`; reopen allowed (FD-T3).
+
+**Transition:** Gift selected → Scene 7 (regular) or Scene 8 (final gold when eligible — Theme Lab uses Scene 7 content for all gifts including Final until Scene 8 is authorized).
 
 ---
 
@@ -290,6 +318,8 @@ Gift animation → letter **object** unfolds → **message** → **photo** (as c
 
 **Repeat** until all non-final gifts opened.
 
+**Theme Lab (Bloom):** Living overlay-style presentation from Founder reference — Scene 6 atmosphere + neat 3×2 gift grid behind a stationery letter object (message/photo). Dismiss via tap outside (“Tap outside the letter to close”). Lab fixtures in `bloom-treasures-fixtures.ts` (no production fetch).
+
 ---
 
 ### Scene 8 — Final Gift Unlock
@@ -304,6 +334,8 @@ Gift animation → letter **object** unfolds → **message** → **photo** (as c
 **Behavior:** Recipient opens Final Gold. **No fireworks. No confetti.** Elegant premium reveal only.
 
 **Business layer:** `openEnvelopeAction` on `isFinal` sortOrder. When `rewardEligible`, triggers `fetchTreasuresRewardAction` (existing).
+
+**Theme Lab (Bloom):** After recipient dismisses Final Gold Scene 7 content, auto-enters this beat (**3.5s**): **KF1** (1.5s) single open gold gift with elegant glow → **KF2** (2s) To/From letter head rises from the gold gift. Then → Scene 9 final-letter.
 
 **Transition:** Reveal complete → Scene 9.
 
@@ -324,6 +356,8 @@ Gift animation → letter **object** unfolds → **message** → **photo** (as c
 
 **Guard:** `rewardEligible` — all envelopes opened (FD-T4).
 
+**Theme Lab (Bloom):** Reuses Connection Scene 11 `letter-reveal` (Moments letter living scene). Wrappers only.
+
 **Transition:** Unlock → Scene 10.
 
 ---
@@ -339,6 +373,8 @@ Binder closed → opening → pages visible → Gallery.
 
 **Target duration:** 2–3 seconds. No interaction.
 
+**Theme Lab (Bloom):** Reuses Connection Scene 12 `gallery-unlock` (Moments album-unlock). Wrappers only.
+
 **Transition:** Duration complete → Scene 11 or Scene 13 (gallery skip).
 
 ---
@@ -353,6 +389,8 @@ Binder closed → opening → pages visible → Gallery.
 Scrollable gallery — existing captions and photos from reward payload.
 
 **Guard:** `photos.length > 0`
+
+**Theme Lab (Bloom):** Reuses Connection Scene 13 `gallery`. Wrappers only.
 
 ---
 
@@ -373,6 +411,8 @@ Scrollable gallery — existing captions and photos from reward payload.
 
 **Guard:** Same as Scene 11.
 
+**Theme Lab (Bloom):** Reuses Connection Scene 14 `gallery-ending`. Wrappers only.
+
 ---
 
 ### Scene 13 — Photobooth
@@ -385,6 +425,8 @@ Scrollable gallery — existing captions and photos from reward payload.
 **CF-R2-A:** First `onEnter` → `completeTreasuresJourneyAction` (fire-and-forget). ADR S11-007.
 
 **Implementation:** Sprint 14 — placement only in Sprint 11.
+
+**Theme Lab (Bloom):** Reuses Connection Scene 15 `photobooth` (Moments photobooth placeholder). Wrappers only.
 
 ---
 

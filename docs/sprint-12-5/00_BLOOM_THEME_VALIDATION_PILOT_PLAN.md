@@ -1,10 +1,10 @@
 # Sprint 12.5 — Bloom Theme Validation Pilot Plan
 
-> **Status:** ✅ **PLAN APPROVED** · Moments 🔒 **LOCKED** · Connection 🔒 **LOCKED** · Memories 🔒 **LOCKED** (Scenes 0–15)  
-> **Date:** 2026-07-19 (plan) · **Moments lock:** 2026-07-20 · **Connection lock:** 2026-07-21 · **Memories lock:** 2026-07-21  
-> **Parent:** [DDR-S12-030](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-034](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-035](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-036](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [Core UI closure](../sprint-12-implementation/README.md) · [Connection audit](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md) · [Memories fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md)  
-> **Scene graph:** [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [Connection](../sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md) · [Memories](../sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md)  
-> **Theme Lab:** `/theme-lab/bloom` (Moments + Connection + Memories locked · Treasures not started)
+> **Status:** ✅ **PLAN APPROVED** · Moments 🔒 **LOCKED** · Connection 🔒 **LOCKED** · Memories 🔒 **LOCKED** · Treasures 🔒 **LOCKED** · **Next:** full Bloom theme audit  
+> **Date:** 2026-07-19 (plan) · **Moments lock:** 2026-07-20 · **Connection lock:** 2026-07-21 · **Memories lock:** 2026-07-21 · **Treasures lock:** 2026-07-21  
+> **Parent:** [DDR-S12-030](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-034](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-035](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-036](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [DDR-S12-037](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md) · [Core UI closure](../sprint-12-implementation/README.md) · [Connection audit](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md) · [Memories fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md) · [Treasures fast gate](./06_BLOOM_TREASURES_FAST_GATE.md)  
+> **Scene graph:** [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [Connection](../sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md) · [Memories](../sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md) · [Treasures](../sprint-11/04_TREASURES_SCENE_ARCHITECTURE.md)  
+> **Theme Lab:** `/theme-lab/bloom` (all four Bloom modes locked · full Bloom audit next)
 
 ---
 
