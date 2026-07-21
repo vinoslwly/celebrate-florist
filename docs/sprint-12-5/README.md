@@ -4,7 +4,8 @@
 > **Bloom Connection:** 🔒 **APPROVED AND LOCKED** (Theme Lab Scenes 0–15) — Photobooth = Moments placeholder (Sprint 14 redesign deferred)  
 > **Bloom Memories:** 🔒 **APPROVED AND LOCKED** (Theme Lab Scenes 0–15 · Scene 10 letter-emergence) — see [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md)  
 > **Bloom Treasures:** 🔒 **APPROVED AND LOCKED** (Theme Lab Scenes 0–13 · Scene 9+ reuses Connection 11+) — see [06 fast gate](./06_BLOOM_TREASURES_FAST_GATE.md)  
-> **Next required step:** Full Bloom theme audit (all four modes)  
+> **Bloom theme (all four modes):** 🔒 **APPROVED AND LOCKED** — see [07 full audit](./07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md)  
+> **Next theme (Warm / Playful / Sky):** ⏸ Awaits Founder approval — **not started**  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
 
@@ -135,7 +136,8 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | Connection audit + lock           | ✅ [04](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md)                                             |
 | Bloom Memories                    | 🔒 **APPROVED AND LOCKED** (Scenes 0–15) — [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md)  |
 | Bloom Treasures                   | 🔒 **APPROVED AND LOCKED** (Scenes 0–13) — [06 fast gate](./06_BLOOM_TREASURES_FAST_GATE.md) |
-| Full Bloom theme audit            | ⏭ **NEXT** (all four modes locked in Theme Lab)                                              |
+| Full Bloom theme audit + lock     | 🔒 **PASSED** — [07](./07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md)                                |
+| Next theme (Warm / Playful / Sky) | ⏸ Awaits Founder approval                                                                    |
 | Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                        |
 
 ### Assets

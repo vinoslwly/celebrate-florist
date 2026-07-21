@@ -12,22 +12,22 @@ This folder is the **single source of truth** for the Celebrate Florist project.
 
 **Before Sprint 06 implementation**, read the Product Revision V2 package. Celebrate evolved from a Digital Greeting Website into an **Interactive Digital Experience Platform** with four experience modes (Moments, Connection, Memories, Treasures).
 
-| #   | Document                                                                             | Purpose                                                                                      |
-| --- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| 7   | [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)                             | Why the product changed, positioning, founder amendments                                     |
-| 8   | [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md)                                   | Per-mode product specification                                                               |
-| 9   | [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)                             | Engineering impact matrix (no code)                                                          |
-| 10  | [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)                       | Schema recommendations (no SQL)                                                              |
-| 11  | [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)                 | **Sprint 06+ roadmap — supersedes pre-revision plan**                                        |
-| 12  | [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                                 | **Studio admin UX — mandatory for Sprint 06 Studio work**                                    |
-| 13  | [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)                               | **Experience Journey SSOT — recipient & buyer-preview ordering (all modes)**                 |
-| 14  | [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md)                         | **CF-R1 + CF-R2 — Replayable Experience SSOT (locked)**                                      |
-| 15  | [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md)           | **Sprint 10 — CF-R2 Treasures replay reset (✅ complete)**                                   |
-| 16  | [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) | **Sprint 11 — Scene Engine core spec + GER (✅ architecture complete; impl NOT authorized)** |
-| —   | [sprint-11/README.md](./sprint-11/README.md)                                         | **Sprint 11 mode docs index — incremental documentation strategy**                           |
-| —   | [sprint-12/README.md](./sprint-12/README.md)                                         | **Sprint 12 UI System — CLOSED (docs baseline)**                                             |
-| —   | [sprint-12-implementation/README.md](./sprint-12-implementation/README.md)           | **Sprint 12 Implementation Pass — CLOSED (Core UI approved)**                                |
-| —   | [sprint-12-5/README.md](./sprint-12-5/README.md)                                     | **Sprint 12.5 — Bloom Moments 🔒 LOCKED**; Connection 🔄 **IN PROGRESS** (Scene 0–1)         |
+| #   | Document                                                                             | Purpose                                                                                                                                                 |
+| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 7   | [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)                             | Why the product changed, positioning, founder amendments                                                                                                |
+| 8   | [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md)                                   | Per-mode product specification                                                                                                                          |
+| 9   | [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)                             | Engineering impact matrix (no code)                                                                                                                     |
+| 10  | [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)                       | Schema recommendations (no SQL)                                                                                                                         |
+| 11  | [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)                 | **Sprint 06+ roadmap — supersedes pre-revision plan**                                                                                                   |
+| 12  | [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                                 | **Studio admin UX — mandatory for Sprint 06 Studio work**                                                                                               |
+| 13  | [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)                               | **Experience Journey SSOT — recipient & buyer-preview ordering (all modes)**                                                                            |
+| 14  | [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md)                         | **CF-R1 + CF-R2 — Replayable Experience SSOT (locked)**                                                                                                 |
+| 15  | [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md)           | **Sprint 10 — CF-R2 Treasures replay reset (✅ complete)**                                                                                              |
+| 16  | [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) | **Sprint 11 — Scene Engine core spec + GER (✅ architecture complete; impl NOT authorized)**                                                            |
+| —   | [sprint-11/README.md](./sprint-11/README.md)                                         | **Sprint 11 mode docs index — incremental documentation strategy**                                                                                      |
+| —   | [sprint-12/README.md](./sprint-12/README.md)                                         | **Sprint 12 UI System — CLOSED (docs baseline)**                                                                                                        |
+| —   | [sprint-12-implementation/README.md](./sprint-12-implementation/README.md)           | **Sprint 12 Implementation Pass — CLOSED (Core UI approved)**                                                                                           |
+| —   | [sprint-12-5/README.md](./sprint-12-5/README.md)                                     | **Sprint 12.5 — Bloom theme 🔒 LOCKED** (Moments · Connection · Memories · Treasures) — [07 audit](./sprint-12-5/07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md) |
 
 Sprint 05.5 was **documentation only** — no code, no migrations. Sprints 00–05 remain valid.
 
