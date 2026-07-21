@@ -2,7 +2,7 @@
 
 > **Bloom Moments:** 🔒 **APPROVED AND LOCKED**  
 > **Bloom Connection:** 🔒 **APPROVED AND LOCKED** (Theme Lab Scenes 0–15) — Photobooth = Moments placeholder (Sprint 14 redesign deferred)  
-> **Bloom Memories:** ⏸ **NOT STARTED**  
+> **Bloom Memories:** 🔒 **APPROVED AND LOCKED** (Theme Lab Scenes 0–15 · Scene 10 letter-emergence) — see [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md)  
 > **Bloom Treasures:** ⏸ **NOT STARTED**  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
@@ -41,7 +41,9 @@ A later change is allowed only for:
 
 **Exception (Connection Scene 0–1, 11–15):** Founder instructed reuse of locked Moments loading, gift introduction, letter, album unlock, gallery, gallery ending, and photobooth — no new reference images required for those beats ([DDR-S12-035](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)).
 
-Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [Connection](../sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md).
+**Exception (Memories Scene 0–3):** Founder instructed reuse of locked Connection living Scenes 0–3 (loading, welcome/flower, locked gift, challenge invitation / gift-locked) — Theme Lab living scenes as-is ([DDR-S12-036](../sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)).
+
+Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [Connection](../sprint-11/02_CONNECTION_SCENE_ARCHITECTURE.md) · [Memories](../sprint-11/03_MEMORIES_SCENE_ARCHITECTURE.md).
 
 ### Moments scene status (Theme Lab) — LOCKED
 
@@ -79,19 +81,40 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | 14 `connection.gallery-ending`        | 🔒 Living (reuses Moments Scene 9 ending · ~1.6s)                            |
 | 15 `connection.photobooth`            | 🔒 Living (reuses Moments Scene 10 photobooth · Sprint 14 redesign deferred) |
 
+### Memories scene status (Theme Lab) — IN PROGRESS
+
+| Scene                           | Status                                                                       |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| 0 `memories.celebrate-loading`  | 🔒 Living (reuses Connection / Moments loading)                              |
+| 1 `memories.welcome`            | 🔒 Living (reuses Connection gift-introduction / Moments flower tap)         |
+| 2 `memories.locked-gift`        | 🔒 Living (reuses Connection locked-gift · 3 failed opens)                   |
+| 3 `memories.gift-locked`        | 🔒 Living (reuses Connection challenge-invitation as-is)                     |
+| 4 `memories.match-transition`   | 🔒 Living (scrapbook MEMORY MATCH! celebration · auto ~1.8s)                 |
+| 5 `memories.match-intro`        | 🔒 Living (gift + Start · emotional gate)                                    |
+| 6 `memories.match.memory.{n}`   | 🔒 Living (photo → story · 20s · black spotlight reveal · 4 lab pairs)       |
+| 7 `memories.calculating`        | 🔒 Living (reuses Connection score-calculation)                              |
+| 8 `memories.score-reveal`       | 🔒 Living (reuses Connection score-reveal)                                   |
+| 9 `memories.memory-transition`  | 🔒 Living (reuses Moments Scene 5 origami sakura letter-transition)          |
+| 10 `memories.letter-emergence`  | 🔒 Living (reuses Connection Scene 10 · gift open + To/From head · ~1.4s)    |
+| 11 `memories.letter-reveal`     | 🔒 Living (reuses Moments Scene 6 letter)                                    |
+| 12 `memories.binder-transition` | 🔒 Living (reuses Moments Scene 7 album-unlock)                              |
+| 13 `memories.gallery`           | 🔒 Living (reuses Moments Scene 8 gallery)                                   |
+| 14 `memories.gallery-ending`    | 🔒 Living (reuses Moments Scene 9 gallery ending)                            |
+| 15 `memories.photobooth`        | 🔒 Living (reuses Moments Scene 10 photobooth · Sprint 14 redesign deferred) |
+
 ### Mode / production gates
 
-| Item                              | Status                                                                                 |
-| --------------------------------- | -------------------------------------------------------------------------------------- |
-| Bloom Pilot Plan                  | ✅ [00](./00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md)                                     |
-| Moments Theme Lab                 | 🔒 **APPROVED AND LOCKED**                                                             |
-| Independent audit (Moments)       | ✅ [02](./02_BLOOM_MOMENTS_INDEPENDENT_AUDIT.md) — PASS WITH REQUIRED FIXES (resolved) |
-| Stabilization + lessons (Moments) | ✅ [03](./03_BLOOM_MOMENTS_STABILIZATION_AND_LESSONS.md)                               |
-| Bloom Connection                  | 🔒 **APPROVED AND LOCKED**                                                             |
-| Connection audit + lock           | ✅ [04](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md)                                       |
-| Bloom Memories                    | ⏸ **NOT STARTED**                                                                      |
-| Bloom Treasures                   | ⏸ **NOT STARTED**                                                                      |
-| Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                  |
+| Item                              | Status                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------- |
+| Bloom Pilot Plan                  | ✅ [00](./00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md)                                          |
+| Moments Theme Lab                 | 🔒 **APPROVED AND LOCKED**                                                                  |
+| Independent audit (Moments)       | ✅ [02](./02_BLOOM_MOMENTS_INDEPENDENT_AUDIT.md) — PASS WITH REQUIRED FIXES (resolved)      |
+| Stabilization + lessons (Moments) | ✅ [03](./03_BLOOM_MOMENTS_STABILIZATION_AND_LESSONS.md)                                    |
+| Bloom Connection                  | 🔒 **APPROVED AND LOCKED**                                                                  |
+| Connection audit + lock           | ✅ [04](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md)                                            |
+| Bloom Memories                    | 🔒 **APPROVED AND LOCKED** (Scenes 0–15) — [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md) |
+| Bloom Treasures                   | ⏸ **NOT STARTED**                                                                           |
+| Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                       |
 
 ### Assets
 

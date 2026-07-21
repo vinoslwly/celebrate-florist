@@ -157,7 +157,13 @@ export function MomentsPersistentShell({
           className="pointer-events-none absolute inset-0 bg-[#F8E4E7]"
         />
       )}
-      <div className={cn("relative z-10 flex flex-col", heightClass)}>
+      <div
+        className={cn(
+          "relative z-10 flex flex-col",
+          heightClass,
+          fillParent && "min-h-0",
+        )}
+      >
         {showBrandChip ? (
           <p
             className={cn(

@@ -16,6 +16,13 @@ import {
   isConnectionQuizQuestionScene,
   type ConnectionSceneId,
 } from "@/features/experience/scene-engine/connection/graph";
+import {
+  MEMORIES_STATIC_SCENE_IDS,
+  isMemoriesMatchMemoryScene,
+  parseMemoriesMatchMemoryIndex,
+  type MemoriesSceneId,
+} from "@/features/experience/scene-engine/memories/graph";
+import { MemoriesSceneHost } from "@/features/experience/scene-engine/memories/memories-scene-host";
 import { MomentsSceneHost } from "@/features/experience/scene-engine/moments/moments-scene-host";
 import {
   PreviewContextNote,
@@ -27,6 +34,12 @@ import {
   BLOOM_CONNECTION_LAB_QUIZ,
   BLOOM_CONNECTION_LAB_SCORE_RESULT,
 } from "@/features/theme-lab/config/bloom-connection-fixtures";
+import {
+  BLOOM_MEMORIES_LAB_EXPERIENCE,
+  BLOOM_MEMORIES_LAB_MATCH,
+  BLOOM_MEMORIES_LAB_PHOTOS,
+  BLOOM_MEMORIES_LAB_SCORE_RESULT,
+} from "@/features/theme-lab/config/bloom-memories-fixtures";
 import {
   BLOOM_MOMENTS_LAB_EXPERIENCE,
   BLOOM_MOMENTS_LAB_PHOTOS,
@@ -45,11 +58,12 @@ import {
 type ModeTab = "moments" | "connection" | "memories" | "treasures";
 type SurfaceTab = "recipient" | "preview";
 
-const IMPLEMENTED_MODES: ModeTab[] = ["moments", "connection"];
+const IMPLEMENTED_MODES: ModeTab[] = ["moments", "connection", "memories"];
 
 const CONNECTION_STATIC_SCENE_SET = new Set<string>(
   CONNECTION_STATIC_SCENE_IDS,
 );
+const MEMORIES_STATIC_SCENE_SET = new Set<string>(MEMORIES_STATIC_SCENE_IDS);
 
 /** Lab-only deep-link: ?connectionScene=connection.celebration-transition */
 function parseConnectionLabScene(
@@ -61,6 +75,24 @@ function parseConnectionLabScene(
   }
   if (isConnectionQuizQuestionScene(raw as ConnectionSceneId)) {
     return raw as ConnectionSceneId;
+  }
+  return undefined;
+}
+
+/** Lab-only deep-link: ?memoriesScene=memories.match.memory.0 */
+function parseMemoriesLabScene(
+  raw: string | null,
+): MemoriesSceneId | undefined {
+  if (!raw) return undefined;
+  if (MEMORIES_STATIC_SCENE_SET.has(raw)) {
+    return raw as MemoriesSceneId;
+  }
+  const asScene = raw as MemoriesSceneId;
+  if (
+    isMemoriesMatchMemoryScene(asScene) &&
+    parseMemoriesMatchMemoryIndex(asScene) != null
+  ) {
+    return asScene;
   }
   return undefined;
 }
@@ -80,8 +112,9 @@ export function BloomThemeLabPage() {
   const connectionJump = parseConnectionLabScene(
     searchParams.get("connectionScene"),
   );
+  const memoriesJump = parseMemoriesLabScene(searchParams.get("memoriesScene"));
   const [mode, setMode] = useState<ModeTab>(
-    connectionJump ? "connection" : "moments",
+    connectionJump ? "connection" : memoriesJump ? "memories" : "moments",
   );
   const [surface, setSurface] = useState<SurfaceTab>("recipient");
   const [accentOption, setAccentOption] = useState(0);
@@ -92,7 +125,15 @@ export function BloomThemeLabPage() {
   const theme = withAccentText(bloomMomentsLabTheme, selectedAccent.className);
   const completionSrc = themeCompletionArtwork(theme);
   const immersiveJourney =
-    (mode === "moments" || mode === "connection") && surface === "recipient";
+    (mode === "moments" || mode === "connection" || mode === "memories") &&
+    surface === "recipient";
+
+  const immersiveModeLabel =
+    mode === "connection"
+      ? "Connection"
+      : mode === "memories"
+        ? "Memories"
+        : "Moments";
 
   return (
     <div
@@ -126,14 +167,13 @@ export function BloomThemeLabPage() {
                 Bloom Theme Lab
               </h1>
               <p className="max-w-2xl text-sm text-muted-foreground">
-                Moments locked. Connection Scene 0–15 living. Production{" "}
-                <span className="font-mono">/e/</span> unchanged.
+                Moments + Connection + Memories locked. Treasures not started.
+                Production <span className="font-mono">/e/</span> unchanged.
               </p>
             </>
           ) : (
             <p className="font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-              Theme Lab · Bloom{" "}
-              {mode === "connection" ? "Connection" : "Moments"}
+              Theme Lab · Bloom {immersiveModeLabel}
             </p>
           )}
 
@@ -172,7 +212,8 @@ export function BloomThemeLabPage() {
                 >
                   {label}
                   {id === "moments" && !immersiveJourney ? " · Locked" : ""}
-                  {id === "connection" && !immersiveJourney
+                  {id === "connection" && !immersiveJourney ? " · Locked" : ""}
+                  {id === "memories" && !immersiveJourney
                     ? " · Scene 0–15"
                     : ""}
                   {!enabled && !immersiveJourney ? " · Not started" : ""}
@@ -181,7 +222,9 @@ export function BloomThemeLabPage() {
             })}
           </div>
 
-          {mode === "moments" || mode === "connection" ? (
+          {mode === "moments" ||
+          mode === "connection" ||
+          mode === "memories" ? (
             <div className="flex flex-wrap items-center gap-2">
               <div
                 className="flex flex-wrap gap-2"
@@ -245,10 +288,10 @@ export function BloomThemeLabPage() {
         </div>
       </header>
 
-      {mode === "memories" || mode === "treasures" ? (
+      {mode === "treasures" ? (
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
           <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
-            {mode} is not started. Complete Connection before the next mode.
+            Treasures is not started. Complete Memories before the next mode.
           </p>
         </div>
       ) : surface === "recipient" && mode === "moments" ? (
@@ -274,12 +317,33 @@ export function BloomThemeLabPage() {
             className="flex h-full min-h-0 flex-col"
           />
         </div>
+      ) : surface === "recipient" && mode === "memories" ? (
+        <div className="min-h-0 flex-1">
+          <MemoriesSceneHost
+            experience={BLOOM_MEMORIES_LAB_EXPERIENCE}
+            photos={BLOOM_MEMORIES_LAB_PHOTOS}
+            match={BLOOM_MEMORIES_LAB_MATCH}
+            scoreResult={BLOOM_MEMORIES_LAB_SCORE_RESULT}
+            theme={theme}
+            showLabChrome
+            initialScene={memoriesJump}
+            className="flex h-full min-h-0 flex-col"
+          />
+        </div>
       ) : mode === "connection" ? (
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
           <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
             Connection Preview (static) is not built yet. Use{" "}
             <span className="font-medium text-foreground">Scene journey</span>{" "}
             for Scene 0–15.
+          </p>
+        </div>
+      ) : mode === "memories" ? (
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+          <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
+            Memories Preview (static) is not built yet. Use{" "}
+            <span className="font-medium text-foreground">Scene journey</span>{" "}
+            for Scenes 0–15.
           </p>
         </div>
       ) : (
