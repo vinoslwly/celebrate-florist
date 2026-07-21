@@ -706,7 +706,7 @@ Scene Engine must **NOT** modify:
 > **Status:** ✅ **CLOSED — Documentation / UI System Baseline** (Founder 2026-07-19) · Core UI **IMPLEMENTED AND APPROVED** · Bloom Moments 🔒 **APPROVED AND LOCKED** (2026-07-20)  
 > **Phases 1–9:** ✅ **APPROVED AND CLOSED** · Bible = **OFFICIAL INDEXED BASELINE**  
 > **Implementation:** ✅ Closed — [sprint-12-implementation/](./sprint-12-implementation/README.md)  
-> **Bloom Moments:** 🔒 [sprint-12-5/README.md](./sprint-12-5/README.md) · Connection **READY — NOT STARTED** · Sprint 13 / 14 **NOT STARTED**  
+> **Bloom Theme Lab:** 🔒 **LOCKED** — all four modes · [08 handoff](../sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md) · Warm **ready for planning** · Sprint 13 / 14 **NOT STARTED**  
 > **Docs:** [sprint-12/README.md](./sprint-12/README.md) · [Bible](./sprint-12/CELEBRATE_UI_SYSTEM_BIBLE.md) · [DDR-S12-034](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)
 
 **Objective (docs — complete):** Define the Celebrate UI System — how every screen feels unmistakably Celebrate — through nine planning phases ending in Design QA and the UI System Bible. **Not** a zero-based redesign; landing page is the visual baseline. Diagnosis: **one Celebrate family, uneven expression.**

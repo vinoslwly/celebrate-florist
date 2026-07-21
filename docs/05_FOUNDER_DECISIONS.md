@@ -566,6 +566,15 @@ Sprint 12 documentation baseline is **closed**. Closure means design rules and i
 | **Register** | [DDR-S12-038](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)                                                                                                                                                                                                                                  |
 | **Docs**     | [07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md](./sprint-12-5/07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md) · [sprint-12-5/README.md](./sprint-12-5/README.md)                                                                                                                                                   |
 
+### FD-S12-20 — Next Theme Planning Gate ⏸ READY
+
+|              |                                                                                                                                                                                                                                                                        |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Date**     | 2026-07-21                                                                                                                                                                                                                                                             |
+| **Decision** | Bloom remote sync **COMPLETE**. **Warm** is **READY FOR PLANNING** (Founder to confirm start). **Playful** and **Sky** remain **NOT STARTED**. No next-theme implementation without Founder approval. Production `/e/[token]` Scene Engine remains **NOT AUTHORIZED**. |
+| **Register** | [DDR-S12-039](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)                                                                                                                                                                                                       |
+| **Docs**     | [08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md](./sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)                                                                                                                                                             |
+
 ---
 
 ## Global Experience Rules (GER)

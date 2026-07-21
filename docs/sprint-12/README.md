@@ -4,7 +4,7 @@
 > **Phases 1–9:** ✅ **APPROVED AND CLOSED**  
 > **Bible:** [CELEBRATE_UI_SYSTEM_BIBLE.md](./CELEBRATE_UI_SYSTEM_BIBLE.md) — **OFFICIAL INDEXED BASELINE**  
 > **Implementation:** ✅ **CLOSED** — Core UI **IMPLEMENTED AND APPROVED** — [../sprint-12-implementation/README.md](../sprint-12-implementation/README.md)  
-> **Sprint 12.5 Bloom pilot:** 📋 Planning authorized — [../sprint-12-5/00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md](../sprint-12-5/00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md)  
+> **Sprint 12.5 Bloom pilot:** 🔒 **LOCKED** — remote sync ✅ · [08 handoff](../sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md) · Warm ready for planning  
 > **Bloom implementation / Motion (S13) / Photobooth (S14):** **NOT STARTED**  
 > **Parent:** [00_SPRINT_12_UI_SYSTEM_PLAN.md](./00_SPRINT_12_UI_SYSTEM_PLAN.md)
 

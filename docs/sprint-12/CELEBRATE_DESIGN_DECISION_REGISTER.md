@@ -518,6 +518,17 @@ Each entry includes: Decision ID · Date · Status · Decision · Reasoning · I
 | **Phase**    | Sprint 12.5 Bloom closure                                                                                                                                                                                                                                    |
 | **Source**   | [07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md](../sprint-12-5/07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md) · [sprint-12-5/README.md](../sprint-12-5/README.md)                                                                                                            |
 
+### DDR-S12-039 — Bloom Remote Sync Complete; Warm Ready for Planning
+
+| Field        | Value                                                                                                                                                                                                                                                               |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Date**     | 2026-07-21                                                                                                                                                                                                                                                          |
+| **Status**   | ✅ **Complete** — remote sync · next-theme handoff                                                                                                                                                                                                                  |
+| **Decision** | Bloom Theme Lab remote sync **COMPLETE** (`3820a6a` on `origin/rebuild/foundation`). **Warm** is **READY FOR PLANNING** — implementation **not authorized** until Founder confirms. **Playful** and **Sky** **NOT STARTED**. Production `/e/` remains unauthorized. |
+| **Impact**   | [08 handoff](../sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md) is the SSOT for future theme workflow. Bloom lock rules, architecture, fixtures, and deferred items preserved.                                                                            |
+| **Phase**    | Sprint 12.5 closure → next theme planning                                                                                                                                                                                                                           |
+| **Source**   | [08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md](../sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)                                                                                                                                                         |
+
 ---
 
 ## Template for future entries
