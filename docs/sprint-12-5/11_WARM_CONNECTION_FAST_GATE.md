@@ -13,17 +13,18 @@
 
 ### Founder follow-up (2026-07-22) — lock & push
 
-| Item                                 | Status                                                            |
-| ------------------------------------ | ----------------------------------------------------------------- |
-| Founder approval                     | ✅ Warm Connection **APPROVED AND LOCKED** in Theme Lab           |
-| Pilot commit                         | `47a2c4e` — `feat(theme-lab): add and lock Warm Connection pilot` |
-| Docs follow-up                       | (this update) — lock notes + carry-forwards                       |
-| Push target                          | `origin/rebuild/foundation`                                       |
-| Production `/e/[token]` Scene Engine | ⛔ Still **unauthorized**                                         |
-| Warm Memories / Treasures            | **Not started**                                                   |
-| Full Warm theme audit                | Required after all four Warm modes — see **Carry-forward** below  |
+| Item                                 | Status                                                                          |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| Founder approval                     | ✅ Warm Connection **APPROVED AND LOCKED** in Theme Lab                         |
+| Pilot commit                         | `47a2c4e` — `feat(theme-lab): add and lock Warm Connection pilot`               |
+| Docs follow-up                       | `a017d49` — `docs(theme-lab): lock Warm Connection and preserve carry-forwards` |
+| Push target                          | `origin/rebuild/foundation`                                                     |
+| Remote sync                          | Confirmed after Founder-authorized push                                         |
+| Production `/e/[token]` Scene Engine | ⛔ Still **unauthorized**                                                       |
+| Warm Memories / Treasures            | **Not started**                                                                 |
+| Full Warm theme audit                | Required after all four Warm modes — see **Carry-forward** below                |
 
-Working tree prepared for Founder-authorized push after the documentation follow-up commit.
+Warm Connection is **APPROVED AND LOCKED** in Theme Lab. Carry-forward notes preserved for the full Warm audit.
 
 ---
 
@@ -293,7 +294,7 @@ Keep visible until the **full Warm theme lock** (after Moments + Connection + Me
 - This file: `docs/sprint-12-5/11_WARM_CONNECTION_FAST_GATE.md`
 - Progress pointers in sprint-12-5 README / handoff
 - Pilot commit: `47a2c4e`
-- Follow-up docs commit: `docs(theme-lab): lock Warm Connection and preserve carry-forwards`
+- Follow-up docs commit: `a017d49` — `docs(theme-lab): lock Warm Connection and preserve carry-forwards`
 - Do **not** amend pushed Bloom or Warm Moments commits
 - Push authorized by Founder to `origin/rebuild/foundation`
 
