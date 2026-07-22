@@ -174,7 +174,7 @@ export function MemoriesMatchTransitionScene(_props: MemoriesSceneProps) {
 
   return (
     <div
-      className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F7E6EA]"
+      className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F7E6EA]"
       role="status"
       aria-live="polite"
       aria-label="Memory Match"
@@ -353,7 +353,7 @@ export function MemoriesMatchTransitionScene(_props: MemoriesSceneProps) {
         : null}
 
       {/* Hero burst + title */}
-      <div className="relative z-30 flex min-h-full flex-1 flex-col items-center justify-center px-4 pb-8 sm:px-6">
+      <div className="relative z-30 flex min-h-full w-full flex-col items-center justify-center px-4 pb-8 sm:px-6">
         <motion.div
           className="relative flex w-full max-w-lg flex-col items-center sm:max-w-xl"
           initial={

@@ -159,7 +159,7 @@ export function MomentsPersistentShell({
       )}
       <div
         className={cn(
-          "relative z-10 flex flex-col",
+          "relative z-10 flex flex-col overflow-hidden",
           heightClass,
           fillParent && "min-h-0",
         )}

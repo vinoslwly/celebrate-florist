@@ -787,10 +787,10 @@ export function AlbumUnlockTransitionScene(_props: MomentsSceneProps) {
   }, []);
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F8E4E7]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F8E4E7]">
       <SceneAtmosphere />
 
-      <div className="relative z-10 flex min-h-full flex-1 flex-col items-center justify-center px-4 py-10">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-4 py-10">
         <motion.div
           initial={{ opacity: 0, y: 16, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}

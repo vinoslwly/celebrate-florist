@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
 
 /** Soft CSS bokeh — no photographic crops (avoids rectangular color blocks). */
 const BOKEH = [
@@ -210,7 +211,7 @@ export function GiftBoxScene({ payload, onComplete }: MomentsSceneProps) {
   const name = payload.experience.greeting_name;
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#FFF0F3]">
+    <div className={cn(SCENE_VIEWPORT_SCROLL, "bg-[#FFF0F3]")}>
       {/* Single smooth plane — no stitched photo panels */}
       <div
         aria-hidden
@@ -322,7 +323,7 @@ export function GiftBoxScene({ payload, onComplete }: MomentsSceneProps) {
       </div>
 
       {/* Content — centered as one block on the viewport */}
-      <div className="relative z-10 flex min-h-full flex-1 flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
         <motion.header
           className="mb-5 text-center sm:mb-6"
           initial={{ opacity: 0, y: -12 }}
@@ -462,8 +463,8 @@ export function GiftBoxScene({ payload, onComplete }: MomentsSceneProps) {
           </motion.article>
         </div>
 
-        {/* Mobile bubbles — outside the centered card stack so they don't shift it */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex flex-wrap justify-center gap-2 px-3 lg:hidden">
+        {/* Mobile bubbles — in-flow so short viewports can scroll to them */}
+        <div className="mt-4 flex flex-wrap justify-center gap-2 px-1 lg:hidden">
           {BUBBLES.filter((b) => !b.hideOnMobile).map((bubble, i) => (
             <motion.span
               key={bubble.text}

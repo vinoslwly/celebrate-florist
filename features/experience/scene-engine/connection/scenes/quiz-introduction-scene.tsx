@@ -162,7 +162,7 @@ export function ConnectionQuizIntroductionScene({
   const reduceMotion = useReducedMotion() ?? false;
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F9D6DE]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F9D6DE]">
       {/* Soft CSS keyframes — one stylesheet, GPU-friendly transforms */}
       <style>{`
         @keyframes qi-petal-fall {
@@ -339,7 +339,7 @@ export function ConnectionQuizIntroductionScene({
         </div>
       ) : null}
 
-      <div className="relative z-10 flex min-h-full flex-1 flex-col items-center px-5 pt-12 pb-8 sm:px-10 sm:pt-14 sm:pb-10">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center px-5 pt-12 pb-8 sm:px-10 sm:pt-14 sm:pb-10">
         <div className="flex w-full max-w-lg flex-1 flex-col items-center justify-between gap-3">
           <div className="flex w-full flex-col items-center">
             <motion.h1

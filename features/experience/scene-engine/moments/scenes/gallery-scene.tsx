@@ -279,7 +279,7 @@ export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
         </div>
       ) : null}
 
-      <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div className="relative z-10 h-0 min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch]">
         <div className="mx-auto flex w-full max-w-xl flex-col px-5 pt-12 pb-0 sm:px-8 sm:pt-14">
           <header className="mb-12 text-center sm:mb-16">
             <motion.div

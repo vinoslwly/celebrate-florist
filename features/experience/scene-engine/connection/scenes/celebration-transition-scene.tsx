@@ -327,7 +327,7 @@ export function ConnectionCelebrationTransitionScene(
   );
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F7B8C8]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F7B8C8]">
       <style>{`
         @keyframes ct-launch {
           0% { transform: translate3d(-50%, 0, 0); }

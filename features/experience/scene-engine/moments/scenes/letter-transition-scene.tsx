@@ -193,7 +193,7 @@ const BLOOMS = buildBloomField();
  */
 export function LetterTransitionScene(_props: MomentsSceneProps) {
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F6D6DE]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F6D6DE]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"

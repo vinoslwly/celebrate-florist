@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
 
 const ASSETS = {
   cornerTl: "/themes/bloom/moments/scene-01-corner-tl.webp",
@@ -71,7 +72,7 @@ const FALLING_PETALS = [
  */
 export function CelebrateLoadingScene(_props: MomentsSceneProps) {
   return (
-    <div className="relative min-h-[100svh] w-full flex-1 overflow-hidden bg-[#FFF5F2]">
+    <div className={`${SCENE_VIEWPORT_LOCK} bg-[#FFF5F2]`}>
       {/* Warm base + living light — no pasted splash / no baked text */}
       <div
         aria-hidden
@@ -225,7 +226,7 @@ export function CelebrateLoadingScene(_props: MomentsSceneProps) {
       </div>
 
       {/* Brand center — real HTML */}
-      <div className="relative z-10 flex min-h-[100svh] flex-col items-center justify-center px-6 text-center">
+      <div className="relative z-10 flex min-h-full flex-col items-center justify-center px-6 text-center">
         <motion.div
           className="flex flex-col items-center"
           initial={{ opacity: 0, y: 18 }}

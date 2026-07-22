@@ -268,7 +268,7 @@ export function GiftOpeningScene({
       : "Tap the gift to open";
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F8E4E7]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F8E4E7]">
       {/* Single smooth plane — no stitched photo panels */}
       <div
         aria-hidden
@@ -403,7 +403,7 @@ export function GiftOpeningScene({
         ))}
       </div>
 
-      <div className="relative z-10 flex min-h-full flex-1 flex-col items-center px-4 pt-10 pb-8 sm:pt-14">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center px-4 pt-10 pb-8 sm:pt-14">
         <AnimatePresence mode="wait">
           {stage === "wrapped" || lockedOnly ? (
             <motion.div

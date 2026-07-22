@@ -174,9 +174,11 @@ export function MemoriesSceneHost({
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className={cn(
-              "flex flex-col",
-              showLabChrome ? "h-full min-h-0 flex-1" : "min-h-[100svh]",
-              isMemoriesMatchMemoryScene(sceneId) && "min-h-0 overflow-y-auto",
+              "flex min-h-0 flex-col",
+              showLabChrome ? "h-full w-full flex-1" : "min-h-[100svh]",
+              isMemoriesMatchMemoryScene(sceneId)
+                ? "overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch]"
+                : "overflow-hidden",
             )}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

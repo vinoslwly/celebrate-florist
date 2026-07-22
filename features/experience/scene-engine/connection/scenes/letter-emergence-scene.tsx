@@ -59,7 +59,7 @@ export function ConnectionLetterEmergenceScene({
   const fromName = payload.experience.closing_name;
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F9C8D4]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F9C8D4]">
       <style>{`
         @keyframes le-glow {
           0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(0.96); }
@@ -123,7 +123,7 @@ export function ConnectionLetterEmergenceScene({
           ))
         : null}
 
-      <div className="relative z-10 flex min-h-full flex-1 flex-col items-center justify-center px-5 py-10">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-5 py-10">
         <div className="relative mx-auto w-full max-w-sm">
           <div
             aria-hidden

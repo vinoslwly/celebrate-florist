@@ -168,7 +168,7 @@ export function ConnectionQuizQuestionScene({
   }
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#FBF6F2]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#FBF6F2]">
       <style>{`
         @keyframes cq-node-pulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(232, 121, 154, 0.45); }
@@ -248,7 +248,7 @@ export function ConnectionQuizQuestionScene({
         </p>
       </div>
 
-      <div className="relative z-10 flex min-h-full flex-1 flex-col px-5 pt-10 pb-28 sm:px-8 sm:pt-12 sm:pb-32">
+      <div className="relative z-10 flex min-h-full w-full flex-col px-5 pt-10 pb-28 sm:px-8 sm:pt-12 sm:pb-32">
         {/* Progress */}
         <motion.div
           className="mx-auto w-full max-w-sm"

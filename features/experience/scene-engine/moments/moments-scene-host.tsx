@@ -114,8 +114,8 @@ export function MomentsSceneHost({
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className={cn(
-              "flex flex-col",
-              showLabChrome ? "h-full min-h-0 flex-1" : "min-h-[100svh]",
+              "flex min-h-0 flex-col overflow-hidden",
+              showLabChrome ? "h-full w-full flex-1" : "min-h-[100svh]",
             )}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

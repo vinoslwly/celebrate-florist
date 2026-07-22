@@ -63,7 +63,7 @@ export function MemoriesMatchIntroScene({ onComplete }: MemoriesSceneProps) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F8E4E7]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F8E4E7]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -170,7 +170,7 @@ export function MemoriesMatchIntroScene({ onComplete }: MemoriesSceneProps) {
         <SoftSakura className="h-full w-full drop-shadow-sm" />
       </motion.div>
 
-      <div className="relative z-10 flex min-h-full flex-1 flex-col items-center justify-center px-6 py-12 sm:px-8">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-6 py-12 sm:px-8">
         <motion.div
           className="flex w-full max-w-md flex-col items-center text-center"
           initial={reduceMotion ? false : { opacity: 0, y: 18 }}

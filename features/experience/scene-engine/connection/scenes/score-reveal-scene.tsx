@@ -125,7 +125,7 @@ export function ConnectionScoreRevealScene({
   const displayPercent = useCountUp(result.percent, !reduceMotion);
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#F7F0EA]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F7F0EA]">
       <style>{`
         @keyframes sr-sparkle {
           0%, 100% { opacity: 0.35; transform: scale(0.85); }
@@ -206,7 +206,7 @@ export function ConnectionScoreRevealScene({
           ))
         : null}
 
-      <div className="relative z-10 flex min-h-full flex-1 flex-col items-center justify-center px-5 py-10 sm:px-8 sm:py-12">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-5 py-10 sm:px-8 sm:py-12">
         <motion.div
           className="relative w-full max-w-[22rem] sm:max-w-md"
           initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.96 }}

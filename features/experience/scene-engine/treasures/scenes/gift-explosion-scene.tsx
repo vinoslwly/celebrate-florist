@@ -158,7 +158,7 @@ export function TreasuresGiftExplosionScene({
   const paths = useMemo(() => BURST_PATHS.slice(0, count), [count]);
 
   return (
-    <div className="relative flex min-h-full w-full flex-1 overflow-hidden bg-[#EFA8BC]">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#EFA8BC]">
       <style>{`
         @keyframes ge-glow {
           0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(0.94); }
