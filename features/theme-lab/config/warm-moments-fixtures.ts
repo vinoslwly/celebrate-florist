@@ -34,9 +34,11 @@ export const WARM_MOMENTS_LAB_EXPERIENCE = {
 } satisfies ExperienceRow;
 
 /**
- * Theme Lab gallery fixtures for Warm Moments Scene 7.
+ * Theme Lab gallery fixtures for Warm Moments Scene 8.
  * Reuses Bloom mood plates as anonymous stand-ins (Theme Lab only).
  * Caption format: "Title · Body"
+ *
+ * No-photo fixture: pass `[]` (Lab: `?noPhotos=1`) — host skips gallery → awaiting.
  */
 export const WARM_MOMENTS_LAB_PHOTOS: PublishedPhoto[] = [
   {

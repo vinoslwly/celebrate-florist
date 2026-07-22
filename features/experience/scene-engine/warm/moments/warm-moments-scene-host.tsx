@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -9,6 +9,20 @@ import { cn } from "@/lib/utils";
 import type { ExperienceRow } from "@/types/database";
 import type { Theme } from "@/types/theme";
 
+import {
+  resolveNextWarmMomentsScene,
+  WARM_MOMENTS_ALBUM_UNLOCK_SCENE,
+  WARM_MOMENTS_AWAITING_SCENE,
+  WARM_MOMENTS_GALLERY_ENDING_SCENE,
+  WARM_MOMENTS_GALLERY_SCENE,
+  WARM_MOMENTS_GIFT_BOX_SCENE,
+  WARM_MOMENTS_GIFT_OPENING_SCENE,
+  WARM_MOMENTS_INITIAL_SCENE,
+  WARM_MOMENTS_LETTER_CONFIRMATION_SCENE,
+  WARM_MOMENTS_LETTER_SCENE,
+  WARM_MOMENTS_LETTER_TRANSITION_SCENE,
+  type WarmMomentsLabSceneId,
+} from "@/features/experience/scene-engine/warm/moments/graph";
 import { WarmAlbumUnlockTransitionScene } from "@/features/experience/scene-engine/warm/moments/scenes/album-unlock-transition-scene";
 import { WarmCelebrateLoadingScene } from "@/features/experience/scene-engine/warm/moments/scenes/celebrate-loading-scene";
 import { WarmGalleryEndingScene } from "@/features/experience/scene-engine/warm/moments/scenes/gallery-ending-scene";
@@ -20,32 +34,19 @@ import { WarmLetterScene } from "@/features/experience/scene-engine/warm/moments
 import { WarmLetterTransitionScene } from "@/features/experience/scene-engine/warm/moments/scenes/letter-transition-scene";
 import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
 
-/** Warm Moments — Theme Lab scenes (further scenes await Founder refs). */
-export const WARM_MOMENTS_INITIAL_SCENE = "warm.moments.celebrate-loading";
-export const WARM_MOMENTS_GIFT_BOX_SCENE = "warm.moments.gift-box";
-export const WARM_MOMENTS_GIFT_OPENING_SCENE = "warm.moments.gift-opening";
-export const WARM_MOMENTS_LETTER_CONFIRMATION_SCENE =
-  "warm.moments.letter-confirmation";
-export const WARM_MOMENTS_LETTER_TRANSITION_SCENE =
-  "warm.moments.letter-transition";
-export const WARM_MOMENTS_LETTER_SCENE = "warm.moments.letter";
-export const WARM_MOMENTS_ALBUM_UNLOCK_SCENE =
-  "warm.moments.album-unlock-transition";
-export const WARM_MOMENTS_GALLERY_SCENE = "warm.moments.gallery";
-export const WARM_MOMENTS_GALLERY_ENDING_SCENE = "warm.moments.gallery-ending";
-export const WARM_MOMENTS_AWAITING_SCENE = "warm.moments.awaiting-next";
-
-export type WarmMomentsLabSceneId =
-  | typeof WARM_MOMENTS_INITIAL_SCENE
-  | typeof WARM_MOMENTS_GIFT_BOX_SCENE
-  | typeof WARM_MOMENTS_GIFT_OPENING_SCENE
-  | typeof WARM_MOMENTS_LETTER_CONFIRMATION_SCENE
-  | typeof WARM_MOMENTS_LETTER_TRANSITION_SCENE
-  | typeof WARM_MOMENTS_LETTER_SCENE
-  | typeof WARM_MOMENTS_ALBUM_UNLOCK_SCENE
-  | typeof WARM_MOMENTS_GALLERY_SCENE
-  | typeof WARM_MOMENTS_GALLERY_ENDING_SCENE
-  | typeof WARM_MOMENTS_AWAITING_SCENE;
+export {
+  WARM_MOMENTS_ALBUM_UNLOCK_SCENE,
+  WARM_MOMENTS_AWAITING_SCENE,
+  WARM_MOMENTS_GALLERY_ENDING_SCENE,
+  WARM_MOMENTS_GALLERY_SCENE,
+  WARM_MOMENTS_GIFT_BOX_SCENE,
+  WARM_MOMENTS_GIFT_OPENING_SCENE,
+  WARM_MOMENTS_INITIAL_SCENE,
+  WARM_MOMENTS_LETTER_CONFIRMATION_SCENE,
+  WARM_MOMENTS_LETTER_SCENE,
+  WARM_MOMENTS_LETTER_TRANSITION_SCENE,
+  type WarmMomentsLabSceneId,
+} from "@/features/experience/scene-engine/warm/moments/graph";
 
 const SCENE_1_DURATION_MS = 2800;
 
@@ -74,14 +75,22 @@ export function WarmMomentsSceneHost({
   const [journeyKey, setJourneyKey] = useState(0);
 
   const payload = { experience, photos, theme };
+  const hasPhotos = photos.length > 0;
+
+  const advance = useCallback(() => {
+    setSceneId((current) => {
+      const next = resolveNextWarmMomentsScene(current, { hasPhotos });
+      return next ?? current;
+    });
+  }, [hasPhotos]);
 
   useEffect(() => {
     if (sceneId !== WARM_MOMENTS_INITIAL_SCENE) return;
     const t = window.setTimeout(() => {
-      setSceneId(WARM_MOMENTS_GIFT_BOX_SCENE);
+      advance();
     }, SCENE_1_DURATION_MS);
     return () => window.clearTimeout(t);
-  }, [sceneId, journeyKey]);
+  }, [sceneId, journeyKey, advance]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -102,6 +111,9 @@ export function WarmMomentsSceneHost({
         <div className="z-40 flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/60 bg-card/90 px-3 py-2 text-xs backdrop-blur-sm">
           <p className="font-mono text-[11px] text-muted-foreground">
             scene · <span className="text-foreground">{sceneId}</span>
+            {!hasPhotos ? (
+              <span className="ml-2 text-amber-700/90">· no-photos</span>
+            ) : null}
           </p>
           <button
             type="button"
@@ -131,52 +143,33 @@ export function WarmMomentsSceneHost({
             {sceneId === WARM_MOMENTS_INITIAL_SCENE ? (
               <WarmCelebrateLoadingScene
                 payload={payload}
-                onComplete={() => setSceneId(WARM_MOMENTS_GIFT_BOX_SCENE)}
+                onComplete={advance}
               />
             ) : sceneId === WARM_MOMENTS_GIFT_BOX_SCENE ? (
-              <WarmGiftBoxScene
-                payload={payload}
-                onComplete={() => setSceneId(WARM_MOMENTS_GIFT_OPENING_SCENE)}
-              />
+              <WarmGiftBoxScene payload={payload} onComplete={advance} />
             ) : sceneId === WARM_MOMENTS_GIFT_OPENING_SCENE ? (
-              <WarmGiftOpeningScene
-                payload={payload}
-                onComplete={() =>
-                  setSceneId(WARM_MOMENTS_LETTER_CONFIRMATION_SCENE)
-                }
-              />
+              <WarmGiftOpeningScene payload={payload} onComplete={advance} />
             ) : sceneId === WARM_MOMENTS_LETTER_CONFIRMATION_SCENE ? (
               <WarmLetterConfirmationScene
                 payload={payload}
-                onComplete={() =>
-                  setSceneId(WARM_MOMENTS_LETTER_TRANSITION_SCENE)
-                }
+                onComplete={advance}
               />
             ) : sceneId === WARM_MOMENTS_LETTER_TRANSITION_SCENE ? (
               <WarmLetterTransitionScene
                 payload={payload}
-                onComplete={() => setSceneId(WARM_MOMENTS_LETTER_SCENE)}
+                onComplete={advance}
               />
             ) : sceneId === WARM_MOMENTS_LETTER_SCENE ? (
-              <WarmLetterScene
-                payload={payload}
-                onComplete={() => setSceneId(WARM_MOMENTS_ALBUM_UNLOCK_SCENE)}
-              />
+              <WarmLetterScene payload={payload} onComplete={advance} />
             ) : sceneId === WARM_MOMENTS_ALBUM_UNLOCK_SCENE ? (
               <WarmAlbumUnlockTransitionScene
                 payload={payload}
-                onComplete={() => setSceneId(WARM_MOMENTS_GALLERY_SCENE)}
+                onComplete={advance}
               />
             ) : sceneId === WARM_MOMENTS_GALLERY_SCENE ? (
-              <WarmGalleryScene
-                payload={payload}
-                onComplete={() => setSceneId(WARM_MOMENTS_GALLERY_ENDING_SCENE)}
-              />
+              <WarmGalleryScene payload={payload} onComplete={advance} />
             ) : sceneId === WARM_MOMENTS_GALLERY_ENDING_SCENE ? (
-              <WarmGalleryEndingScene
-                payload={payload}
-                onComplete={() => setSceneId(WARM_MOMENTS_AWAITING_SCENE)}
-              />
+              <WarmGalleryEndingScene payload={payload} onComplete={advance} />
             ) : (
               <div
                 className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-16 text-center"
@@ -189,8 +182,9 @@ export function WarmMomentsSceneHost({
                   Warm Moments · Theme Lab
                 </p>
                 <p className="max-w-sm font-serif text-lg text-[#E8D4C0]">
-                  Journey complete through gallery ending. Awaiting Founder
-                  reference for photobooth.
+                  {hasPhotos
+                    ? "Journey complete through gallery ending. Awaiting Founder reference for photobooth."
+                    : "Journey complete (no-photo path — gallery skipped). Awaiting Founder reference for photobooth."}
                 </p>
                 <button
                   type="button"
@@ -206,13 +200,15 @@ export function WarmMomentsSceneHost({
                 >
                   Replay Album Unlock
                 </button>
-                <button
-                  type="button"
-                  className="rounded-md border border-[#E8D4C0]/45 px-3 py-1.5 text-sm font-medium text-[#E8D4C0] hover:bg-[#E8D4C0]/10"
-                  onClick={() => setSceneId(WARM_MOMENTS_GALLERY_SCENE)}
-                >
-                  Replay Gallery
-                </button>
+                {hasPhotos ? (
+                  <button
+                    type="button"
+                    className="rounded-md border border-[#E8D4C0]/45 px-3 py-1.5 text-sm font-medium text-[#E8D4C0] hover:bg-[#E8D4C0]/10"
+                    onClick={() => setSceneId(WARM_MOMENTS_GALLERY_SCENE)}
+                  >
+                    Replay Gallery
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className="text-xs text-[#E8D4C0]/70 underline-offset-2 hover:underline"
