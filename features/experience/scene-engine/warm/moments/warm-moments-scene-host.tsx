@@ -12,7 +12,6 @@ import type { Theme } from "@/types/theme";
 import {
   resolveNextWarmMomentsScene,
   WARM_MOMENTS_ALBUM_UNLOCK_SCENE,
-  WARM_MOMENTS_AWAITING_SCENE,
   WARM_MOMENTS_GALLERY_ENDING_SCENE,
   WARM_MOMENTS_GALLERY_SCENE,
   WARM_MOMENTS_GIFT_BOX_SCENE,
@@ -32,11 +31,11 @@ import { WarmGiftOpeningScene } from "@/features/experience/scene-engine/warm/mo
 import { WarmLetterConfirmationScene } from "@/features/experience/scene-engine/warm/moments/scenes/letter-confirmation-scene";
 import { WarmLetterScene } from "@/features/experience/scene-engine/warm/moments/scenes/letter-scene";
 import { WarmLetterTransitionScene } from "@/features/experience/scene-engine/warm/moments/scenes/letter-transition-scene";
+import { WarmPhotoboothScene } from "@/features/experience/scene-engine/warm/moments/scenes/photobooth-scene";
 import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
 
 export {
   WARM_MOMENTS_ALBUM_UNLOCK_SCENE,
-  WARM_MOMENTS_AWAITING_SCENE,
   WARM_MOMENTS_GALLERY_ENDING_SCENE,
   WARM_MOMENTS_GALLERY_SCENE,
   WARM_MOMENTS_GIFT_BOX_SCENE,
@@ -45,6 +44,7 @@ export {
   WARM_MOMENTS_LETTER_CONFIRMATION_SCENE,
   WARM_MOMENTS_LETTER_SCENE,
   WARM_MOMENTS_LETTER_TRANSITION_SCENE,
+  WARM_MOMENTS_PHOTOBOOTH_SCENE,
   type WarmMomentsLabSceneId,
 } from "@/features/experience/scene-engine/warm/moments/graph";
 
@@ -59,7 +59,7 @@ type WarmMomentsSceneHostProps = {
 };
 
 /**
- * Warm Moments Theme Lab host — Scenes 1–9 living; then hold for next Founder ref.
+ * Warm Moments Theme Lab host — Scenes 1–10 living (photobooth = Sprint 14 stub).
  * Does not modify locked Bloom Moments engine.
  */
 export function WarmMomentsSceneHost({
@@ -171,52 +171,7 @@ export function WarmMomentsSceneHost({
             ) : sceneId === WARM_MOMENTS_GALLERY_ENDING_SCENE ? (
               <WarmGalleryEndingScene payload={payload} onComplete={advance} />
             ) : (
-              <div
-                className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-16 text-center"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at 50% 40%, #8B1A22 0%, #6B0F16 50%, #4A0A10 100%)",
-                }}
-              >
-                <p className="font-mono text-[11px] tracking-widest text-[#E8D4C0]/70 uppercase">
-                  Warm Moments · Theme Lab
-                </p>
-                <p className="max-w-sm font-serif text-lg text-[#E8D4C0]">
-                  {hasPhotos
-                    ? "Journey complete through gallery ending. Awaiting Founder reference for photobooth."
-                    : "Journey complete (no-photo path — gallery skipped). Awaiting Founder reference for photobooth."}
-                </p>
-                <button
-                  type="button"
-                  className="rounded-md border border-[#E8D4C0]/45 px-3 py-1.5 text-sm font-medium text-[#E8D4C0] hover:bg-[#E8D4C0]/10"
-                  onClick={() => setSceneId(WARM_MOMENTS_LETTER_SCENE)}
-                >
-                  Replay Scene 6
-                </button>
-                <button
-                  type="button"
-                  className="rounded-md border border-[#E8D4C0]/45 px-3 py-1.5 text-sm font-medium text-[#E8D4C0] hover:bg-[#E8D4C0]/10"
-                  onClick={() => setSceneId(WARM_MOMENTS_ALBUM_UNLOCK_SCENE)}
-                >
-                  Replay Album Unlock
-                </button>
-                {hasPhotos ? (
-                  <button
-                    type="button"
-                    className="rounded-md border border-[#E8D4C0]/45 px-3 py-1.5 text-sm font-medium text-[#E8D4C0] hover:bg-[#E8D4C0]/10"
-                    onClick={() => setSceneId(WARM_MOMENTS_GALLERY_SCENE)}
-                  >
-                    Replay Gallery
-                  </button>
-                ) : null}
-                <button
-                  type="button"
-                  className="text-xs text-[#E8D4C0]/70 underline-offset-2 hover:underline"
-                  onClick={restartJourney}
-                >
-                  Restart from Scene 1
-                </button>
-              </div>
+              <WarmPhotoboothScene payload={payload} onComplete={advance} />
             )}
           </motion.div>
         </AnimatePresence>

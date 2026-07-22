@@ -157,13 +157,14 @@ function WarmClosedBody({ ids }: { ids: GiftPaintIds }) {
 
 export type WarmGiftBoxProps = {
   className?: string;
-  variant?: "closed" | "open";
+  /** ajar — lid cracked with warm glow (Connection score calculation). */
+  variant?: "closed" | "ajar" | "open";
   animateLid?: boolean;
   reduceMotion?: boolean;
 };
 
 /**
- * Warm gift box — SVG closed/open with animated lid for Scene 3.
+ * Warm gift box — SVG closed / ajar / open (lid can animate).
  */
 export function WarmGiftBox({
   className,
@@ -256,6 +257,54 @@ export function WarmGiftBox({
               <WarmGiftLidWithBow ids={ids} x={0} y={0} />
             </g>
           )}
+        </svg>
+      </div>
+    );
+  }
+
+  if (variant === "ajar") {
+    return (
+      <div className={className} aria-hidden>
+        <svg viewBox="0 0 220 240" className="h-full w-full" fill="none">
+          <WarmGiftPaintServers ids={ids} />
+          <ellipse
+            cx="112"
+            cy="218"
+            rx="72"
+            ry="12"
+            fill="#3A080C"
+            opacity="0.28"
+          />
+          {/* Warm glow from the crack */}
+          <ellipse
+            cx="110"
+            cy="108"
+            rx="62"
+            ry="30"
+            fill={`url(#${ids.glow})`}
+          />
+          <ellipse
+            cx="110"
+            cy="110"
+            rx="38"
+            ry="14"
+            fill="#FFFCE8"
+            opacity="0.88"
+          />
+          <WarmClosedBody ids={ids} />
+          <g transform="translate(0 -8) rotate(-5 110 90)">
+            <WarmGiftLidWithBow ids={ids} x={50} y={68} />
+          </g>
+          <path
+            d="M48 98 L50 104 L56 106 L50 108 L48 114 L46 108 L40 106 L46 104 Z"
+            fill="#FFF8E0"
+            opacity="0.9"
+          />
+          <path
+            d="M168 88 L169.5 92 L173.5 93.5 L169.5 95 L168 99 L166.5 95 L162.5 93.5 L166.5 92 Z"
+            fill="#FFF8E0"
+            opacity="0.85"
+          />
         </svg>
       </div>
     );
