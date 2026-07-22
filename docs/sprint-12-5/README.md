@@ -7,7 +7,7 @@
 > **Bloom theme (all four modes):** 🔒 **APPROVED AND LOCKED** — see [07 full audit](./07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md)  
 > **Bloom remote sync:** ✅ **COMPLETE** (`3820a6a` on `origin/rebuild/foundation`)  
 > **Handoff / next theme:** [08 handoff](./08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)  
-> **Warm:** ✅ **Moments locked** — [10](./10_WARM_MOMENTS_FAST_GATE.md) · ✅ **Connection fast gate** — [11](./11_WARM_CONNECTION_FAST_GATE.md) · Memories/Treasures ⏸  
+> **Warm:** 🔒 **Moments locked** — [10](./10_WARM_MOMENTS_FAST_GATE.md) · 🔒 **Connection APPROVED AND LOCKED** — [11](./11_WARM_CONNECTION_FAST_GATE.md) · Memories/Treasures ⏸  
 > **Playful / Sky:** ⏸ not started  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
@@ -129,22 +129,22 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 
 ### Mode / production gates
 
-| Item                              | Status                                                                                            |
-| --------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Bloom Pilot Plan                  | ✅ [00](./00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md)                                                |
-| Moments Theme Lab                 | 🔒 **APPROVED AND LOCKED**                                                                        |
-| Independent audit (Moments)       | ✅ [02](./02_BLOOM_MOMENTS_INDEPENDENT_AUDIT.md) — PASS WITH REQUIRED FIXES (resolved)            |
-| Stabilization + lessons (Moments) | ✅ [03](./03_BLOOM_MOMENTS_STABILIZATION_AND_LESSONS.md)                                          |
-| Bloom Connection                  | 🔒 **APPROVED AND LOCKED**                                                                        |
-| Connection audit + lock           | ✅ [04](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md)                                                  |
-| Bloom Memories                    | 🔒 **APPROVED AND LOCKED** (Scenes 0–15) — [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md)       |
-| Bloom Treasures                   | 🔒 **APPROVED AND LOCKED** (Scenes 0–13) — [06 fast gate](./06_BLOOM_TREASURES_FAST_GATE.md)      |
-| Full Bloom theme audit + lock     | 🔒 **PASSED** — [07](./07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md)                                     |
-| Bloom remote sync                 | ✅ **COMPLETE** — `3820a6a` on remote                                                             |
-| Next-theme handoff                | ✅ [08](./08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)                                           |
-| Warm                              | ✅ **Moments fast gate** — [10](./10_WARM_MOMENTS_FAST_GATE.md) · Connection/Memories/Treasures ⏸ |
-| Playful / Sky                     | ⏸ Not started                                                                                     |
-| Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                             |
+| Item                              | Status                                                                                                                                     |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Bloom Pilot Plan                  | ✅ [00](./00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md)                                                                                         |
+| Moments Theme Lab                 | 🔒 **APPROVED AND LOCKED**                                                                                                                 |
+| Independent audit (Moments)       | ✅ [02](./02_BLOOM_MOMENTS_INDEPENDENT_AUDIT.md) — PASS WITH REQUIRED FIXES (resolved)                                                     |
+| Stabilization + lessons (Moments) | ✅ [03](./03_BLOOM_MOMENTS_STABILIZATION_AND_LESSONS.md)                                                                                   |
+| Bloom Connection                  | 🔒 **APPROVED AND LOCKED**                                                                                                                 |
+| Connection audit + lock           | ✅ [04](./04_BLOOM_CONNECTION_AUDIT_AND_LOCK.md)                                                                                           |
+| Bloom Memories                    | 🔒 **APPROVED AND LOCKED** (Scenes 0–15) — [05 fast gate](./05_BLOOM_MEMORIES_FAST_GATE.md)                                                |
+| Bloom Treasures                   | 🔒 **APPROVED AND LOCKED** (Scenes 0–13) — [06 fast gate](./06_BLOOM_TREASURES_FAST_GATE.md)                                               |
+| Full Bloom theme audit + lock     | 🔒 **PASSED** — [07](./07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md)                                                                              |
+| Bloom remote sync                 | ✅ **COMPLETE** — `3820a6a` on remote                                                                                                      |
+| Next-theme handoff                | ✅ [08](./08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)                                                                                    |
+| Warm                              | 🔒 **Moments + Connection locked** — [10](./10_WARM_MOMENTS_FAST_GATE.md) · [11](./11_WARM_CONNECTION_FAST_GATE.md) · Memories/Treasures ⏸ |
+| Playful / Sky                     | ⏸ Not started                                                                                                                              |
+| Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                                                                      |
 
 ### Assets
 

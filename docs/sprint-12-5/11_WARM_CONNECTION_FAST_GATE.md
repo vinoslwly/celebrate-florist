@@ -11,7 +11,19 @@
 
 **WARM CONNECTION FAST GATE PASSED**
 
-Working tree prepared for a single logical commit. **Do not push** without Founder authorization.
+### Founder follow-up (2026-07-22) — lock & push
+
+| Item                                 | Status                                                            |
+| ------------------------------------ | ----------------------------------------------------------------- |
+| Founder approval                     | ✅ Warm Connection **APPROVED AND LOCKED** in Theme Lab           |
+| Pilot commit                         | `47a2c4e` — `feat(theme-lab): add and lock Warm Connection pilot` |
+| Docs follow-up                       | (this update) — lock notes + carry-forwards                       |
+| Push target                          | `origin/rebuild/foundation`                                       |
+| Production `/e/[token]` Scene Engine | ⛔ Still **unauthorized**                                         |
+| Warm Memories / Treasures            | **Not started**                                                   |
+| Full Warm theme audit                | Required after all four Warm modes — see **Carry-forward** below  |
+
+Working tree prepared for Founder-authorized push after the documentation follow-up commit.
 
 ---
 
@@ -230,29 +242,66 @@ No material runtime **errors** during spot-check (DevTools / HMR info only).
 
 ## Carry-forward for full Warm audit
 
-1. Typography — Poppins vs serif/Outfit on CTAs and long-form letter (Moments + Connection)
-2. Gift-introduction still shows emoji chrome in helper copy (living CTA is real button; polish later)
-3. Photobooth remains Sprint 14 stub
-4. Optional `?warmConnectionScene=` whitelist (Bloom-style) if Founder wants lab deep-links
-5. Repo `npm audit` dedicated security pass
-6. Warm Memories / Treasures — **not started**
-7. Production `/e/[token]` — still **unauthorized**
+Keep visible until the **full Warm theme lock** (after Moments + Connection + Memories + Treasures):
+
+### Typography
+
+- Warm Connection introduced **no new Outfit** usage
+- Serif is still used on some quiz prompts, score headings, CTAs, and reused letter content
+- Full Warm audit must decide whether functional controls return to **Poppins** or receive a formal Warm exception
+- Do **not** allow typography drift to spread silently into Memories or Treasures
+
+### Fixture truth
+
+- Connection score remains fixed at **`92%`**
+- Answers are **not** graded live
+- No production quiz action is called
+- Do **not** treat Theme Lab scoring as production-ready
+
+### Shared Warm components
+
+- `lockedOnly`, `ajar`, and the Warm photobooth stub are **additive**
+- Warm Moments **default** journey must remain unchanged
+- Bloom remains unaffected
+- Shared components must stay **presentation-only**
+
+### Deferred items
+
+- Gift-introduction emoji/helper chrome needs later polish
+- Photobooth remains a **Sprint 14** stub
+- Optional Warm Connection deep-link whitelist is **not** implemented
+- Repo dependency audit still has **6** pre-existing advisories (**3 high**, **3 moderate**)
+- Production `/e/[token]` integration remains **unauthorized**
+
+### Asset rules
+
+- Runtime Connection assets remain approximately **333 KB**
+- Design references stay **outside** `public/`
+- Do **not** restore removed PNG archives or one-off preview files
+- Reuse shared Warm assets instead of duplicating them in future modes
+
+### Modes not started
+
+- Warm Memories — **not started**
+- Warm Treasures — **not started**
+- Full Warm theme audit — **required** after all four modes
 
 ---
 
 ## Documentation & git
 
 - This file: `docs/sprint-12-5/11_WARM_CONNECTION_FAST_GATE.md`
-- Progress pointers updated in sprint-12-5 README / handoff
-- Suggested commit: `feat(theme-lab): add and lock Warm Connection pilot`
+- Progress pointers in sprint-12-5 README / handoff
+- Pilot commit: `47a2c4e`
+- Follow-up docs commit: `docs(theme-lab): lock Warm Connection and preserve carry-forwards`
 - Do **not** amend pushed Bloom or Warm Moments commits
-- Do **not** push without Founder authorization
+- Push authorized by Founder to `origin/rebuild/foundation`
 
 ---
 
 ## Final checklist answers
 
-1. **Verdict:** PASSED
+1. **Verdict:** PASSED → Founder **APPROVED AND LOCKED**
 2. **Warm Connection changes:** Engine 0–15 + fixtures + assets + lab mode
 3. **Reuse:** Warm Moments gift/letter/gallery/photobooth + additive Moments props/graph
 4. **Shared impact:** Warm Moments only (additive); Bloom unchanged
@@ -260,7 +309,7 @@ No material runtime **errors** during spot-check (DevTools / HMR info only).
 6. **Typography:** No new Outfit; serif CTA drift recorded for full audit
 7. **DB/API/workflow:** None
 8. **Security:** Lab isolation + fixtures + noindex; audit baseline unchanged
-9. **Quiz scoring:** Fixture-based (not live)
+9. **Quiz scoring:** Fixture-based (not live) — **not** production-ready
 10. **Mobile spot-check:** PASS
 11. **Desktop spot-check:** PASS
 12. **Full journey:** PASS
@@ -270,16 +319,16 @@ No material runtime **errors** during spot-check (DevTools / HMR info only).
 16. **Warm Moments regression:** PASS
 17. **Bloom regression:** PASS
 18. **Console:** No material errors
-19. **Assets:** Runtime ~333 KB / 3 files; refs ~10.7 MB / 11 files
+19. **Assets:** Runtime ~333 KB / 3 files; refs outside `public/`
 20. **Tech:** tsc ✅ · lint ✅ · build ✅ · audit 6 pre-existing
 21. **Fixes:** Asset hygiene + Connection `noPhotos`
-22. **Non-blocking:** Typography / emoji chrome / photobooth stub / deep-link optional
-23. **Docs:** This file + README/handoff pointers
-24. **Git:** Single commit prepared on `rebuild/foundation`
-25. **Ready to push:** After Founder authorization only
-26. **Ready to lock:** Yes (Theme Lab) pending Founder lock confirmation
-27. **Memories / Treasures:** Not started
+22. **Non-blocking / carry-forward:** See section above
+23. **Docs:** This file + README/handoff pointers (lock follow-up)
+24. **Git:** Pilot `47a2c4e` + docs follow-up on `rebuild/foundation`
+25. **Push:** Authorized — sync to `origin/rebuild/foundation`
+26. **Locked:** ✅ Theme Lab Warm Connection
+27. **Memories / Treasures:** Not started · `/e/[token]` unauthorized
 
 ---
 
-`WARM CONNECTION FAST GATE PASSED — WORKING TREE CLEAN — READY FOR GIT PUSH`
+`WARM CONNECTION LOCKED AND PUSHED — CARRY-FORWARD NOTES PRESERVED`

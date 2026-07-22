@@ -11,17 +11,17 @@
 
 ## Bloom final status
 
-| Item             | Status                                                                                                                                                      |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Moments          | 🔒 Locked (`b96c1b2`)                                                                                                                                       |
-| Connection       | 🔒 Locked (`d056513`)                                                                                                                                       |
-| Memories         | 🔒 Locked (`dda7efe`)                                                                                                                                       |
-| Treasures        | 🔒 Locked (`df262bc`)                                                                                                                                       |
-| Full theme audit | 🔒 Locked (`3820a6a`)                                                                                                                                       |
-| Theme Lab route  | `/theme-lab/bloom`                                                                                                                                          |
-| Warm             | ✅ **Moments locked** ([10](./10_WARM_MOMENTS_FAST_GATE.md)) · ✅ **Connection fast gate** ([11](./11_WARM_CONNECTION_FAST_GATE.md)) · Memories/Treasures ⏸ |
-| Playful          | ⏸ Not started                                                                                                                                               |
-| Sky              | ⏸ Not started                                                                                                                                               |
+| Item             | Status                                                                                                                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Moments          | 🔒 Locked (`b96c1b2`)                                                                                                                      |
+| Connection       | 🔒 Locked (`d056513`)                                                                                                                      |
+| Memories         | 🔒 Locked (`dda7efe`)                                                                                                                      |
+| Treasures        | 🔒 Locked (`df262bc`)                                                                                                                      |
+| Full theme audit | 🔒 Locked (`3820a6a`)                                                                                                                      |
+| Theme Lab route  | `/theme-lab/bloom`                                                                                                                         |
+| Warm             | 🔒 **Moments + Connection locked** ([10](./10_WARM_MOMENTS_FAST_GATE.md) · [11](./11_WARM_CONNECTION_FAST_GATE.md)) · Memories/Treasures ⏸ |
+| Playful          | ⏸ Not started                                                                                                                              |
+| Sky              | ⏸ Not started                                                                                                                              |
 
 Bloom is the **reference implementation** for future themes. Locked scenes must not change casually — only for regression, security, accessibility, shared-infrastructure need, or explicit Founder instruction.
 
