@@ -9,10 +9,10 @@
 
 ## Verdict
 
-**WARM MEMORIES FAST GATE PASSED**
+**WARM MEMORIES FAST GATE PASSED — LOCKED IN THEME LAB**
 
-Warm Memories is **ready to lock** in Theme Lab after Founder review of this gate.  
-Working tree prepared for a single pilot commit. **Do not push without Founder authorization.**
+Warm Memories is **locked** in Theme Lab after fast gate and Founder review.  
+Pilot commit `1b55c41` on `rebuild/foundation`. Founder authorized push to `origin/rebuild/foundation`.
 
 ---
 
@@ -203,11 +203,27 @@ Outside `public/`.
 
 ## Spot-check
 
-### Mobile ~390×844
+### Mobile ~390×844 — Playwright MCP verification
 
-Ceremony → match intro → 4 matches → calculating → score → celebration → letter → gallery unlock → **gallery reached**.  
-Gallery CTA uses locked Warm Moments control (`Celebrate This Moment`); automation hit a mobile scroll/visibility flake on that shared button — **not a Memories regression**.  
-Restart control present on host chrome.
+Verified via Playwright MCP browser at viewport **390×844** on `/theme-lab/warm?mode=memories`.
+
+| Check                         | Result                                                                                                                                          |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Horizontal overflow           | ✅ None — `scrollWidth = clientWidth = 390`                                                                                                     |
+| Full photo journey            | ✅ Ceremony → match intro → 4 matches → calculating → score → celebration → letter → gallery unlock → gallery → gallery ending → **photobooth** |
+| Restart                       | ✅ Returns to `warm.memories.celebrate-loading`                                                                                                 |
+| No-photo path (`?noPhotos=1`) | ✅ Skips gallery; reaches **photobooth**                                                                                                        |
+| Match gameplay                | ✅ Timer, spotlight reveal, progress hearts, options A/B/C all functional                                                                       |
+| Console                       | ✅ No material page errors during successful legs                                                                                               |
+
+**Mobile safety statement:** No clipping, no dead end, no horizontal overflow. All controls remain reachable. **No UI fix is required before push.**
+
+#### Non-blocking carry-forward (accepted by Founder)
+
+1. **Match gameplay vertical density** — match card content is slightly taller than the viewport (~878px vs 844px). Option C and the hint row require a small vertical scroll inside the scene host. Content is fully reachable; not a blocker.
+2. **Shared gallery CTA discoverability** — the Warm Moments control `Celebrate This Moment` may sit below the fold on mobile and require scrolling. Journey still advances; not a Memories regression.
+
+Review both items consistently during the **full Warm theme audit**. Do not redesign match or gallery scenes for this lock.
 
 ### Desktop ~1280×800
 
@@ -253,11 +269,16 @@ Keep visible until the **full Warm theme lock** (after Moments + Connection + Me
 
 - Warm Memories introduced **no new Outfit**
 - Serif remains on match headlines / options / Start CTA
-- Full Warm audit must decide Poppins vs formal Warm serif exception for functional controls
+- **Poppins vs serif/Outfit usage on functional controls** — full Warm audit must decide Poppins vs formal Warm serif exception
+
+### Mobile UX (non-blocking — accepted for Memories lock)
+
+- **Match-card vertical density on short mobile viewports** — option C + hint row need small scroll; no clipping
+- **Shared gallery CTA discoverability below the fold** — `Celebrate This Moment` may require scroll on mobile
 
 ### Fixture truth
 
-- Memories score remains fixed at **`92%`**
+- Memories score remains fixed at **`92%`** — not live grading
 - Match answers are **not** graded live
 - No production match action is called
 
@@ -271,20 +292,22 @@ Keep visible until the **full Warm theme lock** (after Moments + Connection + Me
 
 - Warm Treasures **not started**
 - Full Warm theme audit after all four modes
-- Production `/e/[token]` Scene Engine still unauthorized
-- Photobooth remains Moments/Connection stub (Sprint 14 redesign deferred)
+- Production `/e/[token]` Scene Engine remains **NOT AUTHORIZED**
+- **Photobooth Sprint 14 stub** — Moments/Connection redesign deferred
+- Repository dependency baseline remains **6 pre-existing advisories** (3 high / 3 moderate)
 
 ---
 
 ## Git readiness
 
-| Item                 | Status                                                         |
-| -------------------- | -------------------------------------------------------------- |
-| Suggested commit     | `feat(theme-lab): add and lock Warm Memories pilot`            |
-| Amend pushed commits | ❌ Do not amend Bloom / Warm Moments / Warm Connection commits |
-| Push                 | ❌ Not automatic — Founder authorization required              |
-| Warm Treasures       | Not started                                                    |
-| Full Warm audit      | Not run                                                        |
+| Item                 | Status                                                                   |
+| -------------------- | ------------------------------------------------------------------------ |
+| Pilot commit         | `1b55c41` — `feat(theme-lab): add and lock Warm Memories pilot`          |
+| Docs commit          | `docs(theme-lab): record Warm Memories mobile QA and lock` (if separate) |
+| Amend pushed commits | ❌ Do not amend Bloom / Warm Moments / Warm Connection commits           |
+| Push                 | ✅ Founder authorized → `origin/rebuild/foundation`                      |
+| Warm Treasures       | Not started                                                              |
+| Full Warm audit      | Not run                                                                  |
 
 ---
 
@@ -305,13 +328,14 @@ Keep visible until the **full Warm theme lock** (after Moments + Connection + Me
 11. Assets — runtime README only; refs ~1.71 MB / 3 files
 12. tsc / lint / build / npm audit — pass / pass / pass / baseline 6
 13. Fixes — phantom theme restore; README; deleted spot script
-14. Non-blocking — mobile gallery CTA automation flake on shared Moments button
+14. Non-blocking mobile — match card scroll for option C/hint; gallery CTA below fold (accepted)
 15. Docs — this file + sprint README Warm line
-16. Git — one logical commit prepared (Founder push later)
-17. Ready to push — **after Founder authorization**
-18. Ready to lock — **YES** (Theme Lab)
+16. Git — pilot `1b55c41` + mobile QA docs update; Founder push authorized
+17. Push — **authorized**
+18. Locked — **YES** (Theme Lab)
 19. Treasures not started — **confirmed**
+20. `/e/[token]` — **NOT AUTHORIZED**
 
 ---
 
-`WARM MEMORIES FAST GATE PASSED — WORKING TREE CLEAN — READY FOR GIT PUSH`
+`WARM MEMORIES LOCKED AND PUSHED — MOBILE QA NOTES PRESERVED`
