@@ -7,7 +7,7 @@
 > **Bloom theme (all four modes):** 🔒 **APPROVED AND LOCKED** — see [07 full audit](./07_FULL_BLOOM_THEME_AUDIT_AND_LOCK.md)  
 > **Bloom remote sync:** ✅ **COMPLETE** (`3820a6a` on `origin/rebuild/foundation`)  
 > **Handoff / next theme:** [08 handoff](./08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)  
-> **Warm:** 🔒 **Moments locked** — [10](./10_WARM_MOMENTS_FAST_GATE.md) · 🔒 **Connection APPROVED AND LOCKED** — [11](./11_WARM_CONNECTION_FAST_GATE.md) · Memories/Treasures ⏸  
+> **Warm:** 🔒 **Moments locked** — [10](./10_WARM_MOMENTS_FAST_GATE.md) · 🔒 **Connection APPROVED AND LOCKED** — [11](./11_WARM_CONNECTION_FAST_GATE.md) · Memories fast gate — [12](./12_WARM_MEMORIES_FAST_GATE.md) · Treasures ⏸  
 > **Playful / Sky:** ⏸ not started  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**

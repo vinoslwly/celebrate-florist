@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 import { WarmConnectionSceneHost } from "@/features/experience/scene-engine/warm/connection/warm-connection-scene-host";
+import { WarmMemoriesSceneHost } from "@/features/experience/scene-engine/warm/memories/warm-memories-scene-host";
 import { WarmMomentsSceneHost } from "@/features/experience/scene-engine/warm/moments/warm-moments-scene-host";
 import {
   WARM_CONNECTION_LAB_EXPERIENCE,
@@ -15,33 +16,41 @@ import {
   WARM_CONNECTION_LAB_SCORE_RESULT,
 } from "@/features/theme-lab/config/warm-connection-fixtures";
 import {
+  WARM_MEMORIES_LAB_EXPERIENCE,
+  WARM_MEMORIES_LAB_MATCH,
+  WARM_MEMORIES_LAB_PHOTOS,
+  WARM_MEMORIES_LAB_SCORE_RESULT,
+} from "@/features/theme-lab/config/warm-memories-fixtures";
+import {
   WARM_MOMENTS_LAB_EXPERIENCE,
   WARM_MOMENTS_LAB_PHOTOS,
 } from "@/features/theme-lab/config/warm-moments-fixtures";
 import { warmMomentsLabTheme } from "@/features/themes/config/warm-moments-lab-theme";
 
-type ModeTab = "moments" | "connection";
+type ModeTab = "moments" | "connection" | "memories";
 
-const IMPLEMENTED_MODES: ModeTab[] = ["moments", "connection"];
-const PENDING_MODES = ["memories", "treasures"] as const;
+const IMPLEMENTED_MODES: ModeTab[] = ["moments", "connection", "memories"];
+const PENDING_MODES = ["treasures"] as const;
 
 /**
- * Warm Theme Lab — Moments (1–10) + Connection (0–15 photobooth) living.
- * Memories / Treasures not started. Production `/e/[token]`: NOT AUTHORIZED.
+ * Warm Theme Lab — Moments + Connection locked · Memories full journey (photobooth).
+ * Treasures not started. Production `/e/[token]`: NOT AUTHORIZED.
  *
- * Lab fixtures: `?noPhotos=1` (Moments / Connection gallery skip) · `?mode=connection`
- * Invalid `?warmConnectionScene=` is ignored (no deep-link whitelist yet).
+ * Lab fixtures: `?noPhotos=1` · `?mode=connection|memories`
  */
 export function WarmThemeLabPage() {
   const searchParams = useSearchParams();
   const noPhotos = searchParams.get("noPhotos") === "1";
   const modeParam = searchParams.get("mode");
   const [mode, setMode] = useState<ModeTab>(
-    modeParam === "connection" ? "connection" : "moments",
+    modeParam === "connection" || modeParam === "memories"
+      ? modeParam
+      : "moments",
   );
 
   const momentsPhotos = noPhotos ? [] : WARM_MOMENTS_LAB_PHOTOS;
   const connectionPhotos = noPhotos ? [] : WARM_CONNECTION_LAB_PHOTOS;
+  const memoriesPhotos = noPhotos ? [] : WARM_MEMORIES_LAB_PHOTOS;
 
   return (
     <div className="flex h-[100svh] flex-col overflow-hidden bg-[#4A0A10]">
@@ -79,6 +88,10 @@ export function WarmThemeLabPage() {
             <span className="rounded border border-[#E8D4C0]/35 px-1.5 py-0.5 font-mono text-[10px] text-[#E8D4C0]/90">
               Scenes 1–10 · photobooth stub
             </span>
+          ) : mode === "connection" ? (
+            <span className="rounded border border-[#E8D4C0]/35 px-1.5 py-0.5 font-mono text-[10px] text-[#E8D4C0]/90">
+              Scenes 0–15 · photobooth
+            </span>
           ) : (
             <span className="rounded border border-[#E8D4C0]/35 px-1.5 py-0.5 font-mono text-[10px] text-[#E8D4C0]/90">
               Scenes 0–15 · photobooth
@@ -103,13 +116,23 @@ export function WarmThemeLabPage() {
           showLabChrome
           className="min-h-0 flex-1"
         />
-      ) : (
+      ) : mode === "connection" ? (
         <WarmConnectionSceneHost
           experience={WARM_CONNECTION_LAB_EXPERIENCE}
           photos={connectionPhotos}
           theme={warmMomentsLabTheme}
           quiz={WARM_CONNECTION_LAB_QUIZ}
           scoreResult={WARM_CONNECTION_LAB_SCORE_RESULT}
+          showLabChrome
+          className="min-h-0 flex-1"
+        />
+      ) : (
+        <WarmMemoriesSceneHost
+          experience={WARM_MEMORIES_LAB_EXPERIENCE}
+          photos={memoriesPhotos}
+          theme={warmMomentsLabTheme}
+          match={WARM_MEMORIES_LAB_MATCH}
+          scoreResult={WARM_MEMORIES_LAB_SCORE_RESULT}
           showLabChrome
           className="min-h-0 flex-1"
         />
