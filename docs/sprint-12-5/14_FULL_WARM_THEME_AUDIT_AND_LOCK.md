@@ -259,9 +259,9 @@ No Theme Lab lock blockers.
 
 **Warm Theme Lab (Moments + Connection + Memories + Treasures) is APPROVED AND LOCKED as a complete visual theme pilot.**
 
-Further Theme Lab changes require Founder unlock (regression / shared infra / security / a11y / explicit instruction).
+Founder approved Full Warm Theme Audit on 2026-07-23. Audit commit: `6a6f0cd`. **Playful** is the next approved theme after push. **Sky** not started. Production `/e/[token]` remains **NOT AUTHORIZED**.
 
-**Playful may begin only after Founder approval** (and after this audit commit is pushed if Founder authorizes). Sky remains not started. Production `/e/[token]` remains **NOT AUTHORIZED**.
+Further Theme Lab changes require Founder unlock (regression / shared infra / security / a11y / explicit instruction).
 
 ---
 
