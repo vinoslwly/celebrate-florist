@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
  * restyled crimson + metallic gold (premium luxury). SVG so lid can animate.
  */
 
+export type WarmGiftTone = "crimson" | "gold";
+
 type GiftPaintIds = {
   body: string;
   lid: string;
@@ -28,7 +30,48 @@ function useGiftPaintIds(): GiftPaintIds {
   };
 }
 
-function WarmGiftPaintServers({ ids }: { ids: GiftPaintIds }) {
+function WarmGiftPaintServers({
+  ids,
+  tone = "crimson",
+}: {
+  ids: GiftPaintIds;
+  tone?: WarmGiftTone;
+}) {
+  if (tone === "gold") {
+    return (
+      <defs>
+        <linearGradient id={ids.body} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#F3E0A8" />
+          <stop offset="45%" stopColor="#E0C06A" />
+          <stop offset="100%" stopColor="#C9A227" />
+        </linearGradient>
+        <linearGradient id={ids.lid} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#F8EBC0" />
+          <stop offset="100%" stopColor="#D4AF37" />
+        </linearGradient>
+        <linearGradient id={ids.ribbon} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#F0D78A" />
+          <stop offset="40%" stopColor="#D4AF37" />
+          <stop offset="100%" stopColor="#A67C1A" />
+        </linearGradient>
+        <radialGradient id={ids.glow} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FFF8E0" stopOpacity="0.95" />
+          <stop offset="45%" stopColor="#F0D78A" stopOpacity="0.7" />
+          <stop offset="100%" stopColor="#C9A227" stopOpacity="0" />
+        </radialGradient>
+        <filter id={ids.shadow} x="-20%" y="-10%" width="140%" height="140%">
+          <feDropShadow
+            dx="10"
+            dy="14"
+            stdDeviation="10"
+            floodColor="#8B6914"
+            floodOpacity="0.35"
+          />
+        </filter>
+      </defs>
+    );
+  }
+
   return (
     <defs>
       <linearGradient id={ids.body} x1="0" y1="0" x2="0" y2="1">
@@ -63,16 +106,22 @@ function WarmGiftPaintServers({ ids }: { ids: GiftPaintIds }) {
   );
 }
 
-/** Gold bow + small rose stamp — Warm motif (not Bloom sakura). */
+/** Gold bow — knot stamp adapts for crimson vs final-gold gift. */
 function WarmGiftLidWithBow({
   ids,
   x,
   y,
+  tone = "crimson",
 }: {
   ids: GiftPaintIds;
   x: number;
   y: number;
+  tone?: WarmGiftTone;
 }) {
+  const knotCore = tone === "gold" ? "#A67C1A" : "#8B1A22";
+  const knotMid = tone === "gold" ? "#C9A227" : "#A51C28";
+  const knotDot = tone === "gold" ? "#FFF4D0" : "#F0D78A";
+
   return (
     <g transform={`translate(${x} ${y})`}>
       <rect
@@ -115,11 +164,10 @@ function WarmGiftLidWithBow({
         strokeLinecap="round"
         fill="none"
       />
-      {/* Tiny rose mark on knot */}
       <g transform="translate(50 2)">
-        <circle cx="10" cy="10" r="7" fill="#8B1A22" />
-        <circle cx="10" cy="10" r="3.5" fill="#A51C28" />
-        <circle cx="10" cy="10" r="1.6" fill="#F0D78A" />
+        <circle cx="10" cy="10" r="7" fill={knotCore} />
+        <circle cx="10" cy="10" r="3.5" fill={knotMid} />
+        <circle cx="10" cy="10" r="1.6" fill={knotDot} />
       </g>
     </g>
   );
@@ -159,6 +207,8 @@ export type WarmGiftBoxProps = {
   className?: string;
   /** ajar — lid cracked with warm glow (Connection score calculation). */
   variant?: "closed" | "ajar" | "open";
+  /** crimson = standard Warm gift; gold = Final Treasure. */
+  tone?: WarmGiftTone;
   animateLid?: boolean;
   reduceMotion?: boolean;
 };
@@ -169,6 +219,7 @@ export type WarmGiftBoxProps = {
 export function WarmGiftBox({
   className,
   variant = "closed",
+  tone = "crimson",
   animateLid = false,
   reduceMotion = false,
 }: WarmGiftBoxProps) {
@@ -178,13 +229,13 @@ export function WarmGiftBox({
     return (
       <div className={className} aria-hidden>
         <svg viewBox="0 0 280 160" className="h-full w-full" fill="none">
-          <WarmGiftPaintServers ids={ids} />
+          <WarmGiftPaintServers ids={ids} tone={tone} />
           <ellipse
             cx="150"
             cy="148"
             rx="90"
             ry="12"
-            fill="#3A080C"
+            fill={tone === "gold" ? "#8B6914" : "#3A080C"}
             opacity="0.35"
           />
           <ellipse
@@ -209,8 +260,8 @@ export function WarmGiftBox({
               width="140"
               height="14"
               rx="4"
-              fill="#FFFFFF"
-              opacity="0.12"
+              fill="#F0D78A"
+              opacity="0.18"
             />
             <rect
               x="136"
@@ -250,11 +301,11 @@ export function WarmGiftBox({
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               style={{ originX: "60px", originY: "36px" }}
             >
-              <WarmGiftLidWithBow ids={ids} x={0} y={0} />
+              <WarmGiftLidWithBow ids={ids} x={0} y={0} tone={tone} />
             </motion.g>
           ) : (
             <g transform="translate(-8 48) rotate(-28 60 36)">
-              <WarmGiftLidWithBow ids={ids} x={0} y={0} />
+              <WarmGiftLidWithBow ids={ids} x={0} y={0} tone={tone} />
             </g>
           )}
         </svg>
@@ -266,16 +317,15 @@ export function WarmGiftBox({
     return (
       <div className={className} aria-hidden>
         <svg viewBox="0 0 220 240" className="h-full w-full" fill="none">
-          <WarmGiftPaintServers ids={ids} />
+          <WarmGiftPaintServers ids={ids} tone={tone} />
           <ellipse
             cx="112"
             cy="218"
             rx="72"
             ry="12"
-            fill="#3A080C"
+            fill={tone === "gold" ? "#8B6914" : "#3A080C"}
             opacity="0.28"
           />
-          {/* Warm glow from the crack */}
           <ellipse
             cx="110"
             cy="108"
@@ -293,7 +343,7 @@ export function WarmGiftBox({
           />
           <WarmClosedBody ids={ids} />
           <g transform="translate(0 -8) rotate(-5 110 90)">
-            <WarmGiftLidWithBow ids={ids} x={50} y={68} />
+            <WarmGiftLidWithBow ids={ids} x={50} y={68} tone={tone} />
           </g>
           <path
             d="M48 98 L50 104 L56 106 L50 108 L48 114 L46 108 L40 106 L46 104 Z"
@@ -313,7 +363,7 @@ export function WarmGiftBox({
   return (
     <div className={className} aria-hidden>
       <svg viewBox="0 0 220 240" className="h-full w-full" fill="none">
-        <WarmGiftPaintServers ids={ids} />
+        <WarmGiftPaintServers ids={ids} tone={tone} />
         <ellipse
           cx="112"
           cy="218"
@@ -323,7 +373,7 @@ export function WarmGiftBox({
           opacity="0.22"
         />
         <WarmClosedBody ids={ids} />
-        <WarmGiftLidWithBow ids={ids} x={50} y={68} />
+        <WarmGiftLidWithBow ids={ids} x={50} y={68} tone={tone} />
       </svg>
     </div>
   );
