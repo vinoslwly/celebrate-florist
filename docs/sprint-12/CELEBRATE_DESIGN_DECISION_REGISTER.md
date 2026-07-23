@@ -529,6 +529,17 @@ Each entry includes: Decision ID · Date · Status · Decision · Reasoning · I
 | **Phase**    | Sprint 12.5 closure → next theme planning                                                                                                                                                                                                                           |
 | **Source**   | [08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md](../sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)                                                                                                                                                         |
 
+### DDR-S12-040 — Full Warm Theme Audit Passed; Warm Theme Locked
+
+| Field        | Value                                                                                                                                                                                                                                                                                                                                   |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Date**     | 2026-07-23                                                                                                                                                                                                                                                                                                                              |
+| **Status**   | 🔒 **Locked** — complete Warm Theme Lab theme ([14 audit](../sprint-12-5/14_FULL_WARM_THEME_AUDIT_AND_LOCK.md))                                                                                                                                                                                                                         |
+| **Decision** | Independent full Warm cross-mode audit **PASSED**. Moments, Connection, Memories, and Treasures are locked as one Warm family in Theme Lab. Limited Warm typography exception documented. **Playful** may begin only after Founder approval. **Sky** **NOT STARTED**. Production Scene Engine / `/e/[token]` remain **NOT AUTHORIZED**. |
+| **Impact**   | Warm Theme Lab is the locked crimson/cream/gold baseline alongside Bloom. Next theme (Playful) requires Founder approval. Production integration remains a separate authorization.                                                                                                                                                      |
+| **Phase**    | Sprint 12.5 Warm closure                                                                                                                                                                                                                                                                                                                |
+| **Source**   | [14_FULL_WARM_THEME_AUDIT_AND_LOCK.md](../sprint-12-5/14_FULL_WARM_THEME_AUDIT_AND_LOCK.md) · [sprint-12-5/README.md](../sprint-12-5/README.md)                                                                                                                                                                                         |
+
 ---
 
 ## Template for future entries

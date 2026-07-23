@@ -42,9 +42,8 @@ const IMPLEMENTED_MODES: ModeTab[] = [
 ];
 
 /**
- * Warm Theme Lab — Moments + Connection + Memories locked.
- * Treasures: Scenes 0–13 · photobooth. Production `/e/[token]`: NOT AUTHORIZED.
- * Production `/e/[token]`: NOT AUTHORIZED.
+ * Warm Theme Lab — all four modes locked (Moments · Connection · Memories · Treasures).
+ * Production `/e/[token]` Scene Engine: NOT AUTHORIZED.
  *
  * Lab fixtures: `?noPhotos=1` · `?mode=connection|memories|treasures`
  */

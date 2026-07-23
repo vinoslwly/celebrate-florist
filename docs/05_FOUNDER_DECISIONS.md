@@ -575,6 +575,15 @@ Sprint 12 documentation baseline is **closed**. Closure means design rules and i
 | **Register** | [DDR-S12-039](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)                                                                                                                                                                                                       |
 | **Docs**     | [08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md](./sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)                                                                                                                                                             |
 
+### FD-S12-21 — Full Warm Theme Locked 🔒 APPROVED
+
+|              |                                                                                                                                                                                                                                                                                                                                         |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Date**     | 2026-07-23                                                                                                                                                                                                                                                                                                                              |
+| **Decision** | Warm Theme Lab is **APPROVED AND LOCKED** as a complete theme (Moments · Connection · Memories · Treasures) after independent full audit. Limited Warm typography exception documented. **Playful** may begin only after Founder approval. **Sky** **NOT STARTED**. Production Scene Engine and `/e/[token]` remain **NOT AUTHORIZED**. |
+| **Register** | [DDR-S12-040](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)                                                                                                                                                                                                                                                                        |
+| **Docs**     | [14_FULL_WARM_THEME_AUDIT_AND_LOCK.md](./sprint-12-5/14_FULL_WARM_THEME_AUDIT_AND_LOCK.md) · [sprint-12-5/README.md](./sprint-12-5/README.md)                                                                                                                                                                                           |
+
 ---
 
 ## Global Experience Rules (GER)
