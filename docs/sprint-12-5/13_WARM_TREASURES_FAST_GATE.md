@@ -2,17 +2,23 @@
 
 > **Date:** 2026-07-23  
 > **Checkpoint compared:** `6829b40` — `docs(theme-lab): record Warm Memories mobile QA and lock` (`origin/rebuild/foundation`)  
-> **Scope:** Theme Lab Warm Treasures only · **not** a full Warm theme audit · Playful / Sky **not started**  
+> **Scope:** Theme Lab Warm Treasures · **APPROVED AND LOCKED** · Playful / Sky **not started**  
+> **Pilot commit:** `e78a48a`  
 > **Production `/e/[token]` Scene Engine:** ⛔ **NOT AUTHORIZED**
 
 ---
 
 ## Verdict
 
-**WARM TREASURES FAST GATE PASSED — READY TO LOCK IN THEME LAB**
+**WARM TREASURES APPROVED AND LOCKED — THEME LAB**
 
-All four Warm modes (Moments, Connection, Memories, Treasures) are complete in Theme Lab.  
-**Next required step:** full Warm theme audit. Do **not** push without Founder authorization.
+Founder approved Warm Treasures as **APPROVED AND LOCKED** in Theme Lab after fast gate.  
+Pilot commit: `e78a48a` — `feat(theme-lab): add and lock Warm Treasures pilot` on `rebuild/foundation`.
+
+All four Warm modes (Moments, Connection, Memories, Treasures) are **complete and locked** in Theme Lab.  
+**Next required step:** full Warm theme audit.  
+Playful and Sky remain **not started**.  
+Production `/e/[token]` Scene Engine remains **NOT AUTHORIZED**.
 
 ---
 
@@ -178,28 +184,33 @@ No unused runtime plates. No duplicated Warm Moments / Connection / Memories / B
 
 ---
 
-## Remaining for full Warm audit
+## Carry-forwards for full Warm audit
 
+Do not expand these here — the full Warm audit will review them:
+
+- Final typography decision: Poppins vs limited Warm serif / Outfit exception
+- `WarmGiftBox` `tone` remains presentation-only; default `crimson`
+- **Final Gift** and **Final Reward** terminology and order remain locked
+- Photobooth remains Sprint 14 placeholder
+- `npm audit` baseline remains **6** pre-existing advisories (unchanged by Treasures)
+- Production accessibility / performance review remains pending
 - Cross-mode Warm visual consistency (Moments → Connection → Memories → Treasures)
-- Typography discipline pass (Outfit / serif vs Poppins)
-- Shared gift-box `tone` API review as Warm-wide contract
-- Photobooth still Sprint 14 placeholder
 - Production `/e/[token]` remains unauthorized
 
 ---
 
 ## Git readiness
 
-- Working tree: Warm Treasures pilot only (plus this doc / README)
-- Suggested commit: `feat(theme-lab): add and lock Warm Treasures pilot`
-- **Do not amend** pushed Bloom or prior Warm commits
-- **Do not push** without Founder authorization
+- Pilot commit: `e78a48a` — `feat(theme-lab): add and lock Warm Treasures pilot`
+- Lock-record commit (this update): `docs(theme-lab): record Warm Treasures lock`
+- Founder authorized push to `origin/rebuild/foundation`
 
 ---
 
 ## Confirmations
 
+- Warm Treasures is **APPROVED AND LOCKED** in Theme Lab (`e78a48a`)
+- All four Warm modes are locked in Theme Lab
+- Full Warm theme audit is the **next required step**
 - Playful and Sky were **not** started
 - Production Scene Engine / `/e/[token]` remains **NOT AUTHORIZED**
-- All four Warm modes are complete in Theme Lab
-- Full Warm theme audit is the **next required step**
