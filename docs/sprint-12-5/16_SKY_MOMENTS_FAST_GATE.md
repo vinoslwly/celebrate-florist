@@ -12,8 +12,37 @@
 
 **SKY MOMENTS FAST GATE PASSED**
 
-Working tree prepared for one logical commit. **Do not push** without Founder authorization.  
-**Lock status:** Fast gate pass only — Founder must still approve Theme Lab lock.
+### Founder follow-up (2026-07-30) — lock & push
+
+| Item                                  | Status                                                        |
+| ------------------------------------- | ------------------------------------------------------------- |
+| Founder approval                      | ✅ Sky Moments **APPROVED AND LOCKED** in Theme Lab           |
+| Pilot commit                          | `42a6c88` — `feat(theme-lab): add and lock Sky Moments pilot` |
+| Lock docs commit                      | `docs(theme-lab): record Sky Moments Founder lock`            |
+| Push target                           | `origin/rebuild/foundation`                                   |
+| Production `/e/[token]` Scene Engine  | ⛔ Still **unauthorized**                                     |
+| Sky Connection / Memories / Treasures | **Not started**                                               |
+| Playful                               | **Not started / not modified**                                |
+| Full Sky theme audit                  | Deferred — see **Non-blocking carry-forwards**                |
+
+---
+
+## Founder lock notes (preserved)
+
+- Sky Moments has its **own graph, host, scenes, and local state** (`sky/moments/**`).
+- **No shared source files remain modified** in the Sky Moments pilot tree.
+- **Accidental Warm drift was reverted** (`warm/.../gift-box-scene.tsx` copy tweak removed during gate).
+- **Bloom and Warm remain unchanged** — spot-check: no `sky.moments` leak on locked labs.
+- **Sky identity:** soft blue, clouds, stars, scrapbook, balloon burst, and heart rain — **not a Bloom recolor**.
+- **No Warm font exception copied** (Cormorant / Great Vibes / Outfit not imported into Sky).
+- **Serif/italic density** remains a **full Sky audit carry-forward** — no redesign in this lock pass.
+- **Photo path** and **`?noPhotos=1` path** both pass (gallery skip → photobooth).
+- **Photobooth** remains the **Sprint 14 placeholder** (Bloom `Photobooth` thin wrapper).
+- **Sky gallery** currently **borrows Bloom fixture photos** only for Theme Lab stand-ins.
+- **Optional gallery-ending** and **scene deep-link parity** remain **deferred**.
+- Current repo **`npm audit` baseline: 16 vulnerabilities (13 high, 3 moderate)** — pre-existing; **Sky introduced no package or lockfile changes**.
+- **Do not run `npm audit fix --force`** (would force Next downgrade outside stated range).
+- **`/e/[token]` remains unauthorized** — Theme Lab only at `/theme-lab/sky`.
 
 ---
 
@@ -240,12 +269,13 @@ Did **not** run `npm audit fix --force`.
 
 ## Git readiness
 
-| Item                       | Status                                               |
-| -------------------------- | ---------------------------------------------------- |
-| Proposed commit message    | `feat(theme-lab): add and lock Sky Moments pilot`    |
-| Amend / rewrite Bloom·Warm | ❌ Not done                                          |
-| Push                       | ⛔ Awaiting Founder authorization                    |
-| Ready to lock in Theme Lab | ✅ Fast-gate ready — Founder approval still required |
-| Other Sky modes            | Not started                                          |
-| Playful                    | Not started / not modified                           |
-| `/e/[token]`               | Still unauthorized                                   |
+| Item                       | Status                                                        |
+| -------------------------- | ------------------------------------------------------------- |
+| Pilot commit               | `42a6c88` — `feat(theme-lab): add and lock Sky Moments pilot` |
+| Lock record commit         | `docs(theme-lab): record Sky Moments Founder lock`            |
+| Amend / rewrite Bloom·Warm | ❌ Not done                                                   |
+| Push                       | ✅ Founder authorized → `origin/rebuild/foundation`           |
+| Theme Lab lock             | 🔒 **APPROVED AND LOCKED** (Sky Moments)                      |
+| Other Sky modes            | Not started                                                   |
+| Playful                    | Not started / not modified                                    |
+| `/e/[token]`               | Still unauthorized                                            |

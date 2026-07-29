@@ -1,6 +1,6 @@
 # Sky Moments — Scene 1–9
 
-> **Status:** ✅ **Scene 1–9 living** (photobooth terminal · Sprint 14 redesign deferred)  
+> **Status:** 🔒 **APPROVED AND LOCKED** (Theme Lab · commit `42a6c88`)  
 > **Theme Lab:** `/theme-lab/sky`  
 > **Production `/e/[token]`:** ⛔ NOT AUTHORIZED  
 > **Playful:** ⏸ Not started in this pass
