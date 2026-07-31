@@ -9,6 +9,7 @@
 > **Handoff / next theme:** [08 handoff](./08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)  
 > **Warm theme (all four modes):** 🔒 **APPROVED AND LOCKED** — [14 full audit](./14_FULL_WARM_THEME_AUDIT_AND_LOCK.md) · modes [10](./10_WARM_MOMENTS_FAST_GATE.md) · [11](./11_WARM_CONNECTION_FAST_GATE.md) · [12](./12_WARM_MEMORIES_FAST_GATE.md) · [13](./13_WARM_TREASURES_FAST_GATE.md)  
 > **Sky Moments:** 🔒 **APPROVED AND LOCKED** — [16](./16_SKY_MOMENTS_FAST_GATE.md) · [15](./15_SKY_MOMENTS_SCENE_01_START.md) · `/theme-lab/sky` · commit `42a6c88`
+> **Sky Connection:** ✅ Fast gate passed — [18](./18_SKY_CONNECTION_FAST_GATE.md) · [17](./17_SKY_CONNECTION_SCENE_01_START.md) · `/theme-lab/sky?mode=connection` · awaiting Founder lock/push
 > **Playful:** ⏸ not started  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
@@ -145,6 +146,7 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | Next-theme handoff                | ✅ [08](./08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)                                                                                                                                                                                                             |
 | Warm                              | 🔒 **APPROVED AND LOCKED** (four modes) — [14 full audit](./14_FULL_WARM_THEME_AUDIT_AND_LOCK.md) · [10](./10_WARM_MOMENTS_FAST_GATE.md) · [11](./11_WARM_CONNECTION_FAST_GATE.md) · [12](./12_WARM_MEMORIES_FAST_GATE.md) · [13](./13_WARM_TREASURES_FAST_GATE.md) |
 | Sky Moments                       | 🔒 **APPROVED AND LOCKED** — [16](./16_SKY_MOMENTS_FAST_GATE.md) · [15](./15_SKY_MOMENTS_SCENE_01_START.md) · commit `42a6c88`                                                                                                                                      |
+| Sky Connection                    | ✅ Fast gate passed — [18](./18_SKY_CONNECTION_FAST_GATE.md) · [17](./17_SKY_CONNECTION_SCENE_01_START.md) · awaiting Founder lock/push                                                                                                                             |
 | Playful                           | ⏸ Not started                                                                                                                                                                                                                                                       |
 | Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                                                                                                                                                                                               |
 

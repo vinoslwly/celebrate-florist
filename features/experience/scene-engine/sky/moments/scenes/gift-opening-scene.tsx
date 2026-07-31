@@ -14,6 +14,9 @@ const INK_SOFT = "#4A6A8A";
 
 type Stage = "wrapped" | "opening" | "letter";
 
+/** Connection Scene 2 reuse — three failed open taps, then advance. */
+const LOCKED_FAILS_BEFORE_ADVANCE = 3;
+
 const SPARKLES = [
   { top: "36%", left: "34%", delay: 0.2, size: 4 },
   { top: "40%", left: "66%", delay: 0.8, size: 3 },
@@ -213,21 +216,44 @@ function OpenGiftReveal({
 /**
  * sky.moments.gift-opening — living recreation of Founder Scene 3.
  * Tap gift → open + letter rises (To/From) → tap letter advances.
+ *
+ * `lockedOnly` — Sky Connection Scene 2: wrapped gift only; three failed
+ * open taps (shake, no letter), then advances via onComplete (Bloom pattern).
  */
 export function SkyGiftOpeningScene({
   payload,
   onComplete,
-}: SkyMomentsSceneProps) {
+  lockedOnly = false,
+}: SkyMomentsSceneProps & { lockedOnly?: boolean }) {
   const toName = payload.experience.greeting_name;
   const fromName = payload.experience.closing_name;
   const reduceMotion = useReducedMotion() ?? false;
   const [stage, setStage] = useState<Stage>("wrapped");
+  const [shaking, setShaking] = useState(false);
+  const [lockedFails, setLockedFails] = useState(0);
 
   function handleGiftTap() {
     if (stage !== "wrapped") return;
+    if (lockedOnly) {
+      if (shaking) return;
+      const nextFails = lockedFails + 1;
+      setLockedFails(nextFails);
+      setShaking(true);
+      const shakeMs = nextFails >= LOCKED_FAILS_BEFORE_ADVANCE ? 620 : 520;
+      window.setTimeout(() => {
+        setShaking(false);
+        if (nextFails >= LOCKED_FAILS_BEFORE_ADVANCE) onComplete();
+      }, shakeMs);
+      return;
+    }
     setStage("opening");
     window.setTimeout(() => setStage("letter"), reduceMotion ? 200 : 950);
   }
+
+  const wrappedHeadline =
+    lockedOnly && lockedFails >= 1
+      ? "Hmm… still locked"
+      : "Tap the gift to open";
 
   return (
     <div className={`${SCENE_VIEWPORT_SCROLL} bg-[#E8F2FA]`}>
@@ -387,12 +413,19 @@ export function SkyGiftOpeningScene({
                   <span className="text-sm">♥</span>
                   <span className="h-px w-10 border-t border-dashed border-current sm:w-14" />
                 </div>
-                <p
-                  className="text-center font-serif text-sm font-semibold tracking-[0.28em] uppercase sm:text-base"
-                  style={{ color: INK }}
-                >
-                  Tap the gift to open
-                </p>
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={wrappedHeadline}
+                    className="text-center font-serif text-sm font-semibold tracking-[0.28em] uppercase sm:text-base"
+                    style={{ color: INK }}
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    {wrappedHeadline}
+                  </motion.p>
+                </AnimatePresence>
                 <div
                   className="mt-2 flex items-center gap-2"
                   style={{ color: ACCENT }}
@@ -429,25 +462,53 @@ export function SkyGiftOpeningScene({
 
                 <motion.button
                   type="button"
-                  aria-label="Tap the gift to open"
+                  aria-label={
+                    lockedOnly
+                      ? "Try to open the locked gift"
+                      : "Tap the gift to open"
+                  }
                   onClick={handleGiftTap}
                   className="relative z-10 focus-visible:ring-2 focus-visible:ring-[#6BA3C9] focus-visible:outline-none"
                   initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={shaking ? undefined : { scale: 1.03 }}
+                  whileTap={shaking ? undefined : { scale: 0.97 }}
                 >
                   <motion.span
                     className="block"
                     animate={
-                      reduceMotion ? undefined : { y: [0, -8, 0], rotate: 0 }
+                      shaking
+                        ? lockedFails >= LOCKED_FAILS_BEFORE_ADVANCE
+                          ? {
+                              x: [0, -14, 14, -12, 12, -6, 6, 0],
+                              rotate: [0, -3, 3, -2, 2, 0],
+                              y: 0,
+                            }
+                          : {
+                              x: [0, -10, 10, -8, 8, -4, 4, 0],
+                              rotate: [0, -2, 2, -1, 1, 0],
+                              y: 0,
+                            }
+                        : reduceMotion
+                          ? undefined
+                          : { y: [0, -8, 0], rotate: 0 }
                     }
-                    transition={{
-                      duration: 3.2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.4,
-                    }}
+                    transition={
+                      shaking
+                        ? {
+                            duration:
+                              lockedFails >= LOCKED_FAILS_BEFORE_ADVANCE
+                                ? 0.58
+                                : 0.48,
+                            ease: "easeInOut",
+                          }
+                        : {
+                            duration: 3.2,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: 0.4,
+                          }
+                    }
                   >
                     <SkyGiftBox
                       variant="closed"

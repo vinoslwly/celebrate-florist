@@ -270,7 +270,13 @@ function ClosedBody({ ids }: { ids: GiftPaintIds }) {
 
 export type SkyGiftBoxProps = {
   className?: string;
-  variant?: "closed" | "open";
+  /**
+   * closed — Moments / Connection gift intro
+   * ajar — lid cracked with warm glow (Connection score calculation)
+   * open — Moments gift opening
+   */
+  variant?: "closed" | "ajar" | "open";
+  /** Animate lid from closed → open (open variant only). */
   animateLid?: boolean;
   reduceMotion?: boolean;
 };
@@ -369,6 +375,199 @@ export function SkyGiftBox({
               <SkyGiftLidWithBow ids={ids} x={0} y={0} />
             </g>
           )}
+        </svg>
+      </div>
+    );
+  }
+
+  if (variant === "ajar") {
+    const goldGlow = `${ids.glow}-gold`;
+    const goldRay = `${ids.glow}-ray`;
+    const bodySheen = `${ids.body}-sheen`;
+    const satinRibbon = `${ids.ribbon}-satin`;
+    return (
+      <div className={className} aria-hidden>
+        <svg viewBox="0 0 240 260" className="h-full w-full" fill="none">
+          <SkyGiftPaintServers ids={ids} />
+          <defs>
+            <radialGradient id={goldGlow} cx="50%" cy="55%" r="50%">
+              <stop offset="0%" stopColor="#FFFDF0" stopOpacity="1" />
+              <stop offset="22%" stopColor="#FFE8A0" stopOpacity="0.95" />
+              <stop offset="55%" stopColor="#F0C060" stopOpacity="0.45" />
+              <stop offset="100%" stopColor="#F0C060" stopOpacity="0" />
+            </radialGradient>
+            <linearGradient id={goldRay} x1="0.5" y1="1" x2="0.5" y2="0">
+              <stop offset="0%" stopColor="#FFF8DC" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#FFE8A0" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id={bodySheen} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.35" />
+              <stop offset="40%" stopColor="#FFFFFF" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#1E3A5F" stopOpacity="0.12" />
+            </linearGradient>
+            <linearGradient id={satinRibbon} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="35%" stopColor="#FFFEFB" />
+              <stop offset="70%" stopColor="#F0EBE3" />
+              <stop offset="100%" stopColor="#E2D8CC" />
+            </linearGradient>
+            <filter
+              id={`${ids.shadow}-ajar`}
+              x="-30%"
+              y="-20%"
+              width="160%"
+              height="160%"
+            >
+              <feDropShadow
+                dx="10"
+                dy="16"
+                stdDeviation="12"
+                floodColor="#1E3A5F"
+                floodOpacity="0.32"
+              />
+            </filter>
+          </defs>
+
+          {/* Soft ground shadow */}
+          <ellipse
+            cx="120"
+            cy="236"
+            rx="78"
+            ry="14"
+            fill="#1E3A5F"
+            opacity="0.22"
+          />
+
+          {/* Magical gold bloom from the crack */}
+          <ellipse
+            cx="120"
+            cy="118"
+            rx="88"
+            ry="48"
+            fill={`url(#${goldGlow})`}
+          />
+          <ellipse
+            cx="120"
+            cy="122"
+            rx="48"
+            ry="20"
+            fill="#FFFCE8"
+            opacity="0.95"
+          />
+          {/* Soft light rays */}
+          <path
+            d="M120 128 L95 72 L105 72 Z"
+            fill={`url(#${goldRay})`}
+            opacity="0.55"
+          />
+          <path
+            d="M120 128 L120 58 L130 58 Z"
+            fill={`url(#${goldRay})`}
+            opacity="0.65"
+          />
+          <path
+            d="M120 128 L145 70 L155 70 Z"
+            fill={`url(#${goldRay})`}
+            opacity="0.5"
+          />
+
+          {/* Body — richer bevel + satin ribbons */}
+          <g filter={`url(#${ids.shadow}-ajar)`}>
+            <rect
+              x="48"
+              y="118"
+              width="144"
+              height="104"
+              rx="12"
+              fill={`url(#${ids.body})`}
+            />
+            {/* Right edge depth */}
+            <path
+              d="M180 126 V210 C180 218 176 222 168 222 H180 C188 222 192 216 192 208 V134 C192 126 188 122 180 122 Z"
+              fill="#3D7AAD"
+              opacity="0.28"
+            />
+            <path d="M48 128h144v18H48z" fill="#FFFFFF" opacity="0.18" />
+            <rect
+              x="48"
+              y="118"
+              width="144"
+              height="104"
+              rx="12"
+              fill={`url(#${bodySheen})`}
+            />
+            {/* Satin cream ribbons */}
+            <rect
+              x="104"
+              y="118"
+              width="32"
+              height="104"
+              fill={`url(#${satinRibbon})`}
+            />
+            <rect
+              x="108"
+              y="118"
+              width="8"
+              height="104"
+              fill="#FFFFFF"
+              opacity="0.45"
+            />
+            <StitchRect x={104} y={118} w={32} h={104} rx={2} />
+            <rect
+              x="48"
+              y="158"
+              width="144"
+              height="26"
+              fill={`url(#${satinRibbon})`}
+            />
+            <rect
+              x="48"
+              y="160"
+              width="144"
+              height="6"
+              fill="#FFFFFF"
+              opacity="0.4"
+            />
+            <StitchRect x={48} y={158} w={144} h={26} rx={2} />
+            {/* Soft stars */}
+            {(
+              [
+                [68, 138],
+                [172, 142],
+                [78, 200],
+                [164, 194],
+              ] as const
+            ).map(([sx, sy], i) => (
+              <path
+                key={i}
+                d={`M${sx} ${sy - 5.5}l1.8 4 4.4.4-3.3 3.1.9 4.2-3.8-2.2-3.8 2.2.9-4.2-3.3-3.1 4.4-.4Z`}
+                fill={i % 2 === 0 ? "#FFFFFF" : "#E8F4FC"}
+                opacity="0.92"
+              />
+            ))}
+          </g>
+
+          {/* Lid cracked open — more dramatic ajar */}
+          <g transform="translate(2 -14) rotate(-9 120 98)">
+            <SkyGiftLidWithBow ids={ids} x={60} y={72} />
+          </g>
+
+          {/* Crack-edge sparkles */}
+          <path
+            d="M56 108 L58.2 114 L64 115.5 L58.2 117 L56 123 L53.8 117 L48 115.5 L53.8 114 Z"
+            fill="#FFF8E0"
+            opacity="0.95"
+          />
+          <path
+            d="M178 96 L180 101.5 L185 103 L180 104.5 L178 110 L176 104.5 L171 103 L176 101.5 Z"
+            fill="#FFF8E0"
+            opacity="0.9"
+          />
+          <path
+            d="M120 102 L121.4 106 L125.5 107.2 L121.4 108.4 L120 112.5 L118.6 108.4 L114.5 107.2 L118.6 106 Z"
+            fill="#FFFFFF"
+            opacity="0.95"
+          />
         </svg>
       </div>
     );
