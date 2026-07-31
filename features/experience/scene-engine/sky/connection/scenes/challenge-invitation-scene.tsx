@@ -75,14 +75,6 @@ const STATIC_DECOR = [
   },
   {
     kind: "star" as const,
-    top: "14%",
-    left: "22%",
-    size: 11,
-    fill: SKY,
-    opacity: 0.7,
-  },
-  {
-    kind: "star" as const,
     top: "32%",
     right: "16%",
     size: 13,
@@ -97,22 +89,6 @@ const STATIC_DECOR = [
     fill: SKY,
     opacity: 0.65,
   },
-  {
-    kind: "star" as const,
-    bottom: "30%",
-    left: "16%",
-    size: 10,
-    fill: "#FFE8A0",
-    opacity: 0.6,
-  },
-  {
-    kind: "star" as const,
-    top: "44%",
-    right: "6%",
-    size: 9,
-    fill: "#FFFFFF",
-    opacity: 0.55,
-  },
   { kind: "daisy" as const, bottom: "4%", left: "46%", opacity: 0.8 },
 ] as const;
 
@@ -122,8 +98,6 @@ const BURST = [
   { x: -52, y: 44, rotate: -16, delay: 0.3, size: 11 },
   { x: 58, y: 52, rotate: 20, delay: 0.34, size: 13 },
   { x: 0, y: -70, rotate: 6, delay: 0.22, size: 15 },
-  { x: -30, y: -58, rotate: -12, delay: 0.28, size: 10 },
-  { x: 36, y: -54, rotate: 14, delay: 0.26, size: 10 },
 ] as const;
 
 function SoftStar({
@@ -231,15 +205,22 @@ function SpiralBinding({ className }: { className?: string }) {
 }
 
 /** Founder Scene 3 lock seal — circular scalloped ring + white disc + dashed ring. */
-function SkyLockSealBadge({ className }: { className?: string }) {
+function SkyLockSealBadge({
+  className,
+  reduceMotion,
+}: {
+  className?: string;
+  reduceMotion: boolean;
+}) {
   const scallopedRing =
     "M 48.00 7.00 Q 59.91 3.57 68.50 12.49 Q 80.53 15.47 83.51 27.50 Q 92.43 36.09 89.00 48.00 Q 92.43 59.91 83.51 68.50 Q 80.53 80.53 68.50 83.51 Q 59.91 92.43 48.00 89.00 Q 36.09 92.43 27.50 83.51 Q 15.47 80.53 12.49 68.50 Q 3.57 59.91 7.00 48.00 Q 3.57 36.09 12.49 27.50 Q 15.47 15.47 27.50 12.49 Q 36.09 3.57 48.00 7.00 Z";
 
   return (
     <motion.div
       className={className}
-      animate={{ scale: [1, 1.05, 1] }}
-      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      initial={reduceMotion ? false : { scale: 0.92 }}
+      animate={{ scale: 1 }}
+      transition={{ duration: 0.55, ease: EASE }}
     >
       <svg
         viewBox="0 0 96 96"
@@ -318,7 +299,7 @@ function StarRule() {
   );
 }
 
-function SkySceneDecor({ reduceMotion }: { reduceMotion: boolean }) {
+function SkySceneDecor() {
   return (
     <>
       {/* Static layer — no animation, mobile-safe */}
@@ -398,27 +379,19 @@ function SkySceneDecor({ reduceMotion }: { reduceMotion: boolean }) {
         })}
       </div>
 
-      {/* Two gentle cloud drifts — only animated layer besides falling stars */}
-      {!reduceMotion ? (
-        <>
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute top-[28%] right-[12%] opacity-50"
-            animate={{ x: [0, 8, 0], y: [0, -4, 0] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <PaperStitchCloud className="h-12 w-28" />
-          </motion.div>
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute top-[52%] left-[6%] opacity-40"
-            animate={{ x: [0, -6, 0], y: [0, 3, 0] }}
-            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <PaperStitchCloud flip className="h-10 w-24" />
-          </motion.div>
-        </>
-      ) : null}
+      {/* Static accent clouds — no infinite drift (mobile paint thrash) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-[28%] right-[12%] opacity-50"
+      >
+        <PaperStitchCloud className="h-12 w-28" />
+      </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-[52%] left-[6%] opacity-40"
+      >
+        <PaperStitchCloud flip className="h-10 w-24" />
+      </div>
     </>
   );
 }
@@ -462,19 +435,11 @@ export function SkyConnectionChallengeInvitationScene({
         }}
       />
 
-      {/* Soft paper grain */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.04] mix-blend-multiply"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
-      />
+      {/* Soft paper grain removed — feTurbulence + mix-blend is mobile-expensive */}
 
-      <SkySceneDecor reduceMotion={reduceMotion} />
+      <SkySceneDecor />
 
-      {/* Ambient falling stars — capped at 3 for mobile perf */}
+      {/* One-shot falling stars only — no infinite loops */}
       {!reduceMotion ? (
         <div
           aria-hidden
@@ -490,17 +455,17 @@ export function SkyConnectionChallengeInvitationScene({
                 width: s.size,
                 height: s.size,
               }}
+              initial={{ opacity: 0, y: 0, x: 0, rotate: 0 }}
               animate={{
-                opacity: [0, 0.85, 0.85, 0],
-                y: ["0vh", "110vh"],
-                x: [0, s.x, s.x * -0.35],
-                rotate: [0, 40, -20, 55],
+                opacity: [0, 0.85, 0.7, 0],
+                y: "95vh",
+                x: s.x,
+                rotate: 40,
               }}
               transition={{
-                duration: s.duration,
-                delay: s.delay + 0.5,
-                repeat: Infinity,
-                ease: "linear",
+                duration: 2.2,
+                delay: s.delay * 0.35,
+                ease: "easeIn",
               }}
             >
               <SoftStar className="h-full w-full" fill="#FFE8A0" />
@@ -612,7 +577,10 @@ export function SkyConnectionChallengeInvitationScene({
               animate="show"
             >
               <motion.div variants={fadeUp} className="relative mb-5">
-                <SkyLockSealBadge className="mx-auto flex h-[5rem] w-[5rem] items-center justify-center sm:h-[5.5rem] sm:w-[5.5rem]" />
+                <SkyLockSealBadge
+                  reduceMotion={reduceMotion}
+                  className="mx-auto flex h-[5rem] w-[5rem] items-center justify-center sm:h-[5.5rem] sm:w-[5.5rem]"
+                />
               </motion.div>
 
               <motion.p
@@ -653,25 +621,7 @@ export function SkyConnectionChallengeInvitationScene({
                   boxShadow:
                     "0 14px 28px -10px rgba(30,58,95,0.45), inset 0 0 0 2px rgba(255,255,255,0.35)",
                 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                animate={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        scale: [1, 1.03, 1],
-                        boxShadow: [
-                          "0 14px 28px -10px rgba(30,58,95,0.45), inset 0 0 0 2px rgba(255,255,255,0.35)",
-                          "0 18px 36px -8px rgba(61,122,173,0.55), inset 0 0 0 2px rgba(255,255,255,0.45)",
-                          "0 14px 28px -10px rgba(30,58,95,0.45), inset 0 0 0 2px rgba(255,255,255,0.35)",
-                        ],
-                      }
-                }
-                transition={{
-                  duration: 2.2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               >
                 <span
                   aria-hidden

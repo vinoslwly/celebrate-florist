@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 import { SkyConnectionSceneHost } from "@/features/experience/scene-engine/sky/connection/sky-connection-scene-host";
+import { SkyMemoriesSceneHost } from "@/features/experience/scene-engine/sky/memories/sky-memories-scene-host";
 import { SkyMomentsSceneHost } from "@/features/experience/scene-engine/sky/moments/sky-moments-scene-host";
 import {
   SKY_CONNECTION_LAB_EXPERIENCE,
@@ -14,29 +15,38 @@ import {
   SKY_CONNECTION_LAB_QUIZ,
 } from "@/features/theme-lab/config/sky-connection-fixtures";
 import {
+  SKY_MEMORIES_LAB_EXPERIENCE,
+  SKY_MEMORIES_LAB_MATCH,
+  SKY_MEMORIES_LAB_PHOTOS,
+  SKY_MEMORIES_LAB_SCORE_RESULT,
+} from "@/features/theme-lab/config/sky-memories-fixtures";
+import {
   SKY_MOMENTS_LAB_EXPERIENCE,
   SKY_MOMENTS_LAB_PHOTOS,
 } from "@/features/theme-lab/config/sky-moments-fixtures";
 import { skyMomentsLabTheme } from "@/features/themes/config/sky-moments-lab-theme";
 
-type ModeTab = "moments" | "connection";
+type ModeTab = "moments" | "connection" | "memories";
 
 /**
- * Sky Theme Lab — Moments locked · Connection Scenes 0–15 living.
+ * Sky Theme Lab — Moments + Connection locked · Memories full journey living.
  * Production `/e/[token]`: NOT AUTHORIZED.
  *
- * Lab fixtures: `?noPhotos=1` · `?mode=connection`
+ * Lab fixtures: `?noPhotos=1` · `?mode=connection|memories`
  */
 export function SkyThemeLabPage() {
   const searchParams = useSearchParams();
   const noPhotos = searchParams.get("noPhotos") === "1";
   const modeParam = searchParams.get("mode");
   const [mode, setMode] = useState<ModeTab>(
-    modeParam === "connection" ? "connection" : "moments",
+    modeParam === "connection" || modeParam === "memories"
+      ? modeParam
+      : "moments",
   );
 
   const momentsPhotos = noPhotos ? [] : SKY_MOMENTS_LAB_PHOTOS;
   const connectionPhotos = noPhotos ? [] : SKY_CONNECTION_LAB_PHOTOS;
+  const memoriesPhotos = noPhotos ? [] : SKY_MEMORIES_LAB_PHOTOS;
 
   return (
     <div className="flex h-[100svh] flex-col overflow-hidden bg-[#1E3A5F]">
@@ -46,7 +56,7 @@ export function SkyThemeLabPage() {
             Theme Lab · Sky
           </p>
           <div className="flex flex-wrap gap-1">
-            {(["moments", "connection"] as const).map((tab) => (
+            {(["moments", "connection", "memories"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -66,9 +76,13 @@ export function SkyThemeLabPage() {
             <span className="rounded border border-[#7EB6D9]/45 px-1.5 py-0.5 font-mono text-[10px] text-[#E8F2FA]/90">
               moments · Scene 1–9 · locked
             </span>
+          ) : mode === "connection" ? (
+            <span className="rounded border border-[#7EB6D9]/45 px-1.5 py-0.5 font-mono text-[10px] text-[#E8F2FA]/90">
+              connection · Scenes 0–15 · locked
+            </span>
           ) : (
             <span className="rounded border border-[#7EB6D9]/45 px-1.5 py-0.5 font-mono text-[10px] text-[#E8F2FA]/90">
-              connection · Scenes 0–15 · photobooth
+              memories · Scenes 0–end · living
             </span>
           )}
           {noPhotos ? (
@@ -90,12 +104,22 @@ export function SkyThemeLabPage() {
           showLabChrome
           className="min-h-0 flex-1 bg-[#C5DCEF]"
         />
-      ) : (
+      ) : mode === "connection" ? (
         <SkyConnectionSceneHost
           experience={SKY_CONNECTION_LAB_EXPERIENCE}
           photos={connectionPhotos}
           theme={skyMomentsLabTheme}
           quiz={SKY_CONNECTION_LAB_QUIZ}
+          showLabChrome
+          className="min-h-0 flex-1 bg-[#C5DCEF]"
+        />
+      ) : (
+        <SkyMemoriesSceneHost
+          experience={SKY_MEMORIES_LAB_EXPERIENCE}
+          photos={memoriesPhotos}
+          theme={skyMomentsLabTheme}
+          match={SKY_MEMORIES_LAB_MATCH}
+          scoreResult={SKY_MEMORIES_LAB_SCORE_RESULT}
           showLabChrome
           className="min-h-0 flex-1 bg-[#C5DCEF]"
         />
