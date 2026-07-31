@@ -12,7 +12,37 @@
 
 **SKY MEMORIES FAST GATE PASSED**
 
-Ready for Founder review and push authorization. Pilot commit prepared below; **do not push** until Founder approves.
+### Founder follow-up (2026-08-01) — lock & push
+
+| Item                                 | Status                                                         |
+| ------------------------------------ | -------------------------------------------------------------- |
+| Founder approval                     | ✅ Sky Memories **APPROVED AND LOCKED** in Theme Lab           |
+| Pilot commit                         | `8652d50` — `feat(theme-lab): add and lock Sky Memories pilot` |
+| Lock docs commit                     | `docs(theme-lab): record Sky Memories Founder lock`            |
+| Push target                          | `origin/rebuild/foundation`                                    |
+| Production `/e/[token]` Scene Engine | ⛔ Still **unauthorized**                                      |
+| Sky Treasures                        | **Not started**                                                |
+| Playful                              | **Not started / not modified**                                 |
+| Full Sky theme audit                 | Deferred — see **Non-blocking carry-forwards**                 |
+
+Theme Lab Sky Memories is **APPROVED AND LOCKED**.
+
+---
+
+## Founder lock notes (preserved)
+
+- Sky Memories owns its **graph, host, match state, timer, and progression** (`sky/memories/**`).
+- Score remains **fixture-based at 92%** — answers only advance the journey; **no** live grading or production match submit exists.
+- The Sky Connection Scene 3 mobile-performance adjustment is **intentional and presentation-only** (lighter paint; CTA/copy unchanged).
+- **Sky Moments, Bloom, and Warm remain unchanged.**
+- Serif density on match options and CTAs is deferred to the full Sky audit.
+- Empty match set currently stays on match intro; full Sky audit must decide a safe fallback.
+- `letter-emergence` and `gallery-ending` parity remain deferred.
+- Continuous-motion CTA Playwright instability is non-blocking.
+- Photobooth remains the Sprint 14 placeholder.
+- Current repo `npm audit` baseline is **15 vulnerabilities: 13 high, 2 moderate**.
+- Sky Memories introduced **no package or lockfile changes** — do not run `npm audit fix --force`.
+- Production `/e/[token]` remains **NOT AUTHORIZED**.
 
 ---
 
@@ -249,5 +279,4 @@ Full path (pairCount=4, hasPhotos=true):
 
 ## Final line
 
-**SKY MEMORIES FAST GATE PASSED — WORKING TREE CLEAN — READY FOR GIT PUSH**  
-_(after Founder-authorized commit + push; push not performed in this gate)_
+**SKY MEMORIES LOCKED AND PUSHED — NOTES PRESERVED**

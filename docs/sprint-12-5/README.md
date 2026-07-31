@@ -10,7 +10,7 @@
 > **Warm theme (all four modes):** 🔒 **APPROVED AND LOCKED** — [14 full audit](./14_FULL_WARM_THEME_AUDIT_AND_LOCK.md) · modes [10](./10_WARM_MOMENTS_FAST_GATE.md) · [11](./11_WARM_CONNECTION_FAST_GATE.md) · [12](./12_WARM_MEMORIES_FAST_GATE.md) · [13](./13_WARM_TREASURES_FAST_GATE.md)  
 > **Sky Moments:** 🔒 **APPROVED AND LOCKED** — [16](./16_SKY_MOMENTS_FAST_GATE.md) · [15](./15_SKY_MOMENTS_SCENE_01_START.md) · `/theme-lab/sky` · commit `42a6c88`
 > **Sky Connection:** ✅ **APPROVED AND LOCKED** in Theme Lab — [18](./18_SKY_CONNECTION_FAST_GATE.md) · [17](./17_SKY_CONNECTION_SCENE_01_START.md) · `/theme-lab/sky?mode=connection`
-> **Sky Memories:** ✅ Living through photobooth — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20 fast gate](./20_SKY_MEMORIES_FAST_GATE.md) · `/theme-lab/sky?mode=memories` · Connection reuse for Scene 7–end
+> **Sky Memories:** ✅ **APPROVED AND LOCKED** — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20](./20_SKY_MEMORIES_FAST_GATE.md) · pilot `8652d50` · `/theme-lab/sky?mode=memories` · `/e/` unauthorized
 > **Playful:** ⏸ not started  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
@@ -148,7 +148,7 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | Warm                              | 🔒 **APPROVED AND LOCKED** (four modes) — [14 full audit](./14_FULL_WARM_THEME_AUDIT_AND_LOCK.md) · [10](./10_WARM_MOMENTS_FAST_GATE.md) · [11](./11_WARM_CONNECTION_FAST_GATE.md) · [12](./12_WARM_MEMORIES_FAST_GATE.md) · [13](./13_WARM_TREASURES_FAST_GATE.md) |
 | Sky Moments                       | 🔒 **APPROVED AND LOCKED** — [16](./16_SKY_MOMENTS_FAST_GATE.md) · [15](./15_SKY_MOMENTS_SCENE_01_START.md) · commit `42a6c88`                                                                                                                                      |
 | Sky Connection                    | ✅ **APPROVED AND LOCKED** in Theme Lab — [18](./18_SKY_CONNECTION_FAST_GATE.md) · [17](./17_SKY_CONNECTION_SCENE_01_START.md)                                                                                                                                      |
-| Sky Memories                      | ✅ Living through photobooth — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20](./20_SKY_MEMORIES_FAST_GATE.md) · Connection reuse for Scene 7–end                                                                                                                  |
+| Sky Memories                      | ✅ **APPROVED AND LOCKED** — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20](./20_SKY_MEMORIES_FAST_GATE.md) · pilot `8652d50`                                                                                                                                     |
 | Playful                           | ⏸ Not started                                                                                                                                                                                                                                                       |
 | Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                                                                                                                                                                                               |
 
