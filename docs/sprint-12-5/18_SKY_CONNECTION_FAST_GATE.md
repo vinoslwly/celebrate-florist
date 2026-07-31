@@ -12,7 +12,37 @@
 
 **SKY CONNECTION FAST GATE PASSED**
 
-Working tree prepared for one logical commit. **Do not push without Founder authorization.**
+### Founder follow-up (2026-07-31) — lock & push
+
+| Item                                 | Status                                                           |
+| ------------------------------------ | ---------------------------------------------------------------- |
+| Founder approval                     | ✅ Sky Connection **APPROVED AND LOCKED** in Theme Lab           |
+| Pilot commit                         | `6941977` — `feat(theme-lab): add and lock Sky Connection pilot` |
+| Lock docs commit                     | `docs(theme-lab): record Sky Connection Founder lock`            |
+| Push target                          | `origin/rebuild/foundation`                                      |
+| Production `/e/[token]` Scene Engine | ⛔ Still **unauthorized**                                        |
+| Sky Memories / Treasures             | **Not started**                                                  |
+| Playful                              | **Not started / not modified**                                   |
+| Full Sky theme audit                 | Deferred — see **Non-blocking carry-forwards**                   |
+
+Theme Lab Sky Connection is **APPROVED AND LOCKED**.
+
+---
+
+## Founder lock notes (preserved)
+
+- Sky Connection owns its **graph, host, quiz state, and progression** (`sky/connection/**`).
+- Connection scoring remains **fixture-based at 92%** — no live grading or production quiz submit exists.
+- `lockedOnly` and `ajar` remain **small presentation-only** Sky Moments APIs; default Moments path unchanged.
+- **Sky Moments, Bloom, and Warm remain unchanged.**
+- Sky identity remains soft-blue scrapbook / clouds / stars / balloons / denim.
+- Serif density on quiz options and CTAs is deferred to the full Sky audit.
+- Optional Scene 10 / Scene 14 parity remains deferred.
+- Photobooth remains the Sprint 14 placeholder.
+- Scene deep-link parity remains deferred.
+- Current repo `npm audit` baseline is **15 vulnerabilities: 13 high, 2 moderate**.
+- Sky Connection introduced **no package or lockfile changes** — do not run `npm audit fix --force`.
+- Production `/e/[token]` remains **NOT AUTHORIZED**.
 
 ---
 
@@ -206,16 +236,16 @@ No refs under `public/`. No borrowed Warm/Bloom runtime plates for Connection-ow
 
 ## Git readiness
 
-| Item                                | Status                                               |
-| ----------------------------------- | ---------------------------------------------------- |
-| Proposed commit                     | `feat(theme-lab): add and lock Sky Connection pilot` |
-| Amend locked Bloom / Warm / Moments | ❌ Will not amend                                    |
-| Push                                | ❌ Requires Founder authorization                    |
-| Sky Memories / Treasures / Playful  | Not started                                          |
-| `/e/[token]`                        | Remains unauthorized                                 |
+| Item                                | Status                                                           |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| Pilot commit                        | `6941977` — `feat(theme-lab): add and lock Sky Connection pilot` |
+| Amend locked Bloom / Warm / Moments | ❌ Will not amend                                                |
+| Push                                | ✅ Founder authorized — pushed to `origin/rebuild/foundation`    |
+| Sky Memories / Treasures / Playful  | Not started                                                      |
+| `/e/[token]`                        | Remains unauthorized                                             |
 
 ---
 
-## Lock readiness
+## Lock status
 
-Sky Connection Theme Lab pilot is **ready to lock** after Founder approval of this gate and the prepared commit/push.
+Sky Connection Theme Lab pilot is **APPROVED AND LOCKED**.
