@@ -11,6 +11,7 @@
 > **Sky Moments:** 🔒 **APPROVED AND LOCKED** — [16](./16_SKY_MOMENTS_FAST_GATE.md) · [15](./15_SKY_MOMENTS_SCENE_01_START.md) · `/theme-lab/sky` · commit `42a6c88`
 > **Sky Connection:** ✅ **APPROVED AND LOCKED** in Theme Lab — [18](./18_SKY_CONNECTION_FAST_GATE.md) · [17](./17_SKY_CONNECTION_SCENE_01_START.md) · `/theme-lab/sky?mode=connection`
 > **Sky Memories:** ✅ **APPROVED AND LOCKED** — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20](./20_SKY_MEMORIES_FAST_GATE.md) · pilot `8652d50` · `/theme-lab/sky?mode=memories` · `/e/` unauthorized
+> **Sky Treasures:** ✅ Fast gate passed — [22](./22_SKY_TREASURES_FAST_GATE.md) · [21](./21_SKY_TREASURES_SCENE_01_START.md) · `/theme-lab/sky?mode=treasures` · Scenes 0–13 · ready to lock · full Sky audit next
 > **Playful:** ⏸ not started  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
@@ -149,6 +150,7 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | Sky Moments                       | 🔒 **APPROVED AND LOCKED** — [16](./16_SKY_MOMENTS_FAST_GATE.md) · [15](./15_SKY_MOMENTS_SCENE_01_START.md) · commit `42a6c88`                                                                                                                                      |
 | Sky Connection                    | ✅ **APPROVED AND LOCKED** in Theme Lab — [18](./18_SKY_CONNECTION_FAST_GATE.md) · [17](./17_SKY_CONNECTION_SCENE_01_START.md)                                                                                                                                      |
 | Sky Memories                      | ✅ **APPROVED AND LOCKED** — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20](./20_SKY_MEMORIES_FAST_GATE.md) · pilot `8652d50`                                                                                                                                     |
+| Sky Treasures                     | ✅ Fast gate passed — [22](./22_SKY_TREASURES_FAST_GATE.md) · [21](./21_SKY_TREASURES_SCENE_01_START.md) · Scenes 0–13 · ready to lock · full Sky audit next                                                                                                        |
 | Playful                           | ⏸ Not started                                                                                                                                                                                                                                                       |
 | Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                                                                                                                                                                                               |
 

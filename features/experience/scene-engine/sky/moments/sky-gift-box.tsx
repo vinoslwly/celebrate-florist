@@ -6,8 +6,11 @@ import { motion } from "framer-motion";
 
 /**
  * Sky Moments gift motif — light-blue box + cream stitched ribbon + gingham heart.
+ * Treasures Final uses tone="pearl" (white / silver — not gold).
  * Same closed/open animation model as Bloom / Warm.
  */
+
+export type SkyGiftTone = "sky" | "pearl";
 
 type GiftPaintIds = {
   body: string;
@@ -30,27 +33,76 @@ function useGiftPaintIds(): GiftPaintIds {
   };
 }
 
-function SkyGiftPaintServers({ ids }: { ids: GiftPaintIds }) {
+function SkyGiftPaintServers({
+  ids,
+  tone = "sky",
+}: {
+  ids: GiftPaintIds;
+  tone?: SkyGiftTone;
+}) {
+  const pearl = tone === "pearl";
   return (
     <defs>
       <linearGradient id={ids.body} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#A8D0EA" />
-        <stop offset="50%" stopColor="#7EB6D9" />
-        <stop offset="100%" stopColor="#5B9BC8" />
+        {pearl ? (
+          <>
+            <stop offset="0%" stopColor="#FFFFFF" />
+            <stop offset="55%" stopColor="#FFFFFF" />
+            <stop offset="85%" stopColor="#F7F7F5" />
+            <stop offset="100%" stopColor="#EBE9E4" />
+          </>
+        ) : (
+          <>
+            <stop offset="0%" stopColor="#A8D0EA" />
+            <stop offset="50%" stopColor="#7EB6D9" />
+            <stop offset="100%" stopColor="#5B9BC8" />
+          </>
+        )}
       </linearGradient>
       <linearGradient id={ids.lid} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#B8D8F0" />
-        <stop offset="100%" stopColor="#6BA3C9" />
+        {pearl ? (
+          <>
+            <stop offset="0%" stopColor="#FFFFFF" />
+            <stop offset="70%" stopColor="#FFFEFB" />
+            <stop offset="100%" stopColor="#F0EEE9" />
+          </>
+        ) : (
+          <>
+            <stop offset="0%" stopColor="#B8D8F0" />
+            <stop offset="100%" stopColor="#6BA3C9" />
+          </>
+        )}
       </linearGradient>
+      {/* Pearl ribbon: deeper sky satin so white body pops */}
       <linearGradient id={ids.ribbon} x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#FFFEFB" />
-        <stop offset="45%" stopColor="#F5F0E8" />
-        <stop offset="100%" stopColor="#E8E0D4" />
+        {pearl ? (
+          <>
+            <stop offset="0%" stopColor="#9EC4DE" />
+            <stop offset="40%" stopColor="#5A9BC4" />
+            <stop offset="100%" stopColor="#2A5278" />
+          </>
+        ) : (
+          <>
+            <stop offset="0%" stopColor="#FFFEFB" />
+            <stop offset="45%" stopColor="#F5F0E8" />
+            <stop offset="100%" stopColor="#E8E0D4" />
+          </>
+        )}
       </linearGradient>
       <radialGradient id={ids.glow} cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
-        <stop offset="40%" stopColor="#D6EAF8" stopOpacity="0.7" />
-        <stop offset="100%" stopColor="#6BA3C9" stopOpacity="0" />
+        {pearl ? (
+          <>
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+            <stop offset="40%" stopColor="#FFFEFB" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#C5DCEF" stopOpacity="0" />
+          </>
+        ) : (
+          <>
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
+            <stop offset="40%" stopColor="#D6EAF8" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#6BA3C9" stopOpacity="0" />
+          </>
+        )}
       </radialGradient>
       <pattern
         id={ids.check}
@@ -62,13 +114,13 @@ function SkyGiftPaintServers({ ids }: { ids: GiftPaintIds }) {
         <rect width="4" height="4" fill="#6BA3C9" />
         <rect x="4" y="4" width="4" height="4" fill="#6BA3C9" />
       </pattern>
-      <filter id={ids.shadow} x="-20%" y="-10%" width="140%" height="140%">
+      <filter id={ids.shadow} x="-25%" y="-15%" width="150%" height="150%">
         <feDropShadow
-          dx="8"
-          dy="12"
-          stdDeviation="9"
+          dx={pearl ? 6 : 8}
+          dy={pearl ? 10 : 12}
+          stdDeviation={pearl ? 11 : 9}
           floodColor="#1E3A5F"
-          floodOpacity="0.28"
+          floodOpacity={pearl ? 0.22 : 0.28}
         />
       </filter>
     </defs>
@@ -81,12 +133,14 @@ function StitchRect({
   w,
   h,
   rx = 4,
+  stroke = "#6BA3C9",
 }: {
   x: number;
   y: number;
   w: number;
   h: number;
   rx?: number;
+  stroke?: string;
 }) {
   return (
     <rect
@@ -96,7 +150,7 @@ function StitchRect({
       height={h - 6}
       rx={Math.max(1, rx - 1)}
       fill="none"
-      stroke="#6BA3C9"
+      stroke={stroke}
       strokeWidth="1.2"
       strokeDasharray="3 3"
       opacity="0.55"
@@ -104,18 +158,55 @@ function StitchRect({
   );
 }
 
-/** Cream bow lid with gingham heart + gift tag. */
+/** Lid + bow — sky cream bow, or pearl luxury (wings + solid heart). */
 function SkyGiftLidWithBow({
   ids,
   x,
   y,
+  tone = "sky",
 }: {
   ids: GiftPaintIds;
   x: number;
   y: number;
+  tone?: SkyGiftTone;
 }) {
+  const pearl = tone === "pearl";
+  const stitch = pearl ? "#A8C8E0" : "#6BA3C9";
+
   return (
     <g transform={`translate(${x} ${y})`}>
+      {/* Soft pearl wings — Final Treasure only */}
+      {pearl ? (
+        <g opacity="0.95">
+          <path
+            d="M8 28 C-6 18 -10 4 6 8 C14 10 22 20 28 28 C18 26 12 28 8 28Z"
+            fill="#FFFFFF"
+            stroke="#B8D0E4"
+            strokeWidth="1.2"
+          />
+          <path
+            d="M112 28 C126 18 130 4 114 8 C106 10 98 20 92 28 C102 26 108 28 112 28Z"
+            fill="#FFFFFF"
+            stroke="#B8D0E4"
+            strokeWidth="1.2"
+          />
+          <path
+            d="M10 22 C2 14 4 8 12 12"
+            stroke="#FFFFFF"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            opacity="0.9"
+          />
+          <path
+            d="M110 22 C118 14 116 8 108 12"
+            stroke="#FFFFFF"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            opacity="0.9"
+          />
+        </g>
+      ) : null}
+
       <rect
         x="0"
         y="22"
@@ -123,17 +214,31 @@ function SkyGiftLidWithBow({
         height="30"
         rx="6"
         fill={`url(#${ids.lid})`}
+        stroke={pearl ? "#D0D4DA" : "none"}
+        strokeWidth={pearl ? 1.4 : 0}
       />
+      {/* Lid sheen — crisp white, not blue wash */}
+      {pearl ? (
+        <path
+          d="M6 28h108"
+          stroke="#FFFFFF"
+          strokeWidth="5"
+          strokeLinecap="round"
+          opacity="0.85"
+        />
+      ) : null}
       <rect x="46" y="22" width="28" height="30" fill={`url(#${ids.ribbon})`} />
-      <StitchRect x={46} y={22} w={28} h={30} rx={2} />
+      <StitchRect x={46} y={22} w={28} h={30} rx={2} stroke={stitch} />
 
-      {/* Multi-loop cream bow */}
+      {/* Multi-loop bow — white loops + sky knot for contrast */}
       <ellipse
         cx="28"
         cy="12"
         rx="26"
         ry="14"
-        fill={`url(#${ids.ribbon})`}
+        fill={pearl ? "#FFFFFF" : `url(#${ids.ribbon})`}
+        stroke={pearl ? "#C5D0DC" : undefined}
+        strokeWidth={pearl ? 1.2 : 0}
         transform="rotate(-18 28 12)"
       />
       <ellipse
@@ -141,7 +246,9 @@ function SkyGiftLidWithBow({
         cy="12"
         rx="26"
         ry="14"
-        fill={`url(#${ids.ribbon})`}
+        fill={pearl ? "#FFFFFF" : `url(#${ids.ribbon})`}
+        stroke={pearl ? "#C5D0DC" : undefined}
+        strokeWidth={pearl ? 1.2 : 0}
         transform="rotate(18 92 12)"
       />
       <ellipse
@@ -149,7 +256,7 @@ function SkyGiftLidWithBow({
         cy="8"
         rx="16"
         ry="10"
-        fill={`url(#${ids.ribbon})`}
+        fill={pearl ? "#FFFEFB" : `url(#${ids.ribbon})`}
         transform="rotate(-8 42 8)"
       />
       <ellipse
@@ -157,30 +264,55 @@ function SkyGiftLidWithBow({
         cy="8"
         rx="16"
         ry="10"
-        fill={`url(#${ids.ribbon})`}
+        fill={pearl ? "#FFFEFB" : `url(#${ids.ribbon})`}
         transform="rotate(8 78 8)"
       />
-      <ellipse cx="60" cy="14" rx="11" ry="9" fill={`url(#${ids.ribbon})`} />
-
-      {/* Gingham heart center */}
-      <path
-        d="M60 28c-5.5-4.5-9-7.2-9-11 0-2.8 2.2-4.6 4.5-4.6 1.6 0 3.1 0.9 4.5 2.7 1.4-1.8 2.9-2.7 4.5-2.7 2.3 0 4.5 1.8 4.5 4.6 0 3.8-3.5 6.5-9 11Z"
-        fill={`url(#${ids.check})`}
-        stroke="#5B8FBA"
-        strokeWidth="1"
+      <ellipse
+        cx="60"
+        cy="14"
+        rx="11"
+        ry="9"
+        fill={pearl ? "#6BA3C9" : `url(#${ids.ribbon})`}
       />
+      {pearl ? (
+        <ellipse
+          cx="57"
+          cy="11"
+          rx="3.5"
+          ry="2.2"
+          fill="#FFFFFF"
+          opacity="0.55"
+        />
+      ) : null}
+
+      {/* Heart — solid for pearl (no gingham / checker look) */}
+      {pearl ? (
+        <path
+          d="M60 28c-5.5-4.5-9-7.2-9-11 0-2.8 2.2-4.6 4.5-4.6 1.6 0 3.1 0.9 4.5 2.7 1.4-1.8 2.9-2.7 4.5-2.7 2.3 0 4.5 1.8 4.5 4.6 0 3.8-3.5 6.5-9 11Z"
+          fill="#7EB6D9"
+          stroke="#FFFFFF"
+          strokeWidth="1.2"
+        />
+      ) : (
+        <path
+          d="M60 28c-5.5-4.5-9-7.2-9-11 0-2.8 2.2-4.6 4.5-4.6 1.6 0 3.1 0.9 4.5 2.7 1.4-1.8 2.9-2.7 4.5-2.7 2.3 0 4.5 1.8 4.5 4.6 0 3.8-3.5 6.5-9 11Z"
+          fill={`url(#${ids.check})`}
+          stroke="#5B8FBA"
+          strokeWidth="1"
+        />
+      )}
 
       {/* Streamers */}
       <path
         d="M52 26 Q40 48 32 62"
-        stroke={`url(#${ids.ribbon})`}
+        stroke={pearl ? "#5A9BC4" : `url(#${ids.ribbon})`}
         strokeWidth="10"
         strokeLinecap="round"
         fill="none"
       />
       <path
         d="M68 26 Q80 48 88 62"
-        stroke={`url(#${ids.ribbon})`}
+        stroke={pearl ? "#3D7AAD" : `url(#${ids.ribbon})`}
         strokeWidth="10"
         strokeLinecap="round"
         fill="none"
@@ -191,9 +323,9 @@ function SkyGiftLidWithBow({
       <g transform="translate(98 34) rotate(12)">
         <path
           d="M0 0h28v36c0 0-4-3-8-3s-8 3-8 3c0 0-4-3-8-3s-4 3-4 3V0Z"
-          fill="#FFFEFB"
-          stroke="#D6E0EA"
-          strokeWidth="1"
+          fill="#FFFFFF"
+          stroke={pearl ? "#C5D0DC" : "#D6E0EA"}
+          strokeWidth="1.2"
         />
         <circle
           cx="8"
@@ -203,22 +335,39 @@ function SkyGiftLidWithBow({
           stroke="#6BA3C9"
           strokeWidth="1"
         />
-        {/* Tiny plant mark */}
-        <circle cx="14" cy="18" r="3.2" fill="#1E3A5F" />
-        <circle cx="11" cy="21" r="2.2" fill="#2A4A6E" />
-        <circle cx="17" cy="21" r="2.2" fill="#2A4A6E" />
-        <path
-          d="M14 22v10"
-          stroke="#1E3A5F"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-        />
+        {pearl ? (
+          <path
+            d="M14 14l1.4 3.2 3.5.3-2.6 2.4.7 3.4-3-1.8-3 1.8.7-3.4-2.6-2.4 3.5-.3Z"
+            fill="#5A9BC4"
+          />
+        ) : (
+          <>
+            <circle cx="14" cy="18" r="3.2" fill="#1E3A5F" />
+            <circle cx="11" cy="21" r="2.2" fill="#2A4A6E" />
+            <circle cx="17" cy="21" r="2.2" fill="#2A4A6E" />
+            <path
+              d="M14 22v10"
+              stroke="#1E3A5F"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+          </>
+        )}
       </g>
     </g>
   );
 }
 
-function ClosedBody({ ids }: { ids: GiftPaintIds }) {
+function ClosedBody({
+  ids,
+  tone = "sky",
+}: {
+  ids: GiftPaintIds;
+  tone?: SkyGiftTone;
+}) {
+  const pearl = tone === "pearl";
+  const stitch = pearl ? "#8BB4D0" : "#6BA3C9";
+
   return (
     <g filter={`url(#${ids.shadow})`}>
       <rect
@@ -228,9 +377,55 @@ function ClosedBody({ ids }: { ids: GiftPaintIds }) {
         height="100"
         rx="10"
         fill={`url(#${ids.body})`}
+        stroke={pearl ? "#C8CCD2" : "none"}
+        strokeWidth={pearl ? 1.8 : 0}
       />
-      <path d="M40 120h140v16H40z" fill="#FFFFFF" opacity="0.14" />
-      {/* Cream ribbons */}
+      {/* Pearl luminous sheen — white only, no blue wash */}
+      {pearl ? (
+        <>
+          <path
+            d="M48 118h124"
+            stroke="#FFFFFF"
+            strokeWidth="12"
+            strokeLinecap="round"
+            opacity="0.7"
+          />
+          <path
+            d="M52 128 Q70 150 58 178"
+            stroke="#FFFFFF"
+            strokeWidth="16"
+            strokeLinecap="round"
+            opacity="0.35"
+          />
+          {/* Soft embossed cloud hints — very light gray, not blue */}
+          <ellipse
+            cx="64"
+            cy="168"
+            rx="14"
+            ry="7"
+            fill="#E8E6E2"
+            opacity="0.55"
+          />
+          <ellipse
+            cx="74"
+            cy="166"
+            rx="10"
+            ry="6"
+            fill="#E8E6E2"
+            opacity="0.45"
+          />
+          <ellipse
+            cx="156"
+            cy="172"
+            rx="12"
+            ry="6"
+            fill="#E8E6E2"
+            opacity="0.4"
+          />
+        </>
+      ) : (
+        <path d="M40 120h140v16H40z" fill="#FFFFFF" opacity="0.14" />
+      )}
       <rect
         x="96"
         y="110"
@@ -238,7 +433,17 @@ function ClosedBody({ ids }: { ids: GiftPaintIds }) {
         height="100"
         fill={`url(#${ids.ribbon})`}
       />
-      <StitchRect x={96} y={110} w={28} h={100} rx={2} />
+      {pearl ? (
+        <rect
+          x="100"
+          y="110"
+          width="6"
+          height="100"
+          fill="#FFFFFF"
+          opacity="0.4"
+        />
+      ) : null}
+      <StitchRect x={96} y={110} w={28} h={100} rx={2} stroke={stitch} />
       <rect
         x="40"
         y="148"
@@ -246,7 +451,42 @@ function ClosedBody({ ids }: { ids: GiftPaintIds }) {
         height="22"
         fill={`url(#${ids.ribbon})`}
       />
-      <StitchRect x={40} y={148} w={140} h={22} rx={2} />
+      {pearl ? (
+        <rect
+          x="40"
+          y="150"
+          width="140"
+          height="5"
+          fill="#FFFFFF"
+          opacity="0.35"
+        />
+      ) : null}
+      <StitchRect x={40} y={148} w={140} h={22} rx={2} stroke={stitch} />
+
+      {/* Pearl seal / keyhole at ribbon cross */}
+      {pearl ? (
+        <g transform="translate(110 145)">
+          <circle
+            cx="10"
+            cy="14"
+            r="13"
+            fill="#FFFFFF"
+            stroke="#B0B8C4"
+            strokeWidth="1.8"
+          />
+          <circle cx="10" cy="14" r="9.5" fill="#F4F5F7" />
+          <rect x="5.5" y="12" width="9" height="8" rx="1.5" fill="#5A9BC4" />
+          <path
+            d="M7.2 12V9.8a2.8 2.8 0 0 1 5.6 0V12"
+            stroke="#2A5278"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <circle cx="10" cy="15.5" r="1.1" fill="#FFFFFF" />
+        </g>
+      ) : null}
+
       {/* Stars on box */}
       {(
         [
@@ -260,8 +500,16 @@ function ClosedBody({ ids }: { ids: GiftPaintIds }) {
         <path
           key={i}
           d={`M${sx} ${sy - 5}l1.6 3.6 4 .4-3 2.8.8 3.8-3.4-2-3.4 2 .8-3.8-3-2.8 4-.4Z`}
-          fill={i % 2 === 0 ? "#FFFFFF" : "#D6EAF8"}
-          opacity="0.9"
+          fill={
+            pearl
+              ? i % 2 === 0
+                ? "#6BA3C9"
+                : "#8BB4D0"
+              : i % 2 === 0
+                ? "#FFFFFF"
+                : "#D6EAF8"
+          }
+          opacity={pearl ? 0.8 : 0.9}
         />
       ))}
     </g>
@@ -276,17 +524,23 @@ export type SkyGiftBoxProps = {
    * open — Moments gift opening
    */
   variant?: "closed" | "ajar" | "open";
+  /**
+   * sky — soft blue (default)
+   * pearl — white / silver Final Treasure (Sky Treasures — not gold)
+   */
+  tone?: SkyGiftTone;
   /** Animate lid from closed → open (open variant only). */
   animateLid?: boolean;
   reduceMotion?: boolean;
 };
 
 /**
- * Sky gift box — Theme Lab Moments Scene 3 motif.
+ * Sky gift box — Theme Lab Moments Scene 3 motif · Treasures Final = pearl.
  */
 export function SkyGiftBox({
   className,
   variant = "closed",
+  tone = "sky",
   animateLid = false,
   reduceMotion = false,
 }: SkyGiftBoxProps) {
@@ -296,7 +550,7 @@ export function SkyGiftBox({
     return (
       <div className={className} aria-hidden>
         <svg viewBox="0 0 280 160" className="h-full w-full" fill="none">
-          <SkyGiftPaintServers ids={ids} />
+          <SkyGiftPaintServers ids={ids} tone={tone} />
           <ellipse
             cx="150"
             cy="148"
@@ -320,6 +574,8 @@ export function SkyGiftBox({
               height="72"
               rx="8"
               fill={`url(#${ids.body})`}
+              stroke={tone === "pearl" ? "#C8CCD2" : "none"}
+              strokeWidth={tone === "pearl" ? 1.6 : 0}
             />
             <rect
               x="80"
@@ -328,7 +584,7 @@ export function SkyGiftBox({
               height="14"
               rx="4"
               fill="#FFFFFF"
-              opacity="0.16"
+              opacity={tone === "pearl" ? 0.55 : 0.16}
             />
             <rect
               x="136"
@@ -368,11 +624,11 @@ export function SkyGiftBox({
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               style={{ originX: "60px", originY: "36px" }}
             >
-              <SkyGiftLidWithBow ids={ids} x={0} y={0} />
+              <SkyGiftLidWithBow ids={ids} x={0} y={0} tone={tone} />
             </motion.g>
           ) : (
             <g transform="translate(-8 46) rotate(-28 60 36)">
-              <SkyGiftLidWithBow ids={ids} x={0} y={0} />
+              <SkyGiftLidWithBow ids={ids} x={0} y={0} tone={tone} />
             </g>
           )}
         </svg>
@@ -388,7 +644,7 @@ export function SkyGiftBox({
     return (
       <div className={className} aria-hidden>
         <svg viewBox="0 0 240 260" className="h-full w-full" fill="none">
-          <SkyGiftPaintServers ids={ids} />
+          <SkyGiftPaintServers ids={ids} tone={tone} />
           <defs>
             <radialGradient id={goldGlow} cx="50%" cy="55%" r="50%">
               <stop offset="0%" stopColor="#FFFDF0" stopOpacity="1" />
@@ -549,7 +805,7 @@ export function SkyGiftBox({
 
           {/* Lid cracked open — more dramatic ajar */}
           <g transform="translate(2 -14) rotate(-9 120 98)">
-            <SkyGiftLidWithBow ids={ids} x={60} y={72} />
+            <SkyGiftLidWithBow ids={ids} x={60} y={72} tone={tone} />
           </g>
 
           {/* Crack-edge sparkles */}
@@ -576,17 +832,17 @@ export function SkyGiftBox({
   return (
     <div className={className} aria-hidden>
       <svg viewBox="0 0 220 240" className="h-full w-full" fill="none">
-        <SkyGiftPaintServers ids={ids} />
+        <SkyGiftPaintServers ids={ids} tone={tone} />
         <ellipse
           cx="112"
           cy="218"
           rx="72"
           ry="12"
-          fill="#6BA3C9"
-          opacity="0.22"
+          fill={tone === "pearl" ? "#1E3A5F" : "#6BA3C9"}
+          opacity={tone === "pearl" ? 0.18 : 0.22}
         />
-        <ClosedBody ids={ids} />
-        <SkyGiftLidWithBow ids={ids} x={50} y={66} />
+        <ClosedBody ids={ids} tone={tone} />
+        <SkyGiftLidWithBow ids={ids} x={50} y={66} tone={tone} />
       </svg>
     </div>
   );
