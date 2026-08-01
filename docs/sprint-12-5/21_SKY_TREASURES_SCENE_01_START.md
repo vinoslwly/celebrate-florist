@@ -1,11 +1,11 @@
 # Sky Treasures — Scenes 0–13 (through photobooth)
 
-> **Status:** ✅ **Scenes 0–13 living** · **Fast gate passed** — [22](./22_SKY_TREASURES_FAST_GATE.md) · ready to lock  
+> **Status:** 🔒 **APPROVED AND LOCKED** — [22](./22_SKY_TREASURES_FAST_GATE.md) · Scenes 0–13 · pilot `d67bee2`  
 > **Theme Lab:** `/theme-lab/sky?mode=treasures`  
 > **Production `/e/[token]`:** ⛔ NOT AUTHORIZED  
 > **Sky Moments / Connection / Memories:** 🔒 Locked — reused for ceremony head + letter + balloon + gallery + photobooth  
 > **Sky Playful:** ⏸ Not started  
-> **Full Sky theme audit:** Next after Founder lock + push
+> **Full Sky theme audit:** **Next required step** (all four Sky modes locked)
 
 ---
 

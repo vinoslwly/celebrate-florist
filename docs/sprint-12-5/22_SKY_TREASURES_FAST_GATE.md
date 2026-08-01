@@ -12,9 +12,36 @@
 
 **SKY TREASURES FAST GATE PASSED**
 
-Theme Lab Sky Treasures (Scenes 0–13 through photobooth) is **ready to lock** pending Founder approval and push authorization.
+### Founder follow-up (2026-08-02) — lock & push
 
-All four Sky modes (Moments · Connection · Memories · Treasures) are now complete in Theme Lab. **Next required step:** full Sky theme audit.
+| Item                                 | Status                                                          |
+| ------------------------------------ | --------------------------------------------------------------- |
+| Founder approval                     | ✅ Sky Treasures **APPROVED AND LOCKED** in Theme Lab           |
+| Pilot commit                         | `d67bee2` — `feat(theme-lab): add and lock Sky Treasures pilot` |
+| Lock docs commit                     | `docs(theme-lab): record Sky Treasures Founder lock`            |
+| Push target                          | `origin/rebuild/foundation`                                     |
+| Production `/e/[token]` Scene Engine | ⛔ Still **unauthorized**                                       |
+| Playful                              | **Not started / not modified**                                  |
+| Four Sky modes                       | ✅ Moments · Connection · Memories · Treasures **complete**     |
+| Full Sky theme audit                 | **Next required step**                                          |
+
+Theme Lab Sky Treasures is **APPROVED AND LOCKED**.
+
+### Founder lock notes (preserved)
+
+- Sky Treasures owns its **graph, host, opened-gift state, Final Gift lock, and Final Reward progression** (`sky/treasures/**`).
+- `SkyGiftBox` `tone` stays **presentation-only**; default tone remains **`sky`**; **`pearl`** is only for the approved Final Gift treatment.
+- **Final Gift** = locked final grid item · **Final Reward** = journey after Final Gift content is dismissed.
+- Serif density remains a **full Sky audit** carry-forward.
+- Gallery-ending parity remains **deferred**.
+- Continuous-motion Playwright flake is **non-blocking**.
+- Photobooth remains the **Sprint 14** placeholder.
+- Optional deep-link parity remains **deferred**.
+- Full Sky audit must review **wrapper-chain coupling** across Moments → Connection → Memories/Treasures.
+- Current repo `npm audit` baseline is **7 vulnerabilities: 5 high, 2 moderate**.
+- Sky Treasures introduced **no package or lockfile changes** — do not run `npm audit fix --force`.
+- Production `/e/[token]` remains **NOT AUTHORIZED**.
+- All four Sky modes are now complete; **full Sky theme audit** is the next required step.
 
 ---
 
@@ -239,7 +266,8 @@ Note: Memories lock recorded 15 vulns; advisory DB drift since then — not intr
 4. Continuous-motion CTA Playwright flake (use force click) — discoverability OK
 5. Optional Treasures deep-link (`?treasuresScene=`) not implemented (Warm/Bloom pattern optional)
 6. npm audit baseline — do not force-fix during Theme Lab work
-7. Full Sky theme audit across all four modes
+7. Wrapper-chain coupling review: Moments → Connection → Memories/Treasures
+8. Full Sky theme audit across all four modes
 
 ---
 
@@ -255,12 +283,13 @@ Note: Memories lock recorded 15 vulns; advisory DB drift since then — not intr
 
 ## Git readiness
 
-| Item                                | Status                                              |
-| ----------------------------------- | --------------------------------------------------- |
-| Pilot commit message                | `feat(theme-lab): add and lock Sky Treasures pilot` |
-| Amend locked Bloom/Warm/Sky commits | ❌ Forbidden — not done                             |
-| Push without Founder authorization  | ❌ Do not push                                      |
-| Production `/e/[token]`             | ⛔ Still unauthorized                               |
-| Playful                             | Not started / not modified                          |
-| Four Sky modes complete             | ✅ Moments · Connection · Memories · Treasures      |
-| Full Sky theme audit                | **Next required step** after Founder lock + push    |
+| Item                                | Status                                                          |
+| ----------------------------------- | --------------------------------------------------------------- |
+| Pilot commit                        | `d67bee2` — `feat(theme-lab): add and lock Sky Treasures pilot` |
+| Founder lock docs                   | `docs(theme-lab): record Sky Treasures Founder lock`            |
+| Amend locked Bloom/Warm/Sky commits | ❌ Forbidden — not done                                         |
+| Push                                | ✅ Authorized — `origin/rebuild/foundation`                     |
+| Production `/e/[token]`             | ⛔ Still unauthorized                                           |
+| Playful                             | Not started / not modified                                      |
+| Four Sky modes locked               | ✅ Moments · Connection · Memories · Treasures                  |
+| Full Sky theme audit                | **Next required step**                                          |
