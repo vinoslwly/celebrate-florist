@@ -24,6 +24,31 @@ All four Sky modes own separable graphs/hosts, share only presentation-safe Mome
 
 **No FOUNDER DECISION REQUIRED** blockers.
 
+### Founder follow-up (2026-08-04) — Sky lock, Playful freeze, push
+
+| Item                                 | Status                                                                |
+| ------------------------------------ | --------------------------------------------------------------------- |
+| Founder approval                     | ✅ Full Sky Theme Lab **APPROVED AND LOCKED**                         |
+| Audit commit                         | `43c65f3` — `docs(theme-lab): audit and lock complete Sky theme`      |
+| Scope-freeze docs                    | `docs(project): freeze Playful and record three-theme release scope`  |
+| Push target                          | `origin/rebuild/foundation`                                           |
+| Release scope                        | **3 themes × 4 modes** — Bloom · Warm · Sky only                      |
+| Playful                              | 🧊 **FROZEN** — not a concept rejection; post-publication phase later |
+| Production `/e/[token]` Scene Engine | ⛔ Still **unauthorized**                                             |
+
+### Preserved Sky carry-forwards (production / later)
+
+- Sky Moments is effectively a **shared presentation surface**; changes can affect Connection / Memories / Treasures.
+- `lockedOnly`, `ajar`, and `tone` must remain **small presentation APIs**.
+- Quiz and match option text require a **Poppins/sans** pass before production.
+- Memories empty dataset requires an **explicit fallback** before live data.
+- Continuous-motion CTAs require **reduced-motion and usability** review.
+- Sky gallery photos still use **fixture stand-ins** (Bloom Moments paths).
+- Photobooth remains the **Sprint 14** placeholder.
+- Current `npm audit` baseline is **7 vulnerabilities: 5 high, 2 moderate** — do not run `npm audit fix --force`.
+- Live scoring, Gift actions, and production persistence are **not implemented**.
+- `/e/[token]` remains **unauthorized**.
+
 ---
 
 ## 2. Critical findings
@@ -239,14 +264,16 @@ No Theme Lab **lock blockers** found in a11y.
 
 ## 14. Final Sky lock decision
 
-Theme Lab Sky (Moments · Connection · Memories · Treasures) is **APPROVED AND LOCKED** pending Founder push authorization of this audit commit.
+Theme Lab Sky (Moments · Connection · Memories · Treasures) is **APPROVED AND LOCKED**.
 
-Playful may begin **only after** Founder approval of this lock + push.  
+**Playful is FROZEN** — no implementation, assets, routes, fixtures, or exploration without a future Founder unlock. This is a **delivery decision** to protect publication timeline, not a rejection of Playful’s concept. Future Playful work belongs in a **post-publication** phase.
+
+Active release scope: **Bloom · Warm · Sky** — each with Moments · Connection · Memories · Treasures (**3 × 4**).  
 `/e/[token]` remains **NOT AUTHORIZED**.
 
 ---
 
-## 15. Lessons for Playful
+## 15. Lessons for Playful (when unlocked later)
 
 1. Own graph/host/state early; keep shared APIs visual-only.
 2. Do not bury mode progression inside another mode’s ceremony scene.

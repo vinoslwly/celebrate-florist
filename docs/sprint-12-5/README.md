@@ -12,8 +12,9 @@
 > **Sky Connection:** ✅ **APPROVED AND LOCKED** in Theme Lab — [18](./18_SKY_CONNECTION_FAST_GATE.md) · [17](./17_SKY_CONNECTION_SCENE_01_START.md) · `/theme-lab/sky?mode=connection`
 > **Sky Memories:** ✅ **APPROVED AND LOCKED** — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20](./20_SKY_MEMORIES_FAST_GATE.md) · pilot `8652d50` · `/theme-lab/sky?mode=memories` · `/e/` unauthorized
 > **Sky Treasures:** 🔒 **APPROVED AND LOCKED** — [22](./22_SKY_TREASURES_FAST_GATE.md) · [21](./21_SKY_TREASURES_SCENE_01_START.md) · `/theme-lab/sky?mode=treasures` · pilot `d67bee2`  
-> **Full Sky theme:** ✅ Audit complete — [23](./23_FULL_SKY_THEME_AUDIT_AND_LOCK.md) · ready to lock · Playful next after Founder push
-> **Playful:** ⏸ not started  
+> **Full Sky theme:** 🔒 **APPROVED AND LOCKED** — [23](./23_FULL_SKY_THEME_AUDIT_AND_LOCK.md) · audit `43c65f3`  
+> **Release scope:** **3 themes × 4 modes** — Bloom · Warm · Sky (Moments · Connection · Memories · Treasures each)  
+> **Playful:** 🧊 **FROZEN** — not started; no work without future Founder unlock (post-publication)  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
 
@@ -152,8 +153,9 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | Sky Connection                    | ✅ **APPROVED AND LOCKED** in Theme Lab — [18](./18_SKY_CONNECTION_FAST_GATE.md) · [17](./17_SKY_CONNECTION_SCENE_01_START.md)                                                                                                                                      |
 | Sky Memories                      | ✅ **APPROVED AND LOCKED** — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20](./20_SKY_MEMORIES_FAST_GATE.md) · pilot `8652d50`                                                                                                                                     |
 | Sky Treasures                     | 🔒 **APPROVED AND LOCKED** — [22](./22_SKY_TREASURES_FAST_GATE.md) · [21](./21_SKY_TREASURES_SCENE_01_START.md) · pilot `d67bee2`                                                                                                                                   |
-| Full Sky theme audit + lock       | ✅ Audit complete — [23](./23_FULL_SKY_THEME_AUDIT_AND_LOCK.md) · ready to lock · Playful next after Founder push                                                                                                                                                   |
-| Playful                           | ⏸ Not started                                                                                                                                                                                                                                                       |
+| Full Sky theme audit + lock       | 🔒 **APPROVED AND LOCKED** — [23](./23_FULL_SKY_THEME_AUDIT_AND_LOCK.md) · audit `43c65f3`                                                                                                                                                                          |
+| Release scope                     | **3 × 4** — Bloom · Warm · Sky only (each: Moments · Connection · Memories · Treasures)                                                                                                                                                                             |
+| Playful                           | 🧊 **FROZEN** — delivery decision; post-publication phase; no implementation without Founder unlock                                                                                                                                                                 |
 | Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                                                                                                                                                                                               |
 
 ### Assets
