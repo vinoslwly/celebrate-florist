@@ -14,7 +14,8 @@
 > **Sky Treasures:** 🔒 **APPROVED AND LOCKED** — [22](./22_SKY_TREASURES_FAST_GATE.md) · [21](./21_SKY_TREASURES_SCENE_01_START.md) · `/theme-lab/sky?mode=treasures` · pilot `d67bee2`  
 > **Full Sky theme:** 🔒 **APPROVED AND LOCKED** — [23](./23_FULL_SKY_THEME_AUDIT_AND_LOCK.md) · audit `43c65f3`  
 > **Release scope:** **3 themes × 4 modes** — Bloom · Warm · Sky (Moments · Connection · Memories · Treasures each)  
-> **Playful:** 🧊 **FROZEN** — not started; no work without future Founder unlock (post-publication)  
+> **Playful / Pure:** 🧊 **FROZEN** — not selectable for new Studio orders; no Theme Lab Playful work without Founder unlock  
+> **Sprint 12.5 closure:** [24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md](./24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md)  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
 
@@ -154,8 +155,9 @@ Scene graph SSOT: [Moments](../sprint-11/01_MOMENTS_SCENE_ARCHITECTURE.md) · [C
 | Sky Memories                      | ✅ **APPROVED AND LOCKED** — [19](./19_SKY_MEMORIES_SCENE_01_START.md) · [20](./20_SKY_MEMORIES_FAST_GATE.md) · pilot `8652d50`                                                                                                                                     |
 | Sky Treasures                     | 🔒 **APPROVED AND LOCKED** — [22](./22_SKY_TREASURES_FAST_GATE.md) · [21](./21_SKY_TREASURES_SCENE_01_START.md) · pilot `d67bee2`                                                                                                                                   |
 | Full Sky theme audit + lock       | 🔒 **APPROVED AND LOCKED** — [23](./23_FULL_SKY_THEME_AUDIT_AND_LOCK.md) · audit `43c65f3`                                                                                                                                                                          |
+| Sprint 12.5 final closure         | ✅ [24](./24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) — Theme Lab milestone closed                                                                                                                                                                                       |
 | Release scope                     | **3 × 4** — Bloom · Warm · Sky only (each: Moments · Connection · Memories · Treasures)                                                                                                                                                                             |
-| Playful                           | 🧊 **FROZEN** — delivery decision; post-publication phase; no implementation without Founder unlock                                                                                                                                                                 |
+| Playful / Pure                    | 🧊 **FROZEN** — not selectable for new orders; no Playful Theme Lab without Founder unlock                                                                                                                                                                          |
 | Production `/e/` Scene Engine     | ⛔ **NOT AUTHORIZED**                                                                                                                                                                                                                                               |
 
 ### Assets

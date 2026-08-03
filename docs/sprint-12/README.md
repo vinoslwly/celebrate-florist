@@ -4,8 +4,8 @@
 > **Phases 1–9:** ✅ **APPROVED AND CLOSED**  
 > **Bible:** [CELEBRATE_UI_SYSTEM_BIBLE.md](./CELEBRATE_UI_SYSTEM_BIBLE.md) — **OFFICIAL INDEXED BASELINE**  
 > **Implementation:** ✅ **CLOSED** — Core UI **IMPLEMENTED AND APPROVED** — [../sprint-12-implementation/README.md](../sprint-12-implementation/README.md)  
-> **Sprint 12.5:** Bloom 🔒 · Warm 🔒 ([14 audit](../sprint-12-5/14_FULL_WARM_THEME_AUDIT_AND_LOCK.md)) · Playful/Sky ⏸ · [08 handoff](../sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)  
-> **Bloom implementation / Motion (S13) / Photobooth (S14):** **NOT STARTED**  
+> **Sprint 12.5:** 🔒 **CLOSED** — Bloom·Warm·Sky locked · Playful frozen · [24 closure](../sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md)  
+> **Motion (S13) / Photobooth (S14):** **NOT STARTED** (Founder authorize)  
 > **Parent:** [00_SPRINT_12_UI_SYSTEM_PLAN.md](./00_SPRINT_12_UI_SYSTEM_PLAN.md)
 
 ---

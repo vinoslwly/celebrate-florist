@@ -22,7 +22,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     id: "theme",
     question: "Apakah bisa pilih tema?",
-    answer: "Bisa. Anda bisa memilih salah satu dari empat Experience Theme.",
+    answer: "Bisa. Anda bisa memilih salah satu dari tiga Experience Theme.",
   },
   {
     id: "letter-content",

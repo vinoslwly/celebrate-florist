@@ -12,22 +12,22 @@ This folder is the **single source of truth** for the Celebrate Florist project.
 
 **Before Sprint 06 implementation**, read the Product Revision V2 package. Celebrate evolved from a Digital Greeting Website into an **Interactive Digital Experience Platform** with four experience modes (Moments, Connection, Memories, Treasures).
 
-| #   | Document                                                                             | Purpose                                                                                                                                                 |
-| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 7   | [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)                             | Why the product changed, positioning, founder amendments                                                                                                |
-| 8   | [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md)                                   | Per-mode product specification                                                                                                                          |
-| 9   | [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)                             | Engineering impact matrix (no code)                                                                                                                     |
-| 10  | [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)                       | Schema recommendations (no SQL)                                                                                                                         |
-| 11  | [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)                 | **Sprint 06+ roadmap — supersedes pre-revision plan**                                                                                                   |
-| 12  | [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                                 | **Studio admin UX — mandatory for Sprint 06 Studio work**                                                                                               |
-| 13  | [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)                               | **Experience Journey SSOT — recipient & buyer-preview ordering (all modes)**                                                                            |
-| 14  | [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md)                         | **CF-R1 + CF-R2 — Replayable Experience SSOT (locked)**                                                                                                 |
-| 15  | [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md)           | **Sprint 10 — CF-R2 Treasures replay reset (✅ complete)**                                                                                              |
-| 16  | [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) | **Sprint 11 — Scene Engine core spec + GER (✅ architecture complete; impl NOT authorized)**                                                            |
-| —   | [sprint-11/README.md](./sprint-11/README.md)                                         | **Sprint 11 mode docs index — incremental documentation strategy**                                                                                      |
-| —   | [sprint-12/README.md](./sprint-12/README.md)                                         | **Sprint 12 UI System — CLOSED (docs baseline)**                                                                                                        |
-| —   | [sprint-12-implementation/README.md](./sprint-12-implementation/README.md)           | **Sprint 12 Implementation Pass — CLOSED (Core UI approved)**                                                                                           |
-| —   | [sprint-12-5/README.md](./sprint-12-5/README.md)                                     | **Sprint 12.5 — Bloom 🔒 LOCKED** · remote sync ✅ · [08 handoff](./sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md) · Warm ready for planning |
+| #   | Document                                                                             | Purpose                                                                                                                                         |
+| --- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 7   | [07_PRODUCT_REVISION_V2.md](./07_PRODUCT_REVISION_V2.md)                             | Why the product changed, positioning, founder amendments                                                                                        |
+| 8   | [08_EXPERIENCE_MODES.md](./08_EXPERIENCE_MODES.md)                                   | Per-mode product specification                                                                                                                  |
+| 9   | [09_ARCHITECTURE_IMPACT.md](./09_ARCHITECTURE_IMPACT.md)                             | Engineering impact matrix (no code)                                                                                                             |
+| 10  | [10_DATABASE_REVISION_PLAN.md](./10_DATABASE_REVISION_PLAN.md)                       | Schema recommendations (no SQL)                                                                                                                 |
+| 11  | [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md)                 | **Sprint 06+ roadmap — supersedes pre-revision plan**                                                                                           |
+| 12  | [12_STUDIO_UX.md](./12_STUDIO_UX.md)                                                 | **Studio admin UX — mandatory for Sprint 06 Studio work**                                                                                       |
+| 13  | [13_EXPERIENCE_JOURNEY.md](./13_EXPERIENCE_JOURNEY.md)                               | **Experience Journey SSOT — recipient & buyer-preview ordering (all modes)**                                                                    |
+| 14  | [14_REPLAYABLE_EXPERIENCE.md](./14_REPLAYABLE_EXPERIENCE.md)                         | **CF-R1 + CF-R2 — Replayable Experience SSOT (locked)**                                                                                         |
+| 15  | [15_SPRINT_10_CF-R2_REPLAY_RESET.md](./15_SPRINT_10_CF-R2_REPLAY_RESET.md)           | **Sprint 10 — CF-R2 Treasures replay reset (✅ complete)**                                                                                      |
+| 16  | [16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) | **Sprint 11 — Scene Engine core spec + GER (✅ architecture complete; impl NOT authorized)**                                                    |
+| —   | [sprint-11/README.md](./sprint-11/README.md)                                         | **Sprint 11 mode docs index — incremental documentation strategy**                                                                              |
+| —   | [sprint-12/README.md](./sprint-12/README.md)                                         | **Sprint 12 UI System — CLOSED (docs baseline)**                                                                                                |
+| —   | [sprint-12-implementation/README.md](./sprint-12-implementation/README.md)           | **Sprint 12 Implementation Pass — CLOSED (Core UI approved)**                                                                                   |
+| —   | [sprint-12-5/README.md](./sprint-12-5/README.md)                                     | **Sprint 12.5 — Theme Lab milestone** · Bloom·Warm·Sky 🔒 · Playful/Pure 🧊 · [24 closure](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) |
 
 Sprint 05.5 was **documentation only** — no code, no migrations. Sprints 00–05 remain valid.
 
@@ -39,15 +39,15 @@ Founder approved **CF-R1** and **CF-R2** (CF-R2-A/B/C). **Sprint 10 is officiall
 
 Sprint 00–10 = **Phase A — Product Foundation** ✅ complete. Platform core is shipped. Official long-term roadmap:
 
-| Phase                            | Sprints | Status         | Purpose                                                                                                                                                                 |
-| -------------------------------- | ------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Phase A — Product Foundation** | 00–10   | ✅ Complete    | Engineering, 4 modes, replayability, platform core                                                                                                                      |
-| **Phase B — Experience Layer**   | 11–16   | 🔄 In progress | Sprint 11 architecture ✅; Sprint 12 Core UI ✅; **Sprint 12.5 Bloom 🔒 LOCKED** (remote sync ✅); **Warm ready for planning**; Playful/Sky not started; S13–16 planned |
-| **Phase C — Release Layer**      | 17–19   | 📋 Planned     | QA, production readiness (incl. landing/SEO), **V1 Launch**                                                                                                             |
+| Phase                            | Sprints | Status         | Purpose                                                                                                                                                                                                   |
+| -------------------------------- | ------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase A — Product Foundation** | 00–10   | ✅ Complete    | Engineering, 4 modes, replayability, platform core                                                                                                                                                        |
+| **Phase B — Experience Layer**   | 11–16   | 🔄 In progress | Sprint 11 architecture ✅; Sprint 12 Core UI ✅; **Sprint 12.5 Theme Lab 🔒 CLOSED** (Bloom·Warm·Sky locked · Playful frozen · [24](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md)); S13–16 planned |
+| **Phase C — Release Layer**      | 17–19   | 📋 Planned     | QA, production readiness (incl. landing/SEO), **V1 Launch**                                                                                                                                               |
 
 **Sprint 11 architecture is complete** (2026-07-16). All four modes locked; cross-mode review passed. **Scene Engine implementation has NOT started.** [16](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) · [sprint-11/](./sprint-11/README.md) · [05 — Cross-Mode Review](./sprint-11/05_CROSS_MODE_REVIEW.md).
 
-**Sprint 12 Implementation Pass is CLOSED** (2026-07-19) — Core UI System **IMPLEMENTED AND APPROVED**. **Sprint 12.5 Bloom Theme Lab is 🔒 LOCKED** (2026-07-21) — all four modes + full audit + remote sync complete. [sprint-12-5/](./sprint-12-5/README.md) · [08 handoff](./sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md). Production Scene Engine wiring **NOT AUTHORIZED**.
+**Sprint 12 Implementation Pass is CLOSED** (2026-07-19) — Core UI System **IMPLEMENTED AND APPROVED**. **Sprint 12.5 Theme Lab milestone is 🔒 CLOSED** (2026-08-04) — Bloom · Warm · Sky locked (12 mode combinations); Playful + Pure frozen; release scope **3×4**. [24 closure](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) · [sprint-12-5/](./sprint-12-5/README.md). Production Scene Engine / `/e/[token]` wiring **NOT AUTHORIZED**.
 
 ## ✅ Sprint 05.5 — CLOSED (Official Implementation Baseline)
 
@@ -135,7 +135,7 @@ Read these documents in order. Each file builds on the previous one.
 | Area                        | Status                                                                                                                                                                      |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Development phase**       | **Engineering freeze** — Phase A (Sprint 00–10) complete; Phase B/C planned per [Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved) |
-| **Current sprint**          | **Sprint 12.5 — CLOSED** · Bloom 🔒 locked · Warm ⏸ ready for planning · [handoff](./sprint-12-5/08_BLOOM_HANDOFF_AND_NEXT_THEME_READINESS.md)                              |
+| **Current sprint**          | **Sprint 12.5 — CLOSED** · Bloom·Warm·Sky 🔒 · Playful 🧊 · [24 closure](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) · next: Sprint 13 (Founder authorize)         |
 | **Latest completed sprint** | **Sprint 10** — CF-R2 replay reset (10A–10C) + CRIT-01 `service_role` DELETE hotfix                                                                                         |
 | **Deployment**              | Vercel project linked; Studio + recipient `/e/[token]` + buyer `/preview/[token]` routes deployable                                                                         |
 | **Database**                | **21** migrations in repo; all Sprint 09A–10 migrations applied on remote — see [03_DATABASE.md](./03_DATABASE.md)                                                          |

@@ -13,8 +13,8 @@ import { warmTheme } from "./warm";
  * over "every theme", which a single-file import list can't provide
  * without this.
  *
- * V1 active subset for new orders: bloom, warm, play, sky — see active-themes.ts.
- * Pure remains for backward compatibility and Landing catalog continuity.
+ * V1 active subset for new orders: bloom, warm, sky — see active-themes.ts (FD-S12-22).
+ * Pure and Play remain for backward compatibility / resolver only.
  */
 export const ALL_THEMES: Theme[] = [
   bloomTheme,
@@ -24,10 +24,5 @@ export const ALL_THEMES: Theme[] = [
   playTheme,
 ];
 
-/** Active V1 themes for validation matrices (excludes frozen Pure). */
-export const ACTIVE_V1_THEMES: Theme[] = [
-  bloomTheme,
-  warmTheme,
-  playTheme,
-  skyTheme,
-];
+/** Active V1 themes for Landing / Studio selection (excludes frozen Pure + Playful). */
+export const ACTIVE_V1_THEMES: Theme[] = [bloomTheme, warmTheme, skyTheme];

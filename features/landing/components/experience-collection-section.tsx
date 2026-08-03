@@ -16,7 +16,7 @@ export function ExperienceCollectionSection() {
           id="experience-heading"
           eyebrow="Experience Themes"
           title="Choose your experience."
-          subtitle="Empat suasana, masing-masing punya karakter sendiri — contoh gambar menyusul ya ✨"
+          subtitle="Tiga suasana, masing-masing punya karakter sendiri — contoh gambar menyusul ya ✨"
         />
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2">

@@ -11,17 +11,18 @@
 
 ## Bloom final status
 
-| Item             | Status                                                                               |
-| ---------------- | ------------------------------------------------------------------------------------ |
-| Moments          | 🔒 Locked (`b96c1b2`)                                                                |
-| Connection       | 🔒 Locked (`d056513`)                                                                |
-| Memories         | 🔒 Locked (`dda7efe`)                                                                |
-| Treasures        | 🔒 Locked (`df262bc`)                                                                |
-| Full theme audit | 🔒 Locked (`3820a6a`)                                                                |
-| Theme Lab route  | `/theme-lab/bloom`                                                                   |
-| Warm             | 🔒 **APPROVED AND LOCKED** — [14 full audit](./14_FULL_WARM_THEME_AUDIT_AND_LOCK.md) |
-| Playful          | ⏸ Not started — may begin after Founder approval                                     |
-| Sky              | ⏸ Not started                                                                        |
+| Item             | Status                                                                                                    |
+| ---------------- | --------------------------------------------------------------------------------------------------------- |
+| Moments          | 🔒 Locked (`b96c1b2`)                                                                                     |
+| Connection       | 🔒 Locked (`d056513`)                                                                                     |
+| Memories         | 🔒 Locked (`dda7efe`)                                                                                     |
+| Treasures        | 🔒 Locked (`df262bc`)                                                                                     |
+| Full theme audit | 🔒 Locked (`3820a6a`)                                                                                     |
+| Theme Lab route  | `/theme-lab/bloom`                                                                                        |
+| Warm             | 🔒 **APPROVED AND LOCKED** — [14 full audit](./14_FULL_WARM_THEME_AUDIT_AND_LOCK.md)                      |
+| Sky              | 🔒 **APPROVED AND LOCKED** — [23 full audit](./23_FULL_SKY_THEME_AUDIT_AND_LOCK.md)                       |
+| Playful          | 🧊 **FROZEN** — FD-S12-22 · post-publication only · [24 closure](./24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) |
+| Pure             | 🧊 **FROZEN** (Studio/Landing — not selectable for new orders)                                            |
 
 Bloom is the **reference implementation** for future themes. Locked scenes must not change casually — only for regression, security, accessibility, shared-infrastructure need, or explicit Founder instruction.
 
