@@ -28,6 +28,7 @@ This folder is the **single source of truth** for the Celebrate Florist project.
 | —   | [sprint-12/README.md](./sprint-12/README.md)                                         | **Sprint 12 UI System — CLOSED (docs baseline)**                                                                                                |
 | —   | [sprint-12-implementation/README.md](./sprint-12-implementation/README.md)           | **Sprint 12 Implementation Pass — CLOSED (Core UI approved)**                                                                                   |
 | —   | [sprint-12-5/README.md](./sprint-12-5/README.md)                                     | **Sprint 12.5 — Theme Lab milestone** · Bloom·Warm·Sky 🔒 · Playful/Pure 🧊 · [24 closure](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) |
+| —   | [sprint-13/README.md](./sprint-13/README.md)                                         | **Sprint 13 — Motion** · entry plan ✅ · implementation ⛔ · [01 plan](./sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md)                           |
 
 Sprint 05.5 was **documentation only** — no code, no migrations. Sprints 00–05 remain valid.
 
@@ -39,11 +40,11 @@ Founder approved **CF-R1** and **CF-R2** (CF-R2-A/B/C). **Sprint 10 is officiall
 
 Sprint 00–10 = **Phase A — Product Foundation** ✅ complete. Platform core is shipped. Official long-term roadmap:
 
-| Phase                            | Sprints | Status         | Purpose                                                                                                                                                                                                   |
-| -------------------------------- | ------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Phase A — Product Foundation** | 00–10   | ✅ Complete    | Engineering, 4 modes, replayability, platform core                                                                                                                                                        |
-| **Phase B — Experience Layer**   | 11–16   | 🔄 In progress | Sprint 11 architecture ✅; Sprint 12 Core UI ✅; **Sprint 12.5 Theme Lab 🔒 CLOSED** (Bloom·Warm·Sky locked · Playful frozen · [24](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md)); S13–16 planned |
-| **Phase C — Release Layer**      | 17–19   | 📋 Planned     | QA, production readiness (incl. landing/SEO), **V1 Launch**                                                                                                                                               |
+| Phase                            | Sprints | Status         | Purpose                                                                                                                                                                                              |
+| -------------------------------- | ------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase A — Product Foundation** | 00–10   | ✅ Complete    | Engineering, 4 modes, replayability, platform core                                                                                                                                                   |
+| **Phase B — Experience Layer**   | 11–16   | 🔄 In progress | Sprint 11 architecture ✅; Sprint 12 Core UI ✅; Sprint 12.5 Theme Lab 🔒 CLOSED; **Sprint 13 Motion entry plan ✅** · impl ⛔ · [01](./sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md); S14–16 planned |
+| **Phase C — Release Layer**      | 17–19   | 📋 Planned     | QA, production readiness (incl. landing/SEO), **V1 Launch**                                                                                                                                          |
 
 **Sprint 11 architecture is complete** (2026-07-16). All four modes locked; cross-mode review passed. **Scene Engine implementation has NOT started.** [16](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) · [sprint-11/](./sprint-11/README.md) · [05 — Cross-Mode Review](./sprint-11/05_CROSS_MODE_REVIEW.md).
 
@@ -132,16 +133,16 @@ Read these documents in order. Each file builds on the previous one.
 
 ## Current Project Status
 
-| Area                        | Status                                                                                                                                                                      |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Development phase**       | **Engineering freeze** — Phase A (Sprint 00–10) complete; Phase B/C planned per [Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved) |
-| **Current sprint**          | **Sprint 12.5 — CLOSED** · Bloom·Warm·Sky 🔒 · Playful 🧊 · [24 closure](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) · next: Sprint 13 (Founder authorize)         |
-| **Latest completed sprint** | **Sprint 10** — CF-R2 replay reset (10A–10C) + CRIT-01 `service_role` DELETE hotfix                                                                                         |
-| **Deployment**              | Vercel project linked; Studio + recipient `/e/[token]` + buyer `/preview/[token]` routes deployable                                                                         |
-| **Database**                | **21** migrations in repo; all Sprint 09A–10 migrations applied on remote — see [03_DATABASE.md](./03_DATABASE.md)                                                          |
-| **Security**                | Sprint 02B hardening complete; RLS and privilege hardening complete (migrations 011–015)                                                                                    |
-| **Product**                 | **V2:** All **four experience modes** production-ready — Moments, Connection, Memories, Treasures (Studio publish, preview, QR, recipient UI)                               |
-| **Production readiness**    | **Platform core shipped** — Phase B/C transforms functional product into premium launch experience                                                                          |
+| Area                        | Status                                                                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Development phase**       | **Engineering freeze** — Phase A (Sprint 00–10) complete; Phase B/C planned per [Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved)          |
+| **Current sprint**          | **Sprint 13 — ENTRY PLAN** · implementation ⛔ · [01 plan](./sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md) · Sprint 12.5 🔒 [24](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) |
+| **Latest completed sprint** | **Sprint 10** — CF-R2 replay reset (10A–10C) + CRIT-01 `service_role` DELETE hotfix                                                                                                  |
+| **Deployment**              | Vercel project linked; Studio + recipient `/e/[token]` + buyer `/preview/[token]` routes deployable                                                                                  |
+| **Database**                | **21** migrations in repo; all Sprint 09A–10 migrations applied on remote — see [03_DATABASE.md](./03_DATABASE.md)                                                                   |
+| **Security**                | Sprint 02B hardening complete; RLS and privilege hardening complete (migrations 011–015)                                                                                             |
+| **Product**                 | **V2:** All **four experience modes** production-ready — Moments, Connection, Memories, Treasures (Studio publish, preview, QR, recipient UI)                                        |
+| **Production readiness**    | **Platform core shipped** — Phase B/C transforms functional product into premium launch experience                                                                                   |
 
 ### Sprint History
 

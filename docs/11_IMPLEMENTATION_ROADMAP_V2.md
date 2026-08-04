@@ -706,7 +706,7 @@ Scene Engine must **NOT** modify:
 > **Status:** ✅ **CLOSED — Documentation / UI System Baseline** (Founder 2026-07-19) · Core UI **IMPLEMENTED AND APPROVED** · Bloom Moments 🔒 **APPROVED AND LOCKED** (2026-07-20)  
 > **Phases 1–9:** ✅ **APPROVED AND CLOSED** · Bible = **OFFICIAL INDEXED BASELINE**  
 > **Implementation:** ✅ Closed — [sprint-12-implementation/](./sprint-12-implementation/README.md)  
-> **Sprint 12.5 Theme Lab:** 🔒 **CLOSED** — Bloom·Warm·Sky locked · Playful frozen · [24 closure](../sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) · Sprint 13 / 14 **NOT STARTED** (Founder authorize)  
+> **Sprint 12.5 Theme Lab:** 🔒 **CLOSED** — Bloom·Warm·Sky locked · Playful frozen · [24 closure](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) · **Sprint 13:** entry plan ✅ · implementation ⛔ until Founder authorize · [01 plan](./sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md)  
 > **Docs:** [sprint-12/README.md](./sprint-12/README.md) · [Bible](./sprint-12/CELEBRATE_UI_SYSTEM_BIBLE.md) · [DDR-S12-034](./sprint-12/CELEBRATE_DESIGN_DECISION_REGISTER.md)
 
 **Objective (docs — complete):** Define the Celebrate UI System — how every screen feels unmistakably Celebrate — through nine planning phases ending in Design QA and the UI System Bible. **Not** a zero-based redesign; landing page is the visual baseline. Diagnosis: **one Celebrate family, uneven expression.**
@@ -736,25 +736,24 @@ Scene Engine must **NOT** modify:
 
 ## Sprint 13 — Motion System
 
-> **Status:** 📋 Planned — **NOT STARTED**
+> **Status:** 📋 **ENTRY PLAN COMPLETE** — implementation **NOT STARTED** (Founder authorize) · [entry plan](./sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md)
 
-**Objective:** Transform the recipient experience into an emotional presentation.
+**Objective:** Make Theme Lab journeys feel like an experience, not static pages — **minimal** shared motion foundation (no cinematic framework).
 
-| Scope              | Detail                                                                |
-| ------------------ | --------------------------------------------------------------------- |
-| Presentation style | Canva-inspired presentation approach                                  |
-| Scene transitions  | Cross-scene motion — **follows Scene Graph architecture (Sprint 11)** |
-| Camera movement    | Pan, focus, depth                                                     |
-| Fade, Blur, Zoom   | Core motion vocabulary                                                |
-| Envelope animation | Envelope open/reveal motion                                           |
-| Letter animation   | Letter reveal motion                                                  |
-| Gallery animation  | Gallery entrance/scroll motion                                        |
-| Reduced motion     | Accessibility path required (`prefers-reduced-motion`)                |
-| Motion tokens      | Sourced from Sprint 12 design tokens                                  |
+| Scope              | Detail                                                            |
+| ------------------ | ----------------------------------------------------------------- |
+| Scene transitions  | Host cross-fade consistency + reduced-motion snap                 |
+| Reduced motion     | SSR-safe preference handling across hosts + representative scenes |
+| Envelope / gift    | Ceremonial open on representative Bloom / Warm (/ Sky) surfaces   |
+| Letter / gallery   | Reveal patterns on representative paths                           |
+| CTA ambient        | Remove or reduce unnecessary infinite pulse on primary controls   |
+| Fade / blur / zoom | Supporting vocabulary only — not separate epics                   |
+| Camera             | Light push/pull **only** where it clearly helps                   |
+| Motion tokens      | Small shared kit (`duration` / `ease` / helpers) — not a DSL      |
 
-**Excluded:** Photobooth animation (Sprint 14).
+**Excluded:** Photobooth (Sprint 14) · Playful · `/e/[token]` wiring · rewriting all 12 journey choreographies.
 
-**Deliverable:** Celebrate feels like an **experience**, not a traditional website.
+**Deliverable:** Celebrate Theme Lab feels like an **experience**; identities of Bloom · Warm · Sky preserved.
 
 ---
 

@@ -16,7 +16,7 @@
 > **Release scope:** **3 themes × 4 modes** — Bloom · Warm · Sky (Moments · Connection · Memories · Treasures each)  
 > **Playful / Pure:** 🧊 **FROZEN** — not selectable for new Studio orders; no Theme Lab Playful work without Founder unlock  
 > **Sprint 12.5 closure:** 🔒 **FOUNDER APPROVED CLOSED** — [24](./24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) · `9e380a8`  
-> **Sprint 13:** ⛔ **NOT STARTED** (separate Founder authorization)  
+> **Sprint 13:** 📋 entry plan ✅ · implementation ⛔ — [../sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md](../sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md)  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
 
