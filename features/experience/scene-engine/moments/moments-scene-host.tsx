@@ -16,6 +16,10 @@ import {
   resolveNextMomentsScene,
 } from "@/features/experience/scene-engine/moments/graph";
 import { momentsSceneRegistry } from "@/features/experience/scene-engine/moments/registry";
+import {
+  getHostSceneFade,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
 import { MomentsPersistentShell } from "@/features/themes/components/bloom-moments-decorations";
 
@@ -39,6 +43,8 @@ export function MomentsSceneHost({
 }: MomentsSceneHostProps) {
   const [sceneId, setSceneId] = useState<MomentsSceneId>(initialScene);
   const [journeyKey, setJourneyKey] = useState(0);
+  const reduceMotion = useCelebrateReducedMotion();
+  const sceneFade = getHostSceneFade(reduceMotion);
 
   const payload = { experience, photos, theme };
   const hasPhotos = photos.length > 0;
@@ -110,17 +116,17 @@ export function MomentsSceneHost({
         className={showLabChrome ? "min-h-0 flex-1" : undefined}
         fillParent={showLabChrome}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className={cn(
               "flex min-h-0 flex-col overflow-hidden",
               showLabChrome ? "h-full w-full flex-1" : "min-h-[100svh]",
             )}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.45 }}
+            initial={sceneFade.initial}
+            animate={sceneFade.animate}
+            exit={sceneFade.exit}
+            transition={sceneFade.transition}
           >
             <Scene payload={payload} onComplete={advance} />
           </motion.div>

@@ -1,7 +1,7 @@
 # Sprint 13 — Motion System
 
 > **Status:** ✅ **FOUNDER APPROVED** — entry plan locked · [01 plan](./01_SPRINT_13_MOTION_ENTRY_PLAN.md)  
-> **Implementation:** P0 + representative P1 authorized; broader Sprint 13 not started  
+> **Implementation:** ✅ P0 + 3 Moments host pilots · [02](./02_MOTION_FOUNDATION_AND_HOST_PILOT.md) · broader Sprint 13 not started  
 > **After:** Sprint 12.5 Theme Lab 🔒 CLOSED ([24](../sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md))  
 > **Themes:** Bloom · Warm · Sky locked · Playful / Pure frozen  
 > **`/e/[token]`:** ⛔ NOT AUTHORIZED  
@@ -14,6 +14,7 @@ Make the website feel like an experience, not a collection of static pages — v
 
 ## Documents
 
-| #   | Document                                                                 | Purpose                            |
-| --- | ------------------------------------------------------------------------ | ---------------------------------- |
-| 01  | [01_SPRINT_13_MOTION_ENTRY_PLAN.md](./01_SPRINT_13_MOTION_ENTRY_PLAN.md) | Entry review + implementation plan |
+| #   | Document                                                                           | Purpose                                |
+| --- | ---------------------------------------------------------------------------------- | -------------------------------------- |
+| 01  | [01_SPRINT_13_MOTION_ENTRY_PLAN.md](./01_SPRINT_13_MOTION_ENTRY_PLAN.md)           | Entry review + plan (Founder approved) |
+| 02  | [02_MOTION_FOUNDATION_AND_HOST_PILOT.md](./02_MOTION_FOUNDATION_AND_HOST_PILOT.md) | P0 Motion Kit + 3 Moments host pilots  |

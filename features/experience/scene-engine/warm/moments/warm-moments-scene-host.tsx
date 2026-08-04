@@ -10,6 +10,10 @@ import type { ExperienceRow } from "@/types/database";
 import type { Theme } from "@/types/theme";
 
 import {
+  getHostSceneFade,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
+import {
   resolveNextWarmMomentsScene,
   WARM_MOMENTS_ALBUM_UNLOCK_SCENE,
   WARM_MOMENTS_GALLERY_ENDING_SCENE,
@@ -73,6 +77,8 @@ export function WarmMomentsSceneHost({
     WARM_MOMENTS_INITIAL_SCENE,
   );
   const [journeyKey, setJourneyKey] = useState(0);
+  const reduceMotion = useCelebrateReducedMotion();
+  const sceneFade = getHostSceneFade(reduceMotion);
 
   const payload = { experience, photos, theme };
   const hasPhotos = photos.length > 0;
@@ -131,14 +137,14 @@ export function WarmMomentsSceneHost({
           showLabChrome ? "h-full flex-1" : "min-h-[100svh]",
         )}
       >
-        <AnimatePresence mode="sync" initial={false}>
+        <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className="absolute inset-0 z-10 flex min-h-0 flex-col overflow-hidden"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={sceneFade.initial}
+            animate={sceneFade.animate}
+            exit={sceneFade.exit}
+            transition={sceneFade.transition}
           >
             {sceneId === WARM_MOMENTS_INITIAL_SCENE ? (
               <WarmCelebrateLoadingScene

@@ -10,6 +10,10 @@ import type { ExperienceRow } from "@/types/database";
 import type { Theme } from "@/types/theme";
 
 import {
+  getHostSceneFade,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
+import {
   resolveNextSkyMomentsScene,
   SKY_MOMENTS_BALLOON_BURST_SCENE,
   SKY_MOMENTS_GALLERY_SCENE,
@@ -72,6 +76,8 @@ export function SkyMomentsSceneHost({
     SKY_MOMENTS_INITIAL_SCENE,
   );
   const [journeyKey, setJourneyKey] = useState(0);
+  const reduceMotion = useCelebrateReducedMotion();
+  const sceneFade = getHostSceneFade(reduceMotion);
 
   const payload = { experience, photos, theme };
   const hasPhotos = photos.length > 0;
@@ -127,14 +133,14 @@ export function SkyMomentsSceneHost({
           showLabChrome ? "h-full flex-1" : "min-h-[100svh]",
         )}
       >
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className="absolute inset-0 flex h-full min-h-0 flex-col overflow-hidden bg-[#C5DCEF]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.28 }}
+            initial={sceneFade.initial}
+            animate={sceneFade.animate}
+            exit={sceneFade.exit}
+            transition={sceneFade.transition}
           >
             {sceneId === SKY_MOMENTS_INITIAL_SCENE ? (
               <SkyCelebrateLoadingScene
