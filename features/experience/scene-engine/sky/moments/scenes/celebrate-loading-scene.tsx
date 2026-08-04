@@ -1,8 +1,12 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { SkyMomentsSceneProps } from "@/features/experience/scene-engine/sky/moments/types";
 
 const ASSETS = {
@@ -79,7 +83,8 @@ const FALLING_PETALS = [
  * Full collage on all sides + soft white diamond plate for live brand.
  */
 export function SkyCelebrateLoadingScene(_props: SkyMomentsSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
 
   return (
     <div
@@ -146,14 +151,16 @@ export function SkyCelebrateLoadingScene(_props: SkyMomentsSceneProps) {
           background:
             "radial-gradient(ellipse 50% 40% at 12% 8%, rgba(255,255,255,0.18) 0%, transparent 55%)",
         }}
-        animate={
-          reduceMotion ? { opacity: 0.35 } : { opacity: [0.18, 0.42, 0.22] }
+        animate={ambient ? { opacity: [0.18, 0.42, 0.22] } : { opacity: 0.35 }}
+        transition={
+          ambient
+            ? { duration: 8, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 0 }
         }
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Falling soft sky petals */}
-      {!reduceMotion ? (
+      {ambient ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -197,11 +204,13 @@ export function SkyCelebrateLoadingScene(_props: SkyMomentsSceneProps) {
         >
           <motion.div
             animate={
-              reduceMotion
-                ? undefined
-                : { y: [0, -5, 0], rotate: [0, 3, -2.5, 0] }
+              ambient ? { y: [0, -5, 0], rotate: [0, 3, -2.5, 0] } : undefined
             }
-            transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+            transition={
+              ambient
+                ? { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
+                : { duration: 0 }
+            }
           >
             <SkyPlantMark className="h-12 w-12 sm:h-14 sm:w-14" />
           </motion.div>
@@ -259,24 +268,28 @@ export function SkyCelebrateLoadingScene(_props: SkyMomentsSceneProps) {
             style={{ color: INK_SOFT }}
             initial={reduceMotion ? false : { opacity: 0, y: 10 }}
             animate={
-              reduceMotion
-                ? { opacity: 0.92 }
-                : { opacity: [0.78, 1, 0.78], y: [0, -3, 0] }
+              ambient
+                ? { opacity: [0.78, 1, 0.78], y: [0, -3, 0] }
+                : { opacity: 0.92 }
             }
-            transition={{
-              opacity: {
-                duration: 4.5,
-                delay: 0.7,
-                repeat: Infinity,
-                ease: "easeInOut",
-              },
-              y: {
-                duration: 4.5,
-                delay: 0.7,
-                repeat: Infinity,
-                ease: "easeInOut",
-              },
-            }}
+            transition={
+              ambient
+                ? {
+                    opacity: {
+                      duration: 4.5,
+                      delay: 0.7,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    },
+                    y: {
+                      duration: 4.5,
+                      delay: 0.7,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    },
+                  }
+                : { duration: 0 }
+            }
           >
             {TAGLINE}
           </motion.p>

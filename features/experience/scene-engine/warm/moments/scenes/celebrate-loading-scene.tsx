@@ -1,9 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
 import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 
 const ASSETS = {
   atmosphere: "/themes/warm/moments/scene-01-atmosphere.webp",
@@ -42,7 +46,8 @@ function SoftPetal({ className }: { className?: string }) {
  * Founder background plate + Founder rose icon; brand typography is live HTML.
  */
 export function WarmCelebrateLoadingScene(_props: MomentsSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
 
   return (
     <div className={`${SCENE_VIEWPORT_LOCK} bg-[#4A0A10]`}>
@@ -72,14 +77,16 @@ export function WarmCelebrateLoadingScene(_props: MomentsSceneProps) {
           background:
             "radial-gradient(ellipse 55% 45% at 14% 10%, rgba(255,220,190,0.16) 0%, transparent 55%)",
         }}
-        animate={
-          reduceMotion ? { opacity: 0.7 } : { opacity: [0.4, 0.85, 0.45] }
+        animate={ambient ? { opacity: [0.4, 0.85, 0.45] } : { opacity: 0.7 }}
+        transition={
+          ambient
+            ? { duration: 8, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 0 }
         }
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Extra falling petals — light motion only */}
-      {!reduceMotion ? (
+      {ambient ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -123,11 +130,13 @@ export function WarmCelebrateLoadingScene(_props: MomentsSceneProps) {
         >
           <motion.div
             animate={
-              reduceMotion
-                ? undefined
-                : { y: [0, -4, 0], rotate: [0, 1.5, -1.5, 0] }
+              ambient ? { y: [0, -4, 0], rotate: [0, 1.5, -1.5, 0] } : undefined
             }
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            transition={
+              ambient
+                ? { duration: 6, repeat: Infinity, ease: "easeInOut" }
+                : { duration: 0 }
+            }
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -150,18 +159,18 @@ export function WarmCelebrateLoadingScene(_props: MomentsSceneProps) {
                 className="inline-block"
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={
-                  reduceMotion
-                    ? { opacity: 1 }
-                    : { opacity: 1, y: [0, -2.5, 0] }
+                  ambient ? { opacity: 1, y: [0, -2.5, 0] } : { opacity: 1 }
                 }
                 transition={{
                   opacity: { duration: 0.4, delay: 0.18 + i * 0.05 },
-                  y: {
-                    duration: 3.4,
-                    delay: 0.85 + i * 0.07,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  },
+                  y: ambient
+                    ? {
+                        duration: 3.4,
+                        delay: 0.85 + i * 0.07,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }
+                    : { duration: 0 },
                 }}
               >
                 {letter}

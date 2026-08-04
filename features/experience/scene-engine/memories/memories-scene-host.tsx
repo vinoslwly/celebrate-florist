@@ -20,6 +20,10 @@ import {
 } from "@/features/experience/scene-engine/memories/graph";
 import { memoriesSceneRegistry } from "@/features/experience/scene-engine/memories/registry";
 import { MemoriesMatchMemoryScene } from "@/features/experience/scene-engine/memories/scenes/match-memory-scene";
+import {
+  getHostSceneFade,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
 import type {
   BloomMemoriesLabMatch,
@@ -53,6 +57,8 @@ export function MemoriesSceneHost({
 }: MemoriesSceneHostProps) {
   const [sceneId, setSceneId] = useState<MemoriesSceneId>(initialScene);
   const [journeyKey, setJourneyKey] = useState(0);
+  const reduceMotion = useCelebrateReducedMotion();
+  const sceneFade = getHostSceneFade(reduceMotion);
   const advanceLockRef = useRef(false);
 
   const memoryPairCount = match.pairs.length;
@@ -170,7 +176,7 @@ export function MemoriesSceneHost({
         )}
         fillParent={showLabChrome}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className={cn(
@@ -180,10 +186,10 @@ export function MemoriesSceneHost({
                 ? "overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch]"
                 : "overflow-hidden",
             )}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.45 }}
+            initial={sceneFade.initial}
+            animate={sceneFade.animate}
+            exit={sceneFade.exit}
+            transition={sceneFade.transition}
           >
             {pair != null && memoryIndex != null ? (
               <MemoriesMatchMemoryScene

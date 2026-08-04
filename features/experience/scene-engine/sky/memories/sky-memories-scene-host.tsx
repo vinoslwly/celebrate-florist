@@ -10,6 +10,10 @@ import type { ExperienceRow } from "@/types/database";
 import type { Theme } from "@/types/theme";
 
 import {
+  getHostSceneFade,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
+import {
   isSkyMemoriesMatchMemoryScene,
   parseSkyMemoriesMatchMemoryIndex,
   resolveNextSkyMemoriesScene,
@@ -90,6 +94,8 @@ export function SkyMemoriesSceneHost({
     SKY_MEMORIES_INITIAL_SCENE,
   );
   const [journeyKey, setJourneyKey] = useState(0);
+  const reduceMotion = useCelebrateReducedMotion();
+  const sceneFade = getHostSceneFade(reduceMotion);
   const advanceLockRef = useRef(false);
 
   const memoryPairCount = match.pairs.length;
@@ -176,7 +182,7 @@ export function SkyMemoriesSceneHost({
           showLabChrome ? "h-full flex-1" : "min-h-[100svh]",
         )}
       >
-        <AnimatePresence mode="sync" initial={false}>
+        <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className={cn(
@@ -190,10 +196,10 @@ export function SkyMemoriesSceneHost({
                 ? { backgroundColor: "#9EC9E6" }
                 : undefined
             }
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={sceneFade.initial}
+            animate={sceneFade.animate}
+            exit={sceneFade.exit}
+            transition={sceneFade.transition}
           >
             {pair != null && memoryIndex != null ? (
               <SkyMemoriesMatchMemoryScene

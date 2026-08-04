@@ -10,6 +10,10 @@ import type { ExperienceRow } from "@/types/database";
 import type { Theme } from "@/types/theme";
 
 import {
+  getHostSceneFade,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
+import {
   isSkyTreasuresGiftContentScene,
   parseSkyTreasuresGiftContentSortOrder,
   resolveNextSkyTreasuresScene,
@@ -87,6 +91,8 @@ export function SkyTreasuresSceneHost({
     SKY_TREASURES_INITIAL_SCENE,
   );
   const [journeyKey, setJourneyKey] = useState(0);
+  const reduceMotion = useCelebrateReducedMotion();
+  const sceneFade = getHostSceneFade(reduceMotion);
   const [openedSortOrders, setOpenedSortOrders] = useState<ReadonlySet<number>>(
     () => new Set(),
   );
@@ -209,14 +215,14 @@ export function SkyTreasuresSceneHost({
           showLabChrome ? "h-full flex-1" : "min-h-[100svh]",
         )}
       >
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className="absolute inset-0 flex h-full min-h-0 flex-col overflow-hidden bg-[#C5DCEF]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
+            initial={sceneFade.initial}
+            animate={sceneFade.animate}
+            exit={sceneFade.exit}
+            transition={sceneFade.transition}
           >
             {sceneId === SKY_TREASURES_INITIAL_SCENE ? (
               <SkyTreasuresCelebrateLoadingScene

@@ -10,6 +10,10 @@ import type { ExperienceRow } from "@/types/database";
 import type { Theme } from "@/types/theme";
 
 import {
+  getHostSceneFade,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
+import {
   isSkyConnectionQuizQuestionScene,
   parseSkyConnectionQuizQuestionIndex,
   resolveNextSkyConnectionScene,
@@ -96,6 +100,8 @@ export function SkyConnectionSceneHost({
     SKY_CONNECTION_INITIAL_SCENE,
   );
   const [journeyKey, setJourneyKey] = useState(0);
+  const reduceMotion = useCelebrateReducedMotion();
+  const sceneFade = getHostSceneFade(reduceMotion);
 
   const quizQuestionCount = quiz.questions.length;
   const hasPhotos = photos.length > 0;
@@ -169,14 +175,14 @@ export function SkyConnectionSceneHost({
           showLabChrome ? "h-full flex-1" : "min-h-[100svh]",
         )}
       >
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
             className="absolute inset-0 flex h-full min-h-0 flex-col overflow-hidden bg-[#C5DCEF]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.28 }}
+            initial={sceneFade.initial}
+            animate={sceneFade.animate}
+            exit={sceneFade.exit}
+            transition={sceneFade.transition}
           >
             {question != null && questionIndex != null ? (
               <SkyConnectionQuizQuestionScene
