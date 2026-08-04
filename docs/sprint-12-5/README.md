@@ -15,7 +15,8 @@
 > **Full Sky theme:** 🔒 **APPROVED AND LOCKED** — [23](./23_FULL_SKY_THEME_AUDIT_AND_LOCK.md) · audit `43c65f3`  
 > **Release scope:** **3 themes × 4 modes** — Bloom · Warm · Sky (Moments · Connection · Memories · Treasures each)  
 > **Playful / Pure:** 🧊 **FROZEN** — not selectable for new Studio orders; no Theme Lab Playful work without Founder unlock  
-> **Sprint 12.5 closure:** [24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md](./24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md)  
+> **Sprint 12.5 closure:** 🔒 **FOUNDER APPROVED CLOSED** — [24](./24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) · `9e380a8`  
+> **Sprint 13:** ⛔ **NOT STARTED** (separate Founder authorization)  
 > **Production Scene Engine integration:** ⛔ **NOT AUTHORIZED**  
 > **`/e/[token]` production wiring:** ⛔ **NOT AUTHORIZED**
 

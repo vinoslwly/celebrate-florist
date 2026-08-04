@@ -1,10 +1,11 @@
 # Sprint 12.5 — Final Closure Audit
 
 > **Date:** 2026-08-04  
-> **Branch:** `rebuild/foundation` · baseline `88fc3dd` on `origin/rebuild/foundation` (0/0 at audit start)  
+> **Branch:** `rebuild/foundation` · closure `9e380a8`  
 > **Auditor stance:** Independent Sprint closure review (not a re-run of every mode journey)  
 > **Scope:** Theme Lab milestone across Bloom · Warm · Sky · Playful freeze · docs sync · representative regression  
-> **Sprint 13:** ⛔ **NOT STARTED**  
+> **Founder:** ✅ **APPROVED TO CLOSE** (2026-08-04)  
+> **Sprint 13:** ⛔ **NOT STARTED** (separate Founder authorization required after push)  
 > **Production `/e/[token]` Scene Engine:** ⛔ **NOT AUTHORIZED**
 
 ---
@@ -219,4 +220,6 @@ Sprint 12.5 Theme Lab validation milestone is **CLOSED**:
 - `/e/[token]` **NOT AUTHORIZED**
 - Sprint 13 **not started**
 
-Pending Founder push of this closure commit.
+### Founder closure (2026-08-04)
+
+Founder **approved** this Final Closure Audit. Closure commit `9e380a8` is authorized to push to `origin/rebuild/foundation`. Sprint 13 remains **not started** and requires separate Founder authorization after push. Production `/e/[token]` Scene Engine remains **NOT AUTHORIZED**. Do not run `npm audit fix --force`.
