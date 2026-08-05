@@ -4,6 +4,11 @@ import { useId } from "react";
 
 import { motion } from "framer-motion";
 
+import {
+  MOTION_DURATION,
+  MOTION_EASE,
+} from "@/features/experience/scene-engine/shared/motion";
+
 /**
  * Sky Moments gift motif — light-blue box + cream stitched ribbon + gingham heart.
  * Treasures Final uses tone="pearl" (white / silver — not gold).
@@ -621,7 +626,10 @@ export function SkyGiftBox({
             <motion.g
               initial={{ x: 80, y: 18, rotate: 0, opacity: 0.9 }}
               animate={{ x: -8, y: 46, rotate: -28, opacity: 1 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{
+                duration: MOTION_DURATION.ceremony,
+                ease: MOTION_EASE.out,
+              }}
               style={{ originX: "60px", originY: "36px" }}
             >
               <SkyGiftLidWithBow ids={ids} x={0} y={0} tone={tone} />

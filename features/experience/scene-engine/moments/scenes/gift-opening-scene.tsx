@@ -6,6 +6,13 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
 import { BloomGiftBox } from "@/features/experience/scene-engine/shared/bloom-gift-box";
+import {
+  allowAmbientLoop,
+  getGentleZoom,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 
 type Stage = "wrapped" | "opening" | "letter";
 
@@ -115,13 +122,16 @@ function OpenGiftReveal({
   fromName,
   stage,
   onTapLetter,
+  reduceMotion,
 }: {
   toName: string;
   fromName: string;
   stage: "opening" | "letter";
   onTapLetter: () => void;
+  reduceMotion: boolean;
 }) {
   const revealed = stage === "letter";
+  const ambient = allowAmbientLoop(reduceMotion);
 
   return (
     <div className="relative mx-auto w-full max-w-sm">
@@ -133,8 +143,16 @@ function OpenGiftReveal({
           background:
             "radial-gradient(ellipse at center, rgba(255,236,210,0.95) 0%, rgba(255,200,160,0.55) 40%, transparent 70%)",
         }}
-        animate={{ opacity: [0.55, 0.95, 0.55], scale: [0.96, 1.06, 0.96] }}
-        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+        animate={
+          ambient
+            ? { opacity: [0.55, 0.95, 0.55], scale: [0.96, 1.06, 0.96] }
+            : { opacity: 0.75 }
+        }
+        transition={
+          ambient
+            ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 0 }
+        }
       />
 
       {/* Letter rising from the box */}
@@ -144,13 +162,17 @@ function OpenGiftReveal({
         disabled={!revealed}
         onClick={onTapLetter}
         className="relative z-20 mx-auto block w-[11.5rem] disabled:cursor-default sm:w-[13rem] focus-visible:ring-2 focus-visible:ring-[#C45B7A] focus-visible:outline-none"
-        initial={{ y: 90, opacity: 0, scale: 0.92 }}
+        initial={reduceMotion ? false : { y: 90, opacity: 0, scale: 0.92 }}
         animate={{
           y: revealed ? 0 : 36,
           opacity: 1,
           scale: 1,
         }}
-        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+        transition={{
+          duration: MOTION_DURATION.ceremony,
+          ease: MOTION_EASE.out,
+          delay: reduceMotion ? 0 : 0.15,
+        }}
         whileHover={revealed ? { scale: 1.02 } : undefined}
         whileTap={revealed ? { scale: 0.98 } : undefined}
       >
@@ -198,9 +220,13 @@ function OpenGiftReveal({
           {revealed ? (
             <motion.p
               className="mt-5 text-center font-serif text-[11px] text-[#9A6B78] italic sm:text-xs"
-              initial={{ opacity: 0 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.45 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+                delay: reduceMotion ? 0 : 0.45,
+              }}
             >
               Tap the letter to continue
             </motion.p>
@@ -216,6 +242,7 @@ function OpenGiftReveal({
         <BloomGiftBox
           variant="open"
           animateLid
+          reduceMotion={reduceMotion}
           className="h-36 w-[18rem] sm:h-40 sm:w-[20rem]"
         />
       </div>
@@ -240,6 +267,9 @@ export function GiftOpeningScene({
 }: MomentsSceneProps & { lockedOnly?: boolean }) {
   const toName = payload.experience.greeting_name;
   const fromName = payload.experience.closing_name;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
+  const giftEnter = getGentleZoom(reduceMotion);
   const [stage, setStage] = useState<Stage>("wrapped");
   const [shaking, setShaking] = useState(false);
   const [lockedFails, setLockedFails] = useState(0);
@@ -259,7 +289,10 @@ export function GiftOpeningScene({
       return;
     }
     setStage("opening");
-    window.setTimeout(() => setStage("letter"), 950);
+    const letterDelayMs = reduceMotion
+      ? 160
+      : Math.round(MOTION_DURATION.ceremony * 1000) + 100;
+    window.setTimeout(() => setStage("letter"), letterDelayMs);
   }
 
   const wrappedHeadline =
@@ -285,7 +318,7 @@ export function GiftOpeningScene({
           background:
             "radial-gradient(ellipse 70% 55% at 50% 40%, rgba(255,255,255,0.5) 0%, transparent 70%)",
         }}
-        animate={{ opacity: [0.4, 0.7, 0.4] }}
+        animate={ambient ? { opacity: [0.4, 0.7, 0.4] } : { opacity: 0.55 }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
       {/* Micro-noise breaks CSS banding without looking textured */}
@@ -317,7 +350,11 @@ export function GiftOpeningScene({
               background: `radial-gradient(circle, ${blob.color} 0%, transparent 70%)`,
               filter: `blur(${blob.blur})`,
             }}
-            animate={{ opacity: [0.65, 0.95, 0.65], scale: [1, 1.04, 1] }}
+            animate={
+              ambient
+                ? { opacity: [0.65, 0.95, 0.65], scale: [1, 1.04, 1] }
+                : { opacity: 0.8 }
+            }
             transition={{
               duration: 5 + i * 0.4,
               repeat: Infinity,
@@ -362,12 +399,16 @@ export function GiftOpeningScene({
               width: petal.size,
               height: petal.size * 1.35,
             }}
-            animate={{
-              opacity: [0, 0.85, 0.85, 0],
-              y: ["0vh", "110vh"],
-              x: [0, petal.x, petal.x * -0.4],
-              rotate: [0, 40, -25, 60],
-            }}
+            animate={
+              ambient
+                ? {
+                    opacity: [0, 0.85, 0.85, 0],
+                    y: ["0vh", "110vh"],
+                    x: [0, petal.x, petal.x * -0.4],
+                    rotate: [0, 40, -25, 60],
+                  }
+                : { opacity: 0 }
+            }
             transition={{
               duration: petal.duration,
               delay: petal.delay,
@@ -392,7 +433,11 @@ export function GiftOpeningScene({
               height: s.size,
               boxShadow: "0 0 8px rgba(255,255,255,0.9)",
             }}
-            animate={{ opacity: [0.15, 0.95, 0.15], scale: [0.8, 1.25, 0.8] }}
+            animate={
+              ambient
+                ? { opacity: [0.15, 0.95, 0.15], scale: [0.8, 1.25, 0.8] }
+                : { opacity: 0.45 }
+            }
             transition={{
               duration: 2.2,
               delay: s.delay,
@@ -410,16 +455,22 @@ export function GiftOpeningScene({
               key="wrapped"
               className="flex w-full flex-1 flex-col items-center"
               exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.35 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               <AnimatePresence mode="wait">
                 <motion.p
                   key={wrappedHeadline}
                   className="mb-6 text-center font-serif text-sm font-semibold tracking-[0.28em] text-[#9E2A50] uppercase sm:mb-10 sm:text-base"
-                  initial={{ opacity: 0, y: -8 }}
+                  initial={reduceMotion ? false : { opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 6 }}
-                  transition={{ duration: 0.28 }}
+                  transition={{
+                    duration: MOTION_DURATION.fast,
+                    ease: MOTION_EASE.out,
+                  }}
                 >
                   {wrappedHeadline}
                 </motion.p>
@@ -433,15 +484,23 @@ export function GiftOpeningScene({
                     background:
                       "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,220,230,0.45) 45%, transparent 72%)",
                   }}
-                  animate={{
-                    opacity: [0.55, 0.95, 0.55],
-                    scale: [0.96, 1.04, 0.96],
-                  }}
-                  transition={{
-                    duration: 2.8,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
+                  animate={
+                    ambient
+                      ? {
+                          opacity: [0.55, 0.95, 0.55],
+                          scale: [0.96, 1.04, 0.96],
+                        }
+                      : { opacity: 0.75 }
+                  }
+                  transition={
+                    ambient
+                      ? {
+                          duration: 2.8,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }
+                      : { duration: 0 }
+                  }
                 />
 
                 <motion.button
@@ -451,8 +510,9 @@ export function GiftOpeningScene({
                   }
                   onClick={handleGiftTap}
                   className="relative z-10 focus-visible:ring-2 focus-visible:ring-[#C45B7A] focus-visible:outline-none"
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={giftEnter.initial}
+                  animate={giftEnter.animate}
+                  transition={giftEnter.transition}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
@@ -467,7 +527,7 @@ export function GiftOpeningScene({
                               y: 0,
                             }
                           : { x: [0, -10, 10, -8, 8, -4, 4, 0], y: 0 }
-                        : { y: [0, -8, 0], rotate: 0 }
+                        : { y: 0, rotate: 0 }
                     }
                     transition={
                       shaking
@@ -478,12 +538,7 @@ export function GiftOpeningScene({
                                 : 0.48,
                             ease: "easeInOut",
                           }
-                        : {
-                            duration: 3.2,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: 0.4,
-                          }
+                        : undefined
                     }
                   >
                     <BloomGiftBox
@@ -497,7 +552,11 @@ export function GiftOpeningScene({
               <motion.span
                 aria-hidden
                 className="mt-4 text-[#C45B7A]/50"
-                animate={{ y: [0, 5, 0], opacity: [0.35, 0.7, 0.35] }}
+                animate={
+                  ambient
+                    ? { y: [0, 5, 0], opacity: [0.35, 0.7, 0.35] }
+                    : { opacity: 0.5 }
+                }
                 transition={{ duration: 1.6, repeat: Infinity }}
               >
                 <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
@@ -517,13 +576,17 @@ export function GiftOpeningScene({
               className="flex w-full flex-1 flex-col items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               <OpenGiftReveal
                 toName={toName}
                 fromName={fromName}
                 stage={stage}
                 onTapLetter={onComplete}
+                reduceMotion={reduceMotion}
               />
             </motion.div>
           )}

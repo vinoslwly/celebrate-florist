@@ -2,10 +2,17 @@
 
 import { useState } from "react";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
 import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  getGentleZoom,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import { WarmGiftBox } from "@/features/experience/scene-engine/warm/moments/warm-gift-box";
 
 const BG = "#6B0F16";
@@ -76,6 +83,8 @@ function WarmLetterReveal({
   onTapLetter: () => void;
   reduceMotion: boolean;
 }) {
+  const ambient = allowAmbientLoop(reduceMotion);
+
   return (
     <div className="relative mx-auto w-full max-w-sm">
       <motion.div
@@ -86,9 +95,9 @@ function WarmLetterReveal({
             "radial-gradient(ellipse at center, rgba(255,220,150,0.55) 0%, rgba(180,40,50,0.25) 45%, transparent 70%)",
         }}
         animate={
-          reduceMotion
-            ? { opacity: 0.7 }
-            : { opacity: [0.45, 0.9, 0.45], scale: [0.96, 1.05, 0.96] }
+          ambient
+            ? { opacity: [0.45, 0.9, 0.45], scale: [0.96, 1.05, 0.96] }
+            : { opacity: 0.7 }
         }
         transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -105,7 +114,11 @@ function WarmLetterReveal({
           opacity: 1,
           scale: 1,
         }}
-        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
+        transition={{
+          duration: MOTION_DURATION.ceremony,
+          ease: MOTION_EASE.out,
+          delay: reduceMotion ? 0 : 0.12,
+        }}
         whileHover={revealed ? { scale: 1.02 } : undefined}
         whileTap={revealed ? { scale: 0.98 } : undefined}
       >
@@ -162,7 +175,11 @@ function WarmLetterReveal({
               style={{ color: "#8B5A4A" }}
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+                delay: reduceMotion ? 0 : 0.4,
+              }}
             >
               Tap the letter to continue
             </motion.p>
@@ -202,7 +219,9 @@ export function WarmGiftOpeningScene({
 }: MomentsSceneProps & { lockedOnly?: boolean }) {
   const toName = payload.experience.greeting_name;
   const fromName = payload.experience.closing_name;
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
+  const giftEnter = getGentleZoom(reduceMotion);
   const [stage, setStage] = useState<Stage>("wrapped");
   const [shaking, setShaking] = useState(false);
   const [lockedFails, setLockedFails] = useState(0);
@@ -222,7 +241,7 @@ export function WarmGiftOpeningScene({
       return;
     }
     setStage("opening");
-    window.setTimeout(() => setStage("letter"), reduceMotion ? 200 : 950);
+    window.setTimeout(() => setStage("letter"), reduceMotion ? 160 : 1100);
   }
 
   const wrappedHeadline =
@@ -261,7 +280,7 @@ export function WarmGiftOpeningScene({
       </div>
 
       {/* Gold sparkles around gift */}
-      {!reduceMotion ? (
+      {allowAmbientLoop(reduceMotion) ? (
         <div aria-hidden className="pointer-events-none absolute inset-0">
           {SPARKLES.map((s, i) => (
             <motion.span
@@ -294,13 +313,19 @@ export function WarmGiftOpeningScene({
               key="wrapped"
               className="flex w-full flex-1 flex-col items-center"
               exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.35 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               <motion.div
                 className="mb-8 flex flex-col items-center gap-3 sm:mb-12"
                 initial={reduceMotion ? false : { opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{
+                  duration: MOTION_DURATION.base,
+                  ease: MOTION_EASE.out,
+                }}
               >
                 <GoldOrnamentLine />
                 <AnimatePresence mode="wait">
@@ -311,7 +336,10 @@ export function WarmGiftOpeningScene({
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 4 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{
+                      duration: MOTION_DURATION.fast,
+                      ease: MOTION_EASE.out,
+                    }}
                   >
                     {wrappedHeadline}
                   </motion.p>
@@ -328,12 +356,12 @@ export function WarmGiftOpeningScene({
                       "radial-gradient(ellipse at center, rgba(201,162,39,0.45) 0%, transparent 70%)",
                   }}
                   animate={
-                    reduceMotion
-                      ? { opacity: 0.6 }
-                      : {
+                    ambient
+                      ? {
                           opacity: [0.4, 0.85, 0.4],
                           scale: [0.96, 1.05, 0.96],
                         }
+                      : { opacity: 0.6 }
                   }
                   transition={{
                     duration: 2.8,
@@ -351,8 +379,9 @@ export function WarmGiftOpeningScene({
                   }
                   onClick={handleGiftTap}
                   className="relative z-10 focus-visible:ring-2 focus-visible:ring-[#C9A227] focus-visible:outline-none"
-                  initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={giftEnter.initial}
+                  animate={giftEnter.animate}
+                  transition={giftEnter.transition}
                   whileHover={shaking ? undefined : { scale: 1.03 }}
                   whileTap={shaking ? undefined : { scale: 0.97 }}
                 >
@@ -371,9 +400,7 @@ export function WarmGiftOpeningScene({
                               rotate: [0, -2, 2, -1, 1, 0],
                               y: 0,
                             }
-                        : reduceMotion
-                          ? undefined
-                          : { y: [0, -8, 0], rotate: [0, -0.8, 0.8, 0] }
+                        : { y: 0, rotate: 0 }
                     }
                     transition={
                       shaking
@@ -384,12 +411,7 @@ export function WarmGiftOpeningScene({
                                 : 0.48,
                             ease: "easeInOut",
                           }
-                        : {
-                            duration: 3.4,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: 0.35,
-                          }
+                        : undefined
                     }
                   >
                     <WarmGiftBox
@@ -406,9 +428,9 @@ export function WarmGiftOpeningScene({
                 className="mt-3"
                 style={{ color: GOLD_SOFT }}
                 animate={
-                  reduceMotion
-                    ? { opacity: 0.5 }
-                    : { y: [0, 5, 0], opacity: [0.35, 0.75, 0.35] }
+                  ambient
+                    ? { y: [0, 5, 0], opacity: [0.35, 0.75, 0.35] }
+                    : { opacity: 0.5 }
                 }
                 transition={{ duration: 1.6, repeat: Infinity }}
               >
@@ -429,14 +451,19 @@ export function WarmGiftOpeningScene({
               className="flex w-full flex-1 flex-col items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               {stage === "opening" ? (
                 <motion.p
                   className="mb-8 font-serif text-sm tracking-[0.28em] uppercase sm:text-base"
                   style={{ color: INK_LIGHT }}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  animate={
+                    ambient ? { opacity: [0.4, 1, 0.4] } : { opacity: 1 }
+                  }
                   transition={{ duration: 0.9, repeat: Infinity }}
                 >
                   Opening…

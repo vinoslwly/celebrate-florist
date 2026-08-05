@@ -2,9 +2,16 @@
 
 import { useState } from "react";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  getGentleZoom,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import { SkyGiftBox } from "@/features/experience/scene-engine/sky/moments/sky-gift-box";
 import type { SkyMomentsSceneProps } from "@/features/experience/scene-engine/sky/moments/types";
 
@@ -91,6 +98,7 @@ function OpenGiftReveal({
   reduceMotion: boolean;
 }) {
   const revealed = stage === "letter";
+  const ambient = allowAmbientLoop(reduceMotion);
 
   return (
     <div className="relative mx-auto w-full max-w-sm">
@@ -102,9 +110,9 @@ function OpenGiftReveal({
             "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(184,212,234,0.55) 40%, transparent 70%)",
         }}
         animate={
-          reduceMotion
-            ? { opacity: 0.7 }
-            : { opacity: [0.5, 0.95, 0.5], scale: [0.96, 1.06, 0.96] }
+          ambient
+            ? { opacity: [0.5, 0.95, 0.5], scale: [0.96, 1.06, 0.96] }
+            : { opacity: 0.7 }
         }
         transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -121,7 +129,11 @@ function OpenGiftReveal({
           opacity: 1,
           scale: 1,
         }}
-        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+        transition={{
+          duration: MOTION_DURATION.ceremony,
+          ease: MOTION_EASE.out,
+          delay: reduceMotion ? 0 : 0.15,
+        }}
         whileHover={revealed ? { scale: 1.02 } : undefined}
         whileTap={revealed ? { scale: 0.98 } : undefined}
       >
@@ -190,7 +202,11 @@ function OpenGiftReveal({
               style={{ color: INK_SOFT }}
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.45 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+                delay: reduceMotion ? 0 : 0.45,
+              }}
             >
               Tap the letter to continue
             </motion.p>
@@ -227,7 +243,9 @@ export function SkyGiftOpeningScene({
 }: SkyMomentsSceneProps & { lockedOnly?: boolean }) {
   const toName = payload.experience.greeting_name;
   const fromName = payload.experience.closing_name;
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
+  const giftEnter = getGentleZoom(reduceMotion);
   const [stage, setStage] = useState<Stage>("wrapped");
   const [shaking, setShaking] = useState(false);
   const [lockedFails, setLockedFails] = useState(0);
@@ -247,7 +265,7 @@ export function SkyGiftOpeningScene({
       return;
     }
     setStage("opening");
-    window.setTimeout(() => setStage("letter"), reduceMotion ? 200 : 950);
+    window.setTimeout(() => setStage("letter"), reduceMotion ? 160 : 900);
   }
 
   const wrappedHeadline =
@@ -273,9 +291,7 @@ export function SkyGiftOpeningScene({
           background:
             "radial-gradient(ellipse 70% 55% at 50% 40%, rgba(255,255,255,0.55) 0%, transparent 70%)",
         }}
-        animate={
-          reduceMotion ? { opacity: 0.55 } : { opacity: [0.35, 0.7, 0.4] }
-        }
+        animate={ambient ? { opacity: [0.35, 0.7, 0.4] } : { opacity: 0.55 }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
 
@@ -329,7 +345,7 @@ export function SkyGiftOpeningScene({
       </div>
 
       {/* Drift confetti */}
-      {!reduceMotion ? (
+      {allowAmbientLoop(reduceMotion) ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -376,9 +392,9 @@ export function SkyGiftOpeningScene({
               boxShadow: "0 0 8px rgba(255,255,255,0.9)",
             }}
             animate={
-              reduceMotion
-                ? { opacity: 0.5 }
-                : { opacity: [0.15, 0.95, 0.15], scale: [0.8, 1.25, 0.8] }
+              ambient
+                ? { opacity: [0.15, 0.95, 0.15], scale: [0.8, 1.25, 0.8] }
+                : { opacity: 0.5 }
             }
             transition={{
               duration: 2.2,
@@ -397,12 +413,19 @@ export function SkyGiftOpeningScene({
               key="wrapped"
               className="flex w-full flex-1 flex-col items-center"
               exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.35 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               <motion.div
                 className="mb-6 flex flex-col items-center sm:mb-10"
                 initial={reduceMotion ? false : { opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: MOTION_DURATION.base,
+                  ease: MOTION_EASE.out,
+                }}
               >
                 <div
                   className="mb-2 flex items-center gap-2"
@@ -421,7 +444,10 @@ export function SkyGiftOpeningScene({
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 4 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{
+                      duration: MOTION_DURATION.fast,
+                      ease: MOTION_EASE.out,
+                    }}
                   >
                     {wrappedHeadline}
                   </motion.p>
@@ -446,12 +472,12 @@ export function SkyGiftOpeningScene({
                       "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(184,212,234,0.45) 45%, transparent 72%)",
                   }}
                   animate={
-                    reduceMotion
-                      ? { opacity: 0.7 }
-                      : {
+                    ambient
+                      ? {
                           opacity: [0.55, 0.95, 0.55],
                           scale: [0.96, 1.04, 0.96],
                         }
+                      : { opacity: 0.7 }
                   }
                   transition={{
                     duration: 2.8,
@@ -469,8 +495,9 @@ export function SkyGiftOpeningScene({
                   }
                   onClick={handleGiftTap}
                   className="relative z-10 focus-visible:ring-2 focus-visible:ring-[#6BA3C9] focus-visible:outline-none"
-                  initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={giftEnter.initial}
+                  animate={giftEnter.animate}
+                  transition={giftEnter.transition}
                   whileHover={shaking ? undefined : { scale: 1.03 }}
                   whileTap={shaking ? undefined : { scale: 0.97 }}
                 >
@@ -489,9 +516,7 @@ export function SkyGiftOpeningScene({
                               rotate: [0, -2, 2, -1, 1, 0],
                               y: 0,
                             }
-                        : reduceMotion
-                          ? undefined
-                          : { y: [0, -8, 0], rotate: 0 }
+                        : { y: 0, rotate: 0 }
                     }
                     transition={
                       shaking
@@ -502,12 +527,7 @@ export function SkyGiftOpeningScene({
                                 : 0.48,
                             ease: "easeInOut",
                           }
-                        : {
-                            duration: 3.2,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: 0.4,
-                          }
+                        : undefined
                     }
                   >
                     <SkyGiftBox
@@ -523,9 +543,9 @@ export function SkyGiftOpeningScene({
                 className="mt-4"
                 style={{ color: "rgba(107,163,201,0.55)" }}
                 animate={
-                  reduceMotion
-                    ? undefined
-                    : { y: [0, 5, 0], opacity: [0.35, 0.7, 0.35] }
+                  ambient
+                    ? { y: [0, 5, 0], opacity: [0.35, 0.7, 0.35] }
+                    : { opacity: 0.5 }
                 }
                 transition={{ duration: 1.6, repeat: Infinity }}
               >
@@ -546,7 +566,10 @@ export function SkyGiftOpeningScene({
               className="flex w-full flex-1 flex-col items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
+              transition={{
+                duration: MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               <OpenGiftReveal
                 toName={toName}
