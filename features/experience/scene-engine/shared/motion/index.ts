@@ -12,6 +12,7 @@ export {
   allowPrimaryCtaInfiniteMotion,
   getBlurReveal,
   getGentleZoom,
+  getProgressNodePulseAnimation,
   getStaggerContainer,
   getStaggerItem,
 } from "./presets";

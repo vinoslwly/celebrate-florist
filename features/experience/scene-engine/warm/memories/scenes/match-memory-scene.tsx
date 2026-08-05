@@ -2,8 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
+import {
+  getProgressNodePulseAnimation,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { WarmMemoriesSceneProps } from "@/features/experience/scene-engine/warm/memories/types";
 import type { WarmMemoriesLabMatchPair } from "@/features/theme-lab/config/warm-memories-fixtures";
 
@@ -252,7 +256,7 @@ export function WarmMemoriesMatchMemoryScene({
   pauseAutoAdvance = false,
   onAnswer,
 }: WarmMemoriesMatchMemorySceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [hintBoost, setHintBoost] = useState(0);
@@ -437,9 +441,10 @@ export function WarmMemoriesMatchMemoryScene({
                             boxShadow: !reduceMotion
                               ? undefined
                               : `0 0 0 3px rgba(201,162,74,0.2)`,
-                            animation: !reduceMotion
-                              ? "wmm-node-pulse 2.2s ease-in-out infinite"
-                              : undefined,
+                            animation: getProgressNodePulseAnimation(
+                              reduceMotion,
+                              "wmm-node-pulse",
+                            ),
                           }}
                         >
                           <GoldHeart className="h-4 w-4" />

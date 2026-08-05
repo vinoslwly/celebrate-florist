@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
+import {
+  getProgressNodePulseAnimation,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { WarmConnectionSceneProps } from "@/features/experience/scene-engine/warm/connection/types";
 import type { WarmConnectionLabQuestion } from "@/features/theme-lab/config/warm-connection-fixtures";
 
@@ -78,7 +82,7 @@ export function WarmConnectionQuizQuestionScene({
   totalQuestions,
   onComplete,
 }: WarmConnectionQuizQuestionSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -198,9 +202,10 @@ export function WarmConnectionQuizQuestionScene({
                             backgroundColor: ROSE,
                             boxShadow:
                               "0 4px 14px -4px rgba(107,18,26,0.55), 0 0 0 3px rgba(255,252,248,0.85)",
-                            animation: reduceMotion
-                              ? undefined
-                              : "wqq-node-pulse 2.2s ease-in-out infinite",
+                            animation: getProgressNodePulseAnimation(
+                              reduceMotion,
+                              "wqq-node-pulse",
+                            ),
                           }
                         : done
                           ? {

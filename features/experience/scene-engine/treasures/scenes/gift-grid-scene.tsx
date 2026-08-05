@@ -2,11 +2,15 @@
 
 import { useMemo, useState } from "react";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
 import { BloomGiftBox } from "@/features/experience/scene-engine/shared/bloom-gift-box";
+import {
+  allowAmbientLoop,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { TreasuresSceneProps } from "@/features/experience/scene-engine/treasures/types";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
@@ -171,7 +175,7 @@ export function TreasuresGiftGridScene({
   openedSortOrders,
   onSelectGift,
 }: TreasuresGiftGridSceneProps) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useCelebrateReducedMotion();
   const gifts = useMemo(() => buildLabGifts(TREASURES_LAB_GRID_GIFT_COUNT), []);
   const nonFinalOrders = useMemo(
     () => gifts.filter((g) => !g.isFinal).map((g) => g.sortOrder),
@@ -223,7 +227,7 @@ export function TreasuresGiftGridScene({
       />
 
       {/* Falling petals */}
-      {!reduceMotion
+      {allowAmbientLoop(reduceMotion)
         ? FALLING_PETALS.map((petal, i) => (
             <motion.div
               key={`petal-${i}`}
@@ -252,7 +256,7 @@ export function TreasuresGiftGridScene({
         : null}
 
       {/* Ambient sparkles */}
-      {!reduceMotion
+      {allowAmbientLoop(reduceMotion)
         ? AMBIENT_SPARKLES.map((s, i) => (
             <motion.span
               key={`spark-${i}`}
@@ -359,38 +363,14 @@ export function TreasuresGiftGridScene({
                           "drop-shadow-[0_12px_28px_rgba(196,91,122,0.32)]",
                         isOpened && "drop-shadow-none",
                       )}
-                      animate={
-                        !reduceMotion && canTap && !isOpened
-                          ? { y: [0, -6, 0] }
-                          : { y: 0 }
-                      }
-                      transition={
-                        canTap && !isOpened && !reduceMotion
-                          ? {
-                              duration: 2.6 + (index % 3) * 0.25,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                              delay: index * 0.15,
-                            }
-                          : undefined
-                      }
+                      animate={{ y: 0 }}
                     >
-                      {canTap && !isOpened && !reduceMotion ? (
-                        <motion.div
+                      {canTap && !isOpened ? (
+                        <div
                           className={cn(
-                            "pointer-events-none absolute inset-x-[10%] top-[16%] bottom-[20%] rounded-full blur-2xl",
+                            "pointer-events-none absolute inset-x-[10%] top-[16%] bottom-[20%] rounded-full opacity-55 blur-2xl",
                             gift.isFinal ? "bg-[#F0D78A]/6" : "bg-[#FFD0E0]/65",
                           )}
-                          animate={{
-                            opacity: [0.3, 0.85, 0.3],
-                            scale: [0.9, 1.08, 0.9],
-                          }}
-                          transition={{
-                            duration: 2.8,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: index * 0.12,
-                          }}
                         />
                       ) : null}
 

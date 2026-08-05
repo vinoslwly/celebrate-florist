@@ -119,3 +119,15 @@ export function allowAmbientLoop(reduceMotion: boolean): boolean {
 export function allowPrimaryCtaInfiniteMotion(): false {
   return false;
 }
+
+/**
+ * Progress / step indicator emphasis — one-shot pulse only (never infinite).
+ * Under reduced motion, returns undefined (caller uses static ring/fill).
+ */
+export function getProgressNodePulseAnimation(
+  reduceMotion: boolean,
+  keyframeName: string,
+): string | undefined {
+  if (reduceMotion) return undefined;
+  return `${keyframeName} 2.2s ease-in-out 1`;
+}

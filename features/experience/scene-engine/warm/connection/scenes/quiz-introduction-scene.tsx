@@ -2,9 +2,13 @@
 
 import type { CSSProperties } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { WarmConnectionSceneProps } from "@/features/experience/scene-engine/warm/connection/types";
 import { WarmGiftBox } from "@/features/experience/scene-engine/warm/moments/warm-gift-box";
 
@@ -98,7 +102,7 @@ function HeartLock({ className }: { className?: string }) {
 export function WarmConnectionQuizIntroductionScene({
   onComplete,
 }: WarmConnectionSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
 
   return (
     <div className={SCENE_VIEWPORT_SCROLL} style={{ backgroundColor: BG }}>
@@ -188,7 +192,7 @@ export function WarmConnectionQuizIntroductionScene({
       </div>
 
       {/* CSS falling petals */}
-      {!reduceMotion ? (
+      {allowAmbientLoop(reduceMotion) ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -216,7 +220,7 @@ export function WarmConnectionQuizIntroductionScene({
       ) : null}
 
       {/* Sparkles + hearts near gift */}
-      {!reduceMotion ? (
+      {allowAmbientLoop(reduceMotion) ? (
         <div aria-hidden className="pointer-events-none absolute inset-0">
           {[
             { top: "38%", left: "24%", size: 4, delay: "0s" },
@@ -330,7 +334,7 @@ export function WarmConnectionQuizIntroductionScene({
                 style={{
                   animation: reduceMotion
                     ? undefined
-                    : "wqi-lock-pulse 2s ease-in-out infinite",
+                    : "wqi-lock-pulse 2s ease-in-out 1",
                 }}
               >
                 <HeartLock className="h-12 w-11 drop-shadow-lg sm:h-14 sm:w-12" />
@@ -393,32 +397,10 @@ export function WarmConnectionQuizIntroductionScene({
               whileHover={reduceMotion ? undefined : { scale: 1.03 }}
               whileTap={reduceMotion ? undefined : { scale: 0.98 }}
             >
-              {!reduceMotion ? (
-                <motion.span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-[#C9A227]/25 to-transparent"
-                  animate={{ left: ["-40%", "120%"] }}
-                  transition={{
-                    duration: 2.6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    repeatDelay: 0.9,
-                  }}
-                />
-              ) : null}
               <span className="relative">Start</span>
-              <motion.span
-                aria-hidden
-                className="relative text-xl leading-none"
-                animate={reduceMotion ? undefined : { x: [0, 5, 0] }}
-                transition={{
-                  duration: 1.2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
+              <span aria-hidden className="relative text-xl leading-none">
                 →
-              </motion.span>
+              </span>
             </motion.button>
           </div>
         </div>

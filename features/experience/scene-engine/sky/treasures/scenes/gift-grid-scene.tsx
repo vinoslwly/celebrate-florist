@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from "react";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
 import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
+import { useCelebrateReducedMotion } from "@/features/experience/scene-engine/shared/motion";
 import { SkyGiftBox } from "@/features/experience/scene-engine/sky/moments/sky-gift-box";
 import type { SkyTreasuresSceneProps } from "@/features/experience/scene-engine/sky/treasures/types";
 
@@ -149,7 +150,7 @@ export function SkyTreasuresGiftGridScene({
   openedSortOrders,
   onSelectGift,
 }: SkyTreasuresGiftGridSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
   const gifts = useMemo(
     () => buildLabGifts(SKY_TREASURES_LAB_GRID_GIFT_COUNT),
     [],
@@ -305,39 +306,15 @@ export function SkyTreasuresGiftGridScene({
                           "drop-shadow-[0_12px_28px_rgba(30,58,95,0.28)]",
                         isOpened && "drop-shadow-none",
                       )}
-                      animate={
-                        !reduceMotion && canTap && !isOpened
-                          ? { y: [0, -5, 0] }
-                          : { y: 0 }
-                      }
-                      transition={
-                        canTap && !isOpened && !reduceMotion
-                          ? {
-                              duration: 2.8 + (index % 3) * 0.2,
-                              repeat: Infinity,
-                              ease: "easeInOut",
-                              delay: index * 0.15,
-                            }
-                          : undefined
-                      }
+                      animate={{ y: 0 }}
                     >
-                      {canTap && !isOpened && !reduceMotion ? (
-                        <motion.div
-                          className="pointer-events-none absolute inset-x-[10%] top-[16%] bottom-[20%] rounded-full blur-2xl"
+                      {canTap && !isOpened ? (
+                        <div
+                          className="pointer-events-none absolute inset-x-[10%] top-[16%] bottom-[20%] rounded-full opacity-55 blur-2xl"
                           style={{
                             background: gift.isFinal
                               ? PEARL_GLOW
                               : "rgba(168,208,234,0.65)",
-                          }}
-                          animate={{
-                            opacity: [0.28, 0.75, 0.28],
-                            scale: [0.9, 1.06, 0.9],
-                          }}
-                          transition={{
-                            duration: 2.8,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: index * 0.12,
                           }}
                         />
                       ) : null}

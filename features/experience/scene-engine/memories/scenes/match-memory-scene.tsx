@@ -2,9 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { MemoriesSceneProps } from "@/features/experience/scene-engine/memories/types";
+import {
+  allowAmbientLoop,
+  getProgressNodePulseAnimation,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { BloomMemoriesLabMatchPair } from "@/features/theme-lab/config/bloom-memories-fixtures";
 
 type MemoriesMatchMemorySceneProps = MemoriesSceneProps & {
@@ -133,7 +138,7 @@ export function MemoriesMatchMemoryScene({
   pauseAutoAdvance = false,
   onAnswer,
 }: MemoriesMatchMemorySceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [hintBoost, setHintBoost] = useState(0);
@@ -235,7 +240,7 @@ export function MemoriesMatchMemoryScene({
         }}
       />
 
-      {!reduceMotion
+      {allowAmbientLoop(reduceMotion)
         ? FALLING_PETALS.map((p, i) => (
             <motion.div
               key={i}
@@ -319,10 +324,12 @@ export function MemoriesMatchMemoryScene({
                           : "flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#F0C8D4] bg-[#FFFCFA]"
                     }
                     style={
-                      current && !reduceMotion
+                      current
                         ? {
-                            animation:
-                              "mm-node-pulse 2.2s ease-in-out infinite",
+                            animation: getProgressNodePulseAnimation(
+                              reduceMotion,
+                              "mm-node-pulse",
+                            ),
                           }
                         : undefined
                     }

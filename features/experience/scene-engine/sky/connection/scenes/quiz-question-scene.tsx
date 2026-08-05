@@ -2,9 +2,14 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  getProgressNodePulseAnimation,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { SkyConnectionSceneProps } from "@/features/experience/scene-engine/sky/connection/types";
 import type { SkyConnectionLabQuestion } from "@/features/theme-lab/config/sky-connection-fixtures";
 
@@ -515,7 +520,7 @@ export function SkyConnectionQuizQuestionScene({
   totalQuestions,
   onComplete,
 }: SkyConnectionQuizQuestionSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   // Host remounts this scene per question (`AnimatePresence` key = sceneId),
@@ -664,7 +669,7 @@ export function SkyConnectionQuizQuestionScene({
       </div>
 
       {/* Soft sparkles only */}
-      {!reduceMotion ? (
+      {allowAmbientLoop(reduceMotion) ? (
         <div aria-hidden className="pointer-events-none absolute inset-0 z-[4]">
           {SPARKLES.map((s, i) => (
             <span
@@ -684,7 +689,7 @@ export function SkyConnectionQuizQuestionScene({
       ) : null}
 
       {/* Falling gold stars — 3 only */}
-      {!reduceMotion ? (
+      {allowAmbientLoop(reduceMotion) ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 z-[3] overflow-hidden"
@@ -768,9 +773,10 @@ export function SkyConnectionQuizQuestionScene({
                             backgroundColor: SKY_DEEP,
                             boxShadow:
                               "0 4px 14px -4px rgba(30,58,95,0.5), 0 0 0 3px rgba(255,255,255,0.95)",
-                            animation: reduceMotion
-                              ? undefined
-                              : "sqq-node-pulse 2.2s ease-in-out infinite",
+                            animation: getProgressNodePulseAnimation(
+                              reduceMotion,
+                              "sqq-node-pulse",
+                            ),
                           }
                         : done
                           ? {

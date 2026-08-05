@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { ConnectionSceneProps } from "@/features/experience/scene-engine/connection/types";
+import {
+  getProgressNodePulseAnimation,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { BloomConnectionLabQuestion } from "@/features/theme-lab/config/bloom-connection-fixtures";
 
 type ConnectionQuizQuestionSceneProps = ConnectionSceneProps & {
@@ -153,7 +157,7 @@ export function ConnectionQuizQuestionScene({
   totalQuestions,
   onComplete,
 }: ConnectionQuizQuestionSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -288,10 +292,12 @@ export function ConnectionQuizQuestionScene({
                           : "flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#F0C8D4] bg-[#FFFCFA]"
                     }
                     style={
-                      current && !reduceMotion
+                      current
                         ? {
-                            animation:
-                              "cq-node-pulse 2.2s ease-in-out infinite",
+                            animation: getProgressNodePulseAnimation(
+                              reduceMotion,
+                              "cq-node-pulse",
+                            ),
                           }
                         : undefined
                     }

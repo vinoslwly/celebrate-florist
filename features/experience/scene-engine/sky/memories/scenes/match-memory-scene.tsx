@@ -2,8 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
+import {
+  getProgressNodePulseAnimation,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { SkyMemoriesSceneProps } from "@/features/experience/scene-engine/sky/memories/types";
 import type { SkyMemoriesLabMatchPair } from "@/features/theme-lab/config/sky-memories-fixtures";
 
@@ -344,7 +348,7 @@ export function SkyMemoriesMatchMemoryScene({
   pauseAutoAdvance = false,
   onAnswer,
 }: SkyMemoriesMatchMemorySceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [hintBoost, setHintBoost] = useState(0);
@@ -535,9 +539,10 @@ export function SkyMemoriesMatchMemoryScene({
                             boxShadow: !reduceMotion
                               ? undefined
                               : `0 0 0 3px rgba(90,155,196,0.25)`,
-                            animation: !reduceMotion
-                              ? "smm-node-pulse 2.2s ease-in-out infinite"
-                              : undefined,
+                            animation: getProgressNodePulseAnimation(
+                              reduceMotion,
+                              "smm-node-pulse",
+                            ),
                           }}
                         >
                           <FivePointStar className="h-4 w-4" fill="white" />
