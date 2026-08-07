@@ -2,10 +2,16 @@
 
 import type { CSSProperties } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { ConnectionSceneProps } from "@/features/experience/scene-engine/connection/types";
 import { BloomGiftBox } from "@/features/experience/scene-engine/shared/bloom-gift-box";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 
 /** Static drift petals — density without Framer cost. */
 const DRIFT_PETALS = [
@@ -150,8 +156,6 @@ function PetalMark({ className }: { className?: string }) {
   );
 }
 
-const easeOut = [0.22, 1, 0.36, 1] as const;
-
 /**
  * connection.quiz-introduction — living Founder Scene 5.
  * Emotional density + mobile-safe motion (CSS petals, capped FM loops).
@@ -159,7 +163,8 @@ const easeOut = [0.22, 1, 0.36, 1] as const;
 export function ConnectionQuizIntroductionScene({
   onComplete,
 }: ConnectionSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F9D6DE]">
@@ -206,10 +211,10 @@ export function ConnectionQuizIntroductionScene({
         style={{
           background:
             "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,200,220,0.55) 38%, transparent 70%)",
-          animation: reduceMotion
-            ? undefined
-            : "qi-glow-breathe 3.2s ease-in-out infinite",
-          willChange: reduceMotion ? undefined : "transform, opacity",
+          animation: ambient
+            ? "qi-glow-breathe 3.2s ease-in-out infinite"
+            : undefined,
+          willChange: ambient ? "transform, opacity" : undefined,
         }}
       />
 
@@ -271,7 +276,7 @@ export function ConnectionQuizIntroductionScene({
       </div>
 
       {/* CSS falling petals — 4 only */}
-      {!reduceMotion ? (
+      {ambient ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -299,7 +304,7 @@ export function ConnectionQuizIntroductionScene({
       ) : null}
 
       {/* Soft sparkles near gift — CSS, few nodes */}
-      {!reduceMotion ? (
+      {ambient ? (
         <div aria-hidden className="pointer-events-none absolute inset-0">
           {[
             { top: "40%", left: "26%", size: 5, delay: "0s" },
@@ -344,9 +349,14 @@ export function ConnectionQuizIntroductionScene({
           <div className="flex w-full flex-col items-center">
             <motion.h1
               className="text-center font-serif text-[2.05rem] leading-[1.15] font-semibold tracking-tight text-[#7A2436] sm:text-[2.75rem]"
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, ease: easeOut }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               How well do you know me?
             </motion.h1>
@@ -355,7 +365,13 @@ export function ConnectionQuizIntroductionScene({
               className="mt-5 flex items-center justify-center gap-3.5 text-[#E07090]"
               initial={reduceMotion ? false : { opacity: 0, scaleX: 0.6 }}
               animate={{ opacity: 1, scaleX: 1 }}
-              transition={{ duration: 0.45, delay: 0.12, ease: easeOut }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                delay: reduceMotion ? 0 : 0.1,
+                ease: MOTION_EASE.out,
+              }}
             >
               <span
                 className="h-px w-14 bg-current opacity-75 sm:w-20"
@@ -373,17 +389,23 @@ export function ConnectionQuizIntroductionScene({
 
           <motion.div
             className="relative my-1 flex shrink-0 items-center justify-center"
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.88, y: 20 }}
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.94, y: 14 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: easeOut }}
+            transition={{
+              duration: reduceMotion
+                ? MOTION_DURATION.instant
+                : MOTION_DURATION.ceremony,
+              delay: reduceMotion ? 0 : 0.12,
+              ease: MOTION_EASE.out,
+            }}
           >
             <div
               className="qi-anim-float"
               style={{
-                animation: reduceMotion
-                  ? undefined
-                  : "qi-gift-float 3.4s ease-in-out 0.85s infinite",
-                willChange: reduceMotion ? undefined : "transform",
+                animation: ambient
+                  ? "qi-gift-float 3.4s ease-in-out 0.85s infinite"
+                  : undefined,
+                willChange: ambient ? "transform" : undefined,
               }}
             >
               <BloomGiftBox
@@ -396,9 +418,15 @@ export function ConnectionQuizIntroductionScene({
           <div className="flex w-full flex-col items-center">
             <motion.p
               className="max-w-[18rem] text-center font-serif text-[1.05rem] leading-relaxed text-[#8F5E6C] sm:max-w-sm sm:text-xl"
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.32, ease: easeOut }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                delay: reduceMotion ? 0 : 0.2,
+                ease: MOTION_EASE.out,
+              }}
             >
               Answer every question to{" "}
               <span className="font-semibold text-[#7A2436]">
@@ -414,9 +442,16 @@ export function ConnectionQuizIntroductionScene({
                 background:
                   "linear-gradient(180deg, #ED8AA8 0%, #D46888 48%, #C0456E 100%)",
               }}
-              initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.42, ease: easeOut }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                delay: reduceMotion ? 0 : 0.28,
+                ease: MOTION_EASE.out,
+              }}
+              whileHover={reduceMotion ? undefined : { scale: 1.02 }}
               whileTap={reduceMotion ? undefined : { scale: 0.98 }}
               aria-label="Start quiz"
             >

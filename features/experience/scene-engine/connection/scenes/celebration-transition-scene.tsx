@@ -2,9 +2,11 @@
 
 import { useSyncExternalStore, type CSSProperties } from "react";
 
-import { useReducedMotion } from "framer-motion";
-
 import type { ConnectionSceneProps } from "@/features/experience/scene-engine/connection/types";
+import {
+  allowAmbientLoop,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 
 type FireworkSpec = {
   left: string;
@@ -318,7 +320,8 @@ function FireworkIcon({
 export function ConnectionCelebrationTransitionScene(
   _props: ConnectionSceneProps,
 ) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   /** Client-only mount avoids SVG trig hydration drift across runtimes. */
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -372,7 +375,7 @@ export function ConnectionCelebrationTransitionScene(
 
       {mounted ? (
         <>
-          {!reduceMotion
+          {ambient
             ? [
                 { top: "18%", left: "12%", delay: "0s" },
                 { top: "12%", left: "70%", delay: "0.4s" },
@@ -409,10 +412,10 @@ export function ConnectionCelebrationTransitionScene(
                       width: fw.size,
                       height: fw.size,
                       ["--ct-rise"]: fw.rise,
-                      animation: reduceMotion
-                        ? undefined
-                        : `ct-launch ${fw.duration} cubic-bezier(0.22, 0.8, 0.28, 1) ${fw.delay} infinite`,
-                      willChange: reduceMotion ? undefined : "transform",
+                      animation: ambient
+                        ? `ct-launch ${fw.duration} cubic-bezier(0.22, 0.8, 0.28, 1) ${fw.delay} infinite`
+                        : undefined,
+                      willChange: ambient ? "transform" : undefined,
                     } as CSSProperties
                   }
                 >
@@ -421,21 +424,19 @@ export function ConnectionCelebrationTransitionScene(
                     style={{
                       height: Math.round(fw.size * 0.55),
                       background: `linear-gradient(to top, transparent 0%, ${pal.trail} 45%, #FFFFFF 100%)`,
-                      animation: reduceMotion
-                        ? undefined
-                        : `ct-trail ${fw.duration} ease-out ${fw.delay} infinite`,
+                      animation: ambient
+                        ? `ct-trail ${fw.duration} ease-out ${fw.delay} infinite`
+                        : undefined,
                     }}
                   />
 
                   <div
                     className="ct-anim-burst absolute inset-0"
                     style={{
-                      animation: reduceMotion
-                        ? undefined
-                        : `ct-burst ${fw.duration} ease-out ${fw.delay} infinite`,
-                      willChange: reduceMotion
-                        ? undefined
-                        : "transform, opacity",
+                      animation: ambient
+                        ? `ct-burst ${fw.duration} ease-out ${fw.delay} infinite`
+                        : undefined,
+                      willChange: ambient ? "transform, opacity" : undefined,
                     }}
                   >
                     <FireworkIcon

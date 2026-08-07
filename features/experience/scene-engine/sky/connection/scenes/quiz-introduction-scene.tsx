@@ -2,9 +2,15 @@
 
 import type { CSSProperties } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { SkyConnectionSceneProps } from "@/features/experience/scene-engine/sky/connection/types";
 import { SkyGiftBox } from "@/features/experience/scene-engine/sky/moments/sky-gift-box";
 
@@ -13,7 +19,6 @@ const INK_SOFT = "#3D7AAD";
 const SKY = "#7EB6D9";
 const SKY_DEEP = "#5A9BC4";
 const GOLD = "#FFE8A0";
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Static sticker placement — density without Framer cost. */
 const STATIC_STARS = [
@@ -388,7 +393,8 @@ function SilkRibbon({ className }: { className?: string }) {
 export function SkyConnectionQuizIntroductionScene({
   onComplete,
 }: SkyConnectionSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
 
   return (
     <div className={SCENE_VIEWPORT_SCROLL} style={{ background: "#A8D0E8" }}>
@@ -447,10 +453,10 @@ export function SkyConnectionQuizIntroductionScene({
         style={{
           background:
             "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(184,220,240,0.5) 40%, transparent 70%)",
-          animation: reduceMotion
-            ? undefined
-            : "sqi-glow-breathe 3.2s ease-in-out infinite",
-          willChange: reduceMotion ? undefined : "transform, opacity",
+          animation: ambient
+            ? "sqi-glow-breathe 3.2s ease-in-out infinite"
+            : undefined,
+          willChange: ambient ? "transform, opacity" : undefined,
         }}
       />
 
@@ -470,9 +476,9 @@ export function SkyConnectionQuizIntroductionScene({
         style={
           {
             ["--sqi-rot"]: "8deg",
-            animation: reduceMotion
-              ? undefined
-              : "sqi-bob 3.6s ease-in-out 0.4s infinite",
+            animation: ambient
+              ? "sqi-bob 3.6s ease-in-out 0.4s infinite"
+              : undefined,
           } as CSSProperties
         }
       >
@@ -487,9 +493,9 @@ export function SkyConnectionQuizIntroductionScene({
         style={
           {
             ["--sqi-rot"]: "-8deg",
-            animation: reduceMotion
-              ? undefined
-              : "sqi-bob 4s ease-in-out 0.2s infinite",
+            animation: ambient
+              ? "sqi-bob 4s ease-in-out 0.2s infinite"
+              : undefined,
           } as CSSProperties
         }
       >
@@ -503,9 +509,9 @@ export function SkyConnectionQuizIntroductionScene({
         style={
           {
             ["--sqi-rot"]: "6deg",
-            animation: reduceMotion
-              ? undefined
-              : "sqi-bob 3.8s ease-in-out 0.6s infinite",
+            animation: ambient
+              ? "sqi-bob 3.8s ease-in-out 0.6s infinite"
+              : undefined,
           } as CSSProperties
         }
       >
@@ -546,7 +552,7 @@ export function SkyConnectionQuizIntroductionScene({
       </div>
 
       {/* CSS falling stars — 4 only */}
-      {!reduceMotion ? (
+      {ambient ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -574,7 +580,7 @@ export function SkyConnectionQuizIntroductionScene({
       ) : null}
 
       {/* Soft CSS sparkles near gift */}
-      {!reduceMotion ? (
+      {ambient ? (
         <div aria-hidden className="pointer-events-none absolute inset-0">
           {[
             { top: "38%", left: "24%", size: 5, delay: "0s" },
@@ -621,9 +627,14 @@ export function SkyConnectionQuizIntroductionScene({
             <motion.h1
               className="max-w-[17rem] text-center font-serif leading-[1.12] tracking-tight sm:max-w-md"
               style={{ color: INK }}
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, ease: EASE }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               <span className="block text-[1.85rem] font-semibold sm:text-[2.55rem]">
                 How well do you
@@ -642,7 +653,13 @@ export function SkyConnectionQuizIntroductionScene({
               aria-hidden
               initial={reduceMotion ? false : { opacity: 0, scaleX: 0.6 }}
               animate={{ opacity: 1, scaleX: 1 }}
-              transition={{ duration: 0.45, delay: 0.12, ease: EASE }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                delay: reduceMotion ? 0 : 0.1,
+                ease: MOTION_EASE.out,
+              }}
             >
               <span className="h-px w-12 bg-current opacity-70 sm:w-16" />
               <SoftStar className="h-3.5 w-3.5" fill={SKY_DEEP} />
@@ -652,17 +669,23 @@ export function SkyConnectionQuizIntroductionScene({
 
           <motion.div
             className="relative my-1 flex shrink-0 items-center justify-center"
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.88, y: 20 }}
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.94, y: 14 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
+            transition={{
+              duration: reduceMotion
+                ? MOTION_DURATION.instant
+                : MOTION_DURATION.ceremony,
+              delay: reduceMotion ? 0 : 0.12,
+              ease: MOTION_EASE.out,
+            }}
           >
             <div
               className="sqi-anim-float"
               style={{
-                animation: reduceMotion
-                  ? undefined
-                  : "sqi-gift-float 3.4s ease-in-out 0.7s infinite",
-                willChange: reduceMotion ? undefined : "transform",
+                animation: ambient
+                  ? "sqi-gift-float 3.4s ease-in-out 0.7s infinite"
+                  : undefined,
+                willChange: ambient ? "transform" : undefined,
               }}
             >
               <SkyGiftBox
@@ -676,9 +699,15 @@ export function SkyConnectionQuizIntroductionScene({
             <motion.p
               className="max-w-[18rem] text-center font-serif text-[1.05rem] leading-relaxed italic sm:max-w-sm sm:text-xl"
               style={{ color: INK_SOFT }}
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.28, ease: EASE }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                delay: reduceMotion ? 0 : 0.2,
+                ease: MOTION_EASE.out,
+              }}
             >
               Answer every question to unlock your gift.
             </motion.p>
@@ -693,11 +722,17 @@ export function SkyConnectionQuizIntroductionScene({
                 boxShadow:
                   "0 14px 28px -10px rgba(30,58,95,0.45), inset 0 1px 0 rgba(255,255,255,0.35)",
               }}
-              initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.4, ease: EASE }}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                delay: reduceMotion ? 0 : 0.28,
+                ease: MOTION_EASE.out,
+              }}
+              whileHover={reduceMotion ? undefined : { scale: 1.03 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
             >
               {/* Denim stitch ring */}
               <span

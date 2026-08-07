@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { BloomGiftBox } from "@/features/experience/scene-engine/shared/bloom-gift-box";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { TreasuresSceneProps } from "@/features/experience/scene-engine/treasures/types";
-
-const EASE_OUT = [0.22, 1, 0.36, 1] as const;
-const EASE_POP = [0.16, 1.25, 0.3, 1] as const;
 
 /** Theme Lab Scene 8 — KF1 glow 1.5s, KF2 letter 2s (total 3.5s). */
 export const TREASURES_FINAL_UNLOCK_DURATION_MS = 3500;
@@ -78,7 +81,8 @@ function SakuraMark({ className }: { className?: string }) {
 export function TreasuresFinalGiftUnlockScene({
   payload,
 }: TreasuresSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   const [phase, setPhase] = useState<"glow" | "letter">("glow");
   const toName = payload.experience.greeting_name;
   const fromName = payload.experience.closing_name;
@@ -109,7 +113,7 @@ export function TreasuresFinalGiftUnlockScene({
         }}
       />
 
-      {!reduceMotion
+      {ambient
         ? PETALS.map((p, i) => (
             <motion.div
               key={`petal-${i}`}
@@ -133,7 +137,7 @@ export function TreasuresFinalGiftUnlockScene({
           ))
         : null}
 
-      {!reduceMotion
+      {ambient
         ? SPARKLES.map((s, i) => (
             <motion.span
               key={`spark-${i}`}
@@ -163,31 +167,43 @@ export function TreasuresFinalGiftUnlockScene({
                 "radial-gradient(ellipse at center, rgba(255,248,210,0.98) 0%, rgba(240,200,100,0.55) 38%, transparent 70%)",
             }}
             animate={
-              reduceMotion
-                ? { opacity: 0.9 }
-                : { opacity: [0.55, 1, 0.7], scale: [0.92, 1.08, 0.98] }
+              ambient
+                ? { opacity: [0.55, 1, 0.7], scale: [0.92, 1.08, 0.98] }
+                : { opacity: 0.9, scale: 1 }
             }
-            transition={{
-              duration: 2.4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            transition={
+              ambient
+                ? {
+                    duration: 2.4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }
+                : { duration: MOTION_DURATION.instant }
+            }
           />
 
-          {/* Light rays — KF1 emphasis */}
-          {!reduceMotion ? (
+          {/* Light rays — KF1 anticipation emphasis */}
+          {ambient ? (
             <motion.div
               aria-hidden
               className="pointer-events-none absolute top-[20%] left-1/2 z-0 h-40 w-48 -translate-x-1/2"
               initial={{ opacity: 0 }}
               animate={{
-                opacity: displayPhase === "glow" ? [0.35, 0.7, 0.4] : 0.25,
+                opacity: displayPhase === "glow" ? [0.35, 0.75, 0.45] : 0.22,
+                scale: displayPhase === "glow" ? [0.96, 1.04, 1] : 1,
               }}
-              transition={{
-                duration: 1.8,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              transition={
+                displayPhase === "glow"
+                  ? {
+                      duration: 1.6,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }
+                  : {
+                      duration: MOTION_DURATION.base,
+                      ease: MOTION_EASE.soft,
+                    }
+              }
               style={{
                 background:
                   "conic-gradient(from 200deg at 50% 100%, transparent 0deg, rgba(255,240,200,0.55) 25deg, transparent 55deg, rgba(255,230,160,0.4) 90deg, transparent 120deg)",
@@ -203,10 +219,15 @@ export function TreasuresFinalGiftUnlockScene({
                 key="letter"
                 className="relative z-20 mx-auto w-[11.5rem] sm:w-[13rem]"
                 initial={
-                  reduceMotion ? false : { y: 72, opacity: 0, scale: 0.88 }
+                  reduceMotion ? false : { y: 64, opacity: 0, scale: 0.92 }
                 }
                 animate={{ y: 0, opacity: 1, scale: 1 }}
-                transition={{ duration: 1.15, ease: EASE_POP }}
+                transition={{
+                  duration: reduceMotion
+                    ? MOTION_DURATION.instant
+                    : MOTION_DURATION.ceremony,
+                  ease: MOTION_EASE.pop,
+                }}
                 role="img"
                 aria-label={`Letter to ${toName} from ${fromName}`}
               >
@@ -247,8 +268,11 @@ export function TreasuresFinalGiftUnlockScene({
                 className="relative z-20 mx-auto h-[7.5rem] w-[11.5rem] sm:h-[8.5rem] sm:w-[13rem]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35, ease: EASE_OUT }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{
+                  duration: MOTION_DURATION.fast,
+                  ease: MOTION_EASE.out,
+                }}
                 aria-hidden
               />
             )}
@@ -256,9 +280,14 @@ export function TreasuresFinalGiftUnlockScene({
 
           <motion.div
             className="relative z-10 -mt-6 flex justify-center sm:-mt-8"
-            initial={reduceMotion ? false : { opacity: 0, y: 20, scale: 0.94 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.7, ease: EASE_OUT }}
+            transition={{
+              duration: reduceMotion
+                ? MOTION_DURATION.instant
+                : MOTION_DURATION.ceremony,
+              ease: MOTION_EASE.out,
+            }}
             aria-hidden
           >
             <BloomGiftBox

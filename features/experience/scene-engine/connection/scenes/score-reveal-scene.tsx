@@ -2,10 +2,16 @@
 
 import { useEffect, useState } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { ConnectionSceneProps } from "@/features/experience/scene-engine/connection/types";
 import { BloomGiftBox } from "@/features/experience/scene-engine/shared/bloom-gift-box";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import { BLOOM_CONNECTION_LAB_SCORE_RESULT } from "@/features/theme-lab/config/bloom-connection-fixtures";
 
 const STATIC_PETALS = [
@@ -90,8 +96,6 @@ function CrestMark({ className }: { className?: string }) {
   );
 }
 
-const easeOut = [0.22, 1, 0.36, 1] as const;
-
 function useCountUp(target: number, enabled: boolean, durationMs = 900) {
   const [value, setValue] = useState(() => (enabled ? 0 : target));
 
@@ -120,7 +124,8 @@ export function ConnectionScoreRevealScene({
   payload,
   onComplete,
 }: ConnectionSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   const result = payload.scoreResult ?? BLOOM_CONNECTION_LAB_SCORE_RESULT;
   const displayPercent = useCountUp(result.percent, !reduceMotion);
 
@@ -184,7 +189,7 @@ export function ConnectionScoreRevealScene({
       </div>
 
       {/* Soft sparkles */}
-      {!reduceMotion
+      {ambient
         ? [
             { top: "22%", left: "18%", delay: "0s" },
             { top: "28%", left: "78%", delay: "0.5s" },
@@ -209,9 +214,14 @@ export function ConnectionScoreRevealScene({
       <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-5 py-10 sm:px-8 sm:py-12">
         <motion.div
           className="relative w-full max-w-[22rem] sm:max-w-md"
-          initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.96 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 16, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.55, ease: easeOut }}
+          transition={{
+            duration: reduceMotion
+              ? MOTION_DURATION.instant
+              : MOTION_DURATION.ceremony,
+            ease: MOTION_EASE.out,
+          }}
         >
           {/* Soft pink backing layer */}
           <div
@@ -289,9 +299,16 @@ export function ConnectionScoreRevealScene({
             background:
               "linear-gradient(180deg, #ED8AA8 0%, #D46888 48%, #C0456E 100%)",
           }}
-          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.25, ease: easeOut }}
+          transition={{
+            duration: reduceMotion
+              ? MOTION_DURATION.instant
+              : MOTION_DURATION.base,
+            delay: reduceMotion ? 0 : 0.2,
+            ease: MOTION_EASE.out,
+          }}
+          whileHover={reduceMotion ? undefined : { scale: 1.02 }}
           whileTap={reduceMotion ? undefined : { scale: 0.98 }}
           aria-label="Reveal my gift"
         >

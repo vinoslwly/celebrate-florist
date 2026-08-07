@@ -2,8 +2,10 @@
 
 import { useSyncExternalStore, type CSSProperties } from "react";
 
-import { useReducedMotion } from "framer-motion";
-
+import {
+  allowAmbientLoop,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { WarmConnectionSceneProps } from "@/features/experience/scene-engine/warm/connection/types";
 
 type FireworkSpec = {
@@ -302,7 +304,8 @@ function GoldSparkle({ className }: { className?: string }) {
 export function WarmConnectionCelebrationTransitionScene(
   _props: WarmConnectionSceneProps,
 ) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -364,7 +367,7 @@ export function WarmConnectionCelebrationTransitionScene(
 
       {mounted ? (
         <>
-          {!reduceMotion
+          {ambient
             ? [
                 { top: "16%", left: "14%", delay: "0s", size: 10 },
                 { top: "11%", left: "72%", delay: "0.45s", size: 8 },
@@ -404,10 +407,10 @@ export function WarmConnectionCelebrationTransitionScene(
                       width: fw.size,
                       height: fw.size,
                       ["--wct-rise"]: fw.rise,
-                      animation: reduceMotion
-                        ? undefined
-                        : `wct-launch ${fw.duration} cubic-bezier(0.22, 0.8, 0.28, 1) ${fw.delay} infinite`,
-                      willChange: reduceMotion ? undefined : "transform",
+                      animation: ambient
+                        ? `wct-launch ${fw.duration} cubic-bezier(0.22, 0.8, 0.28, 1) ${fw.delay} infinite`
+                        : undefined,
+                      willChange: ambient ? "transform" : undefined,
                     } as CSSProperties
                   }
                 >
@@ -416,9 +419,9 @@ export function WarmConnectionCelebrationTransitionScene(
                     style={{
                       height: Math.round(fw.size * 0.52),
                       background: `linear-gradient(to top, transparent 0%, ${pal.trail} 40%, #FFF8E8 100%)`,
-                      animation: reduceMotion
-                        ? undefined
-                        : `wct-trail ${fw.duration} ease-out ${fw.delay} infinite`,
+                      animation: ambient
+                        ? `wct-trail ${fw.duration} ease-out ${fw.delay} infinite`
+                        : undefined,
                     }}
                   />
 
@@ -426,12 +429,10 @@ export function WarmConnectionCelebrationTransitionScene(
                     className="wct-anim-burst absolute inset-0"
                     style={{
                       filter: "drop-shadow(0 0 14px rgba(240,216,120,0.35))",
-                      animation: reduceMotion
-                        ? undefined
-                        : `wct-burst ${fw.duration} ease-out ${fw.delay} infinite`,
-                      willChange: reduceMotion
-                        ? undefined
-                        : "transform, opacity",
+                      animation: ambient
+                        ? `wct-burst ${fw.duration} ease-out ${fw.delay} infinite`
+                        : undefined,
+                      willChange: ambient ? "transform, opacity" : undefined,
                     }}
                   >
                     <FireworkIcon
