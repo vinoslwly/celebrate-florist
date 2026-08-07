@@ -1,7 +1,7 @@
 # Sprint 13 — Motion System
 
 > **Status:** ✅ **FOUNDER APPROVED** — entry plan locked · [01 plan](./01_SPRINT_13_MOTION_ENTRY_PLAN.md)  
-> **Implementation:** ✅ P0 · 12-host fade · RM/interactive P2 · gift ceremony · representative letter motion · [02](./02_MOTION_FOUNDATION_AND_HOST_PILOT.md) · [03](./03_HOST_TRANSITION_EXPANSION_AND_RM_FIX.md) · [04](./04_FOCUSED_RM_AND_INTERACTIVE_MOTION_PASS.md) · [05](./05_REPRESENTATIVE_GIFT_ENVELOPE_CEREMONY.md) · [06](./06_REPRESENTATIVE_LETTER_MOTION.md) · gallery not started  
+> **Implementation:** ✅ P0 · 12-host fade · RM/interactive P2 · gift ceremony · letter motion · representative gallery motion · [02](./02_MOTION_FOUNDATION_AND_HOST_PILOT.md) · [03](./03_HOST_TRANSITION_EXPANSION_AND_RM_FIX.md) · [04](./04_FOCUSED_RM_AND_INTERACTIVE_MOTION_PASS.md) · [05](./05_REPRESENTATIVE_GIFT_ENVELOPE_CEREMONY.md) · [06](./06_REPRESENTATIVE_LETTER_MOTION.md) · [07](./07_REPRESENTATIVE_GALLERY_MOTION.md)  
 > **After:** Sprint 12.5 Theme Lab 🔒 CLOSED ([24](../sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md))  
 > **Themes:** Bloom · Warm · Sky locked · Playful / Pure frozen  
 > **`/e/[token]`:** ⛔ NOT AUTHORIZED  
@@ -22,3 +22,4 @@ Make the website feel like an experience, not a collection of static pages — v
 | 04  | [04_FOCUSED_RM_AND_INTERACTIVE_MOTION_PASS.md](./04_FOCUSED_RM_AND_INTERACTIVE_MOTION_PASS.md) | Focused RM + CTA/node pulse cleanup           |
 | 05  | [05_REPRESENTATIVE_GIFT_ENVELOPE_CEREMONY.md](./05_REPRESENTATIVE_GIFT_ENVELOPE_CEREMONY.md)   | Representative Bloom/Warm/Sky gift open       |
 | 06  | [06_REPRESENTATIVE_LETTER_MOTION.md](./06_REPRESENTATIVE_LETTER_MOTION.md)                     | Representative Bloom/Warm/Sky letter reading  |
+| 07  | [07_REPRESENTATIVE_GALLERY_MOTION.md](./07_REPRESENTATIVE_GALLERY_MOTION.md)                   | Representative Bloom/Warm/Sky gallery reveal  |

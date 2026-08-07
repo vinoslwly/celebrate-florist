@@ -1,12 +1,18 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { SCENE_SCROLL_PANE } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  MOTION_STAGGER,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { SkyMomentsSceneProps } from "@/features/experience/scene-engine/sky/moments/types";
 import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
 const INK = "#1E3A5F";
 const HAND = "#3D7AAD";
 const PAPER = "#FFFEFB";
@@ -138,10 +144,16 @@ function MemoryCard({
   const polaroid = (
     <motion.div
       className="relative w-[11.5rem] shrink-0 sm:w-[14rem]"
-      initial={reduceMotion ? false : { opacity: 0, y: 26, rotate: tilt - 3 }}
-      whileInView={{ opacity: 1, y: 0, rotate: tilt }}
+      initial={
+        reduceMotion ? false : { opacity: 0, y: 12, scale: 0.98, rotate: tilt }
+      }
+      whileInView={{ opacity: 1, y: 0, scale: 1, rotate: tilt }}
       viewport={{ once: true, amount: 0.28 }}
-      transition={{ duration: 0.55, ease: EASE }}
+      transition={{
+        duration: MOTION_DURATION.fast,
+        ease: MOTION_EASE.out,
+        delay: reduceMotion ? 0 : MOTION_STAGGER.tight,
+      }}
     >
       <div
         aria-hidden
@@ -207,10 +219,14 @@ function MemoryCard({
       className={`relative max-w-[10.5rem] sm:max-w-[13rem] ${
         photoLeft ? "text-left" : "text-right"
       }`}
-      initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.35 }}
-      transition={{ duration: 0.5, delay: reduceMotion ? 0 : 0.08, ease: EASE }}
+      transition={{
+        duration: MOTION_DURATION.fast,
+        delay: reduceMotion ? 0 : MOTION_STAGGER.tight,
+        ease: MOTION_EASE.out,
+      }}
     >
       <div className={`${photoLeft ? "" : "flex justify-end"}`}>
         <NumberFlag n={n} className="mb-2 inline-block" />
@@ -263,10 +279,11 @@ function MemoryCard({
 
 /**
  * sky.moments.gallery — scrapbook "Our Moments" sky album.
- * Mobile-light: whileInView cards, few ambient SVGs, no extra font loads.
+ * Airy / light reveal — kit-aligned (Sprint 13).
  */
 export function SkyGalleryScene({ payload, onComplete }: SkyMomentsSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   const photos = [...payload.photos].sort(
     (a, b) => a.sort_order - b.sort_order,
   );
@@ -305,7 +322,7 @@ export function SkyGalleryScene({ payload, onComplete }: SkyMomentsSceneProps) {
       <SoftCloud className="pointer-events-none absolute bottom-[18%] left-[4%] z-[1] h-8 w-24 opacity-40 scale-x-[-1]" />
 
       {/* Few ambient stars — opacity only, mobile-safe */}
-      {!reduceMotion ? (
+      {ambient ? (
         <div aria-hidden className="pointer-events-none absolute inset-0 z-[2]">
           {[
             { t: "12%", l: "18%" },
@@ -338,9 +355,14 @@ export function SkyGalleryScene({ payload, onComplete }: SkyMomentsSceneProps) {
             <motion.p
               className="font-serif text-[2.35rem] leading-none tracking-tight italic sm:text-[2.75rem]"
               style={{ color: INK }}
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: EASE }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               Our Moments
             </motion.p>
@@ -352,9 +374,15 @@ export function SkyGalleryScene({ payload, onComplete }: SkyMomentsSceneProps) {
                 clipPath: TORN,
                 boxShadow: "0 10px 24px -12px rgba(30,58,95,0.28)",
               }}
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.08, ease: EASE }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.fast,
+                delay: reduceMotion ? 0 : MOTION_STAGGER.tight,
+                ease: MOTION_EASE.out,
+              }}
             >
               <p
                 className="font-serif text-[12.5px] leading-snug italic sm:text-[13.5px]"
@@ -377,7 +405,13 @@ export function SkyGalleryScene({ payload, onComplete }: SkyMomentsSceneProps) {
               className="absolute -top-1 -right-0 hidden w-16 sm:block sm:w-20"
               initial={reduceMotion ? false : { opacity: 0, rotate: 8 }}
               animate={{ opacity: 1, rotate: 6 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{
+                delay: reduceMotion ? 0 : MOTION_STAGGER.base,
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.fast,
+                ease: MOTION_EASE.out,
+              }}
             >
               <div
                 className="relative rounded-sm bg-[#E8F2FA] p-1.5 text-[8px] leading-tight text-[#3D7AAD]"
@@ -419,10 +453,13 @@ export function SkyGalleryScene({ payload, onComplete }: SkyMomentsSceneProps) {
           {/* Closing + CTA */}
           <motion.div
             className="mt-12 flex flex-col items-center gap-5 px-4 sm:mt-14"
-            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 0.55, ease: EASE }}
+            transition={{
+              duration: MOTION_DURATION.base,
+              ease: MOTION_EASE.out,
+            }}
           >
             <p
               className="max-w-xs text-center font-serif text-[15px] leading-relaxed italic sm:text-base"
@@ -441,13 +478,8 @@ export function SkyGalleryScene({ payload, onComplete }: SkyMomentsSceneProps) {
                 boxShadow:
                   "0 14px 32px -10px rgba(30,58,95,0.45), 0 0 0 2px rgba(255,255,255,0.4)",
               }}
+              whileHover={reduceMotion ? undefined : { scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.02, 1] }}
-              transition={{
-                duration: 2.4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
             >
               <MiniFlower className="h-5 w-5" />
               Celebrate This Moment

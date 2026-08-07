@@ -1,11 +1,16 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  MOTION_STAGGER,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Few petals, opacity/transform only — mobile-safe ambient. */
 const FALLING = [
@@ -120,10 +125,16 @@ function PolaroidCard({
   const polaroid = (
     <motion.div
       className="relative w-[13rem] shrink-0 sm:w-[16rem]"
-      initial={reduceMotion ? false : { opacity: 0, y: 28, rotate: tilt - 4 }}
-      whileInView={{ opacity: 1, y: 0, rotate: tilt }}
+      initial={
+        reduceMotion ? false : { opacity: 0, y: 16, scale: 0.98, rotate: tilt }
+      }
+      whileInView={{ opacity: 1, y: 0, scale: 1, rotate: tilt }}
       viewport={{ once: true, amount: 0.28 }}
-      transition={{ duration: 0.55, ease: EASE }}
+      transition={{
+        duration: MOTION_DURATION.base,
+        ease: MOTION_EASE.out,
+        delay: reduceMotion ? 0 : MOTION_STAGGER.tight,
+      }}
     >
       {/* Contact shadow — solid, no blur filter */}
       <div
@@ -181,10 +192,14 @@ function PolaroidCard({
       className={`relative max-w-[11.5rem] sm:max-w-[14.5rem] ${
         photoLeft ? "text-left" : "text-right"
       }`}
-      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.35 }}
-      transition={{ duration: 0.5, delay: reduceMotion ? 0 : 0.1, ease: EASE }}
+      transition={{
+        duration: MOTION_DURATION.base,
+        delay: reduceMotion ? 0 : MOTION_STAGGER.base,
+        ease: MOTION_EASE.out,
+      }}
     >
       <p className="font-serif text-[1.3rem] leading-[1.2] font-semibold tracking-tight text-[#5C1E30] sm:text-[1.55rem]">
         {title}
@@ -217,10 +232,11 @@ function PolaroidCard({
 
 /**
  * moments.gallery — living Founder Scene 8 (scrollable polaroid memories).
- * Mobile-light: weight from polaroids, not particle density.
+ * Soft luminous reveal — mobile-light, kit-aligned (Sprint 13).
  */
 export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   const photos = [...payload.photos].sort(
     (a, b) => a.sort_order - b.sort_order,
   );
@@ -245,7 +261,7 @@ export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
       />
 
       {/* Ambient petals — behind content only, no CSS filters */}
-      {!reduceMotion ? (
+      {ambient ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
@@ -286,7 +302,12 @@ export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
               className="mb-4 flex items-center justify-center gap-3"
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.45 }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               <div className="h-px w-10 bg-gradient-to-r from-transparent to-[#D890A8]" />
               <SakuraMark className="h-5 w-5" />
@@ -294,17 +315,28 @@ export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
             </motion.div>
             <motion.h1
               className="font-serif text-[2.75rem] leading-none font-semibold tracking-tight text-[#5C1E30] sm:text-6xl"
-              initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, ease: EASE }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               Gallery
             </motion.h1>
             <motion.p
               className="mt-4 flex items-center justify-center gap-2.5 font-serif text-[14px] text-[#8B4A5E] sm:text-base"
-              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: reduceMotion ? 0 : 0.12, duration: 0.45 }}
+              transition={{
+                delay: reduceMotion ? 0 : MOTION_STAGGER.tight,
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.base,
+                ease: MOTION_EASE.out,
+              }}
             >
               <LeafMark className="h-3.5 w-3.5" />
               <span className="tracking-wide italic">
@@ -327,10 +359,13 @@ export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
 
           <motion.div
             className="relative mt-20 text-center sm:mt-24"
-            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.35 }}
-            transition={{ duration: 0.55, ease: EASE }}
+            transition={{
+              duration: MOTION_DURATION.base,
+              ease: MOTION_EASE.out,
+            }}
           >
             <div className="mx-auto mb-5 flex items-center justify-center gap-2">
               <Flourish className="h-4 w-14 opacity-80" />

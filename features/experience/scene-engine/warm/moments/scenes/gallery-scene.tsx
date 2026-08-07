@@ -2,10 +2,16 @@
 
 import { Cormorant_Garamond, Great_Vibes, Outfit } from "next/font/google";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
 import { SCENE_SCROLL_PANE } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  MOTION_DURATION,
+  MOTION_EASE,
+  MOTION_STAGGER,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
 
 const script = Great_Vibes({
@@ -27,7 +33,6 @@ const label = Outfit({
   display: "swap",
 });
 
-const EASE = [0.22, 1, 0.36, 1] as const;
 const INK = "#3F282C";
 const ROSE = "#7A121C";
 const GOLD = "#C9A227";
@@ -37,6 +42,9 @@ const PAPER = "#F4EBE0";
 const ON_RED = "#FFF8F0";
 const ON_RED_SOFT = "#E8D4C0";
 const ON_RED_GOLD = "#F0D878";
+
+/** Deliberate Warm album strip stagger (seconds) — slightly slower than Bloom/Sky. */
+const WARM_STRIP_STEP = 0.14;
 
 function splitCaption(caption: string | null): { title: string; body: string } {
   if (!caption?.trim()) {
@@ -207,9 +215,15 @@ function MemoryStrip({
   return (
     <motion.article
       className="relative"
-      initial={reduceMotion ? false : { opacity: 0, y: 22 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.65, delay: 0.12 + index * 0.1, ease: EASE }}
+      initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        duration: reduceMotion
+          ? MOTION_DURATION.instant
+          : MOTION_DURATION.ceremony,
+        delay: reduceMotion ? 0 : MOTION_STAGGER.base + index * WARM_STRIP_STEP,
+        ease: MOTION_EASE.out,
+      }}
     >
       <div
         className="relative overflow-hidden px-3.5 py-4 sm:px-4 sm:py-5"
@@ -276,11 +290,14 @@ function MemoryStrip({
  * Ref: design-references/warm/moments/scene-08-gallery-reference.png
  */
 export function WarmGalleryScene({ payload, onComplete }: MomentsSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
   const photos = [...payload.photos].sort(
     (a, b) => a.sort_order - b.sort_order,
   );
   const toName = payload.experience.greeting_name || "you";
+  const closingDelay = reduceMotion
+    ? 0
+    : MOTION_STAGGER.base + Math.max(photos.length, 1) * WARM_STRIP_STEP;
 
   return (
     <div
@@ -319,7 +336,12 @@ export function WarmGalleryScene({ payload, onComplete }: MomentsSceneProps) {
               className="text-left"
               initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: EASE }}
+              transition={{
+                duration: reduceMotion
+                  ? MOTION_DURATION.instant
+                  : MOTION_DURATION.ceremony,
+                ease: MOTION_EASE.out,
+              }}
             >
               <h1
                 className={`${script.className} text-[2.6rem] leading-[1.05] sm:text-[3rem]`}
@@ -377,7 +399,13 @@ export function WarmGalleryScene({ payload, onComplete }: MomentsSceneProps) {
             className="mt-10 flex flex-col items-center gap-5 sm:mt-12 sm:gap-6"
             initial={reduceMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.55, ease: EASE }}
+            transition={{
+              delay: closingDelay,
+              duration: reduceMotion
+                ? MOTION_DURATION.instant
+                : MOTION_DURATION.base,
+              ease: MOTION_EASE.out,
+            }}
           >
             <p
               className={`${script.className} text-center text-xl sm:text-2xl`}
@@ -409,6 +437,7 @@ export function WarmGalleryScene({ payload, onComplete }: MomentsSceneProps) {
                     "0 14px 32px -10px rgba(10,2,4,0.55)",
                   ].join(", "),
                 }}
+                whileHover={reduceMotion ? undefined : { scale: 1.018 }}
                 whileTap={{ scale: 0.985 }}
               >
                 Celebrate This Moment
