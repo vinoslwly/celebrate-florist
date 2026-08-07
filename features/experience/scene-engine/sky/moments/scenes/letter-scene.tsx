@@ -2,11 +2,17 @@
 
 import type { ReactNode } from "react";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
 import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 import type { SkyMomentsSceneProps } from "@/features/experience/scene-engine/sky/moments/types";
 
 const INK = "#1E3A5F";
@@ -14,7 +20,6 @@ const HAND = "#3D7AAD";
 const CTA_FROM = "#8EBFDE";
 const CTA_TO = "#4A8FBF";
 const PAPER = "#FFFEFB";
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 function splitLetterBody(body: string): string[] {
   const trimmed = body.trim();
@@ -27,17 +32,26 @@ function Reveal({
   children,
   delay,
   className,
+  reduceMotion,
 }: {
   children: ReactNode;
   delay: number;
   className?: string;
+  reduceMotion: boolean;
 }) {
+  if (reduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.65, delay, ease: EASE }}
+      transition={{
+        duration: MOTION_DURATION.base,
+        delay,
+        ease: MOTION_EASE.out,
+      }}
     >
       {children}
     </motion.div>
@@ -201,20 +215,22 @@ function ScrapLayer({
  * No "Celebrate the sky" ticket.
  */
 export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   const { experience } = payload;
   const toName = experience.greeting_name?.trim() || "friend";
   const fromName = experience.closing_name?.trim() || "Someone who loves you";
   const closing = experience.letter_closing?.trim() || "With love,";
   const bodyChunks = splitLetterBody(experience.letter_content ?? "");
 
-  const d = (n: number) => (reduceMotion ? Math.min(n * 0.2, 0.1) : n);
-  const bodyStart = d(0.85);
-  const bodyStep = reduceMotion ? 0.05 : 0.36;
+  // Airy / lighter pacing than Bloom & Warm
+  const pace = (n: number) => (reduceMotion ? 0 : n);
+  const bodyStart = pace(0.55);
+  const bodyStep = reduceMotion ? 0 : 0.18;
   const afterBody = bodyStart + bodyChunks.length * bodyStep;
-  const closingDelay = afterBody + d(0.18);
-  const signatureDelay = closingDelay + d(0.28);
-  const ctaDelay = signatureDelay + d(0.32);
+  const closingDelay = afterBody + pace(0.12);
+  const signatureDelay = closingDelay + pace(0.18);
+  const ctaDelay = signatureDelay + pace(0.22);
 
   return (
     <div
@@ -260,10 +276,12 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
       <motion.div
         aria-hidden
         className="pointer-events-none absolute right-[10%] bottom-[14%] z-[6] sm:right-[11%] sm:bottom-[14%]"
-        animate={
-          reduceMotion ? undefined : { y: [0, -9, 0], rotate: [10, 3, 10] }
+        animate={ambient ? { y: [0, -9, 0], rotate: [10, 3, 10] } : undefined}
+        transition={
+          ambient
+            ? { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
+            : undefined
         }
-        transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
       >
         <svg
           className="absolute -top-9 -left-12 h-10 w-16 opacity-70 sm:-top-11 sm:-left-20 sm:h-14 sm:w-24 sm:opacity-75"
@@ -316,7 +334,12 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
             className="pointer-events-none absolute top-1 left-3 z-20 sm:-top-2 sm:left-1"
             initial={reduceMotion ? false : { scale: 0, rotate: -30 }}
             animate={{ scale: 1, rotate: -12 }}
-            transition={{ delay: d(0.35), type: "spring", stiffness: 160 }}
+            transition={{
+              delay: pace(0.28),
+              type: "spring",
+              stiffness: 160,
+              duration: reduceMotion ? MOTION_DURATION.instant : undefined,
+            }}
           >
             <FeltStar
               className="h-8 w-8 drop-shadow-md sm:h-12 sm:w-12"
@@ -327,7 +350,12 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
             className="pointer-events-none absolute top-[20%] left-3 z-20 sm:left-2"
             initial={reduceMotion ? false : { scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: d(0.5), type: "spring", stiffness: 160 }}
+            transition={{
+              delay: pace(0.38),
+              type: "spring",
+              stiffness: 160,
+              duration: reduceMotion ? MOTION_DURATION.instant : undefined,
+            }}
           >
             <FeltStar
               className="h-6 w-6 drop-shadow sm:h-8 sm:w-8"
@@ -339,7 +367,12 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
             className="pointer-events-none absolute top-[56%] right-3 z-20 sm:right-1"
             initial={reduceMotion ? false : { scale: 0, rotate: 20 }}
             animate={{ scale: 1, rotate: 8 }}
-            transition={{ delay: d(0.55), type: "spring", stiffness: 160 }}
+            transition={{
+              delay: pace(0.42),
+              type: "spring",
+              stiffness: 160,
+              duration: reduceMotion ? MOTION_DURATION.instant : undefined,
+            }}
           >
             <FeltStar
               className="h-7 w-7 drop-shadow-md sm:h-9 sm:w-9"
@@ -365,9 +398,14 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
               clipPath:
                 "polygon(1.5% 1%, 38% 0%, 70% 2%, 98.5% 0.5%, 100% 30%, 99% 68%, 100% 97%, 70% 100%, 28% 98.5%, 0% 100%, 1% 68%, 0% 28%)",
             }}
-            initial={reduceMotion ? false : { opacity: 0, y: 28, scale: 0.96 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.75, ease: EASE }}
+            transition={{
+              duration: reduceMotion
+                ? MOTION_DURATION.instant
+                : MOTION_DURATION.base,
+              ease: MOTION_EASE.out,
+            }}
           >
             {/* Soft crumple wash */}
             <div
@@ -392,7 +430,7 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
             />
 
             <div className="relative text-center">
-              <Reveal delay={d(0.3)}>
+              <Reveal delay={pace(0.22)} reduceMotion={reduceMotion}>
                 <p
                   className="font-serif text-[1.4rem] italic sm:text-[1.55rem]"
                   style={{ color: HAND }}
@@ -403,7 +441,11 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
 
               <div className="mt-6 space-y-4 text-left sm:mt-7 sm:space-y-5">
                 {bodyChunks.map((chunk, i) => (
-                  <Reveal key={i} delay={bodyStart + i * bodyStep}>
+                  <Reveal
+                    key={i}
+                    delay={bodyStart + i * bodyStep}
+                    reduceMotion={reduceMotion}
+                  >
                     <p
                       className="font-serif text-[15px] leading-[1.75] sm:text-base"
                       style={{ color: INK }}
@@ -414,7 +456,11 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
                 ))}
               </div>
 
-              <Reveal delay={closingDelay} className="mt-8 sm:mt-9">
+              <Reveal
+                delay={closingDelay}
+                reduceMotion={reduceMotion}
+                className="mt-8 sm:mt-9"
+              >
                 <p
                   className="font-serif text-base italic sm:text-lg"
                   style={{ color: HAND }}
@@ -423,7 +469,11 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
                 </p>
               </Reveal>
 
-              <Reveal delay={signatureDelay} className="mt-1">
+              <Reveal
+                delay={signatureDelay}
+                reduceMotion={reduceMotion}
+                className="mt-1"
+              >
                 <p
                   className="font-serif text-lg sm:text-xl"
                   style={{ color: HAND }}
@@ -432,14 +482,16 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
                     {fromName}
                     <motion.span
                       style={{ color: "#6BA3C9" }}
-                      animate={
-                        reduceMotion ? undefined : { scale: [1, 1.18, 1] }
+                      animate={ambient ? { scale: [1, 1.18, 1] } : undefined}
+                      transition={
+                        ambient
+                          ? {
+                              duration: 1.8,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            }
+                          : undefined
                       }
-                      transition={{
-                        duration: 1.8,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
                     >
                       <HeartMark className="h-3.5 w-3.5" />
                     </motion.span>
@@ -447,7 +499,11 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
                 </p>
               </Reveal>
 
-              <Reveal delay={ctaDelay} className="relative mt-9 sm:mt-10">
+              <Reveal
+                delay={ctaDelay}
+                reduceMotion={reduceMotion}
+                className="relative mt-9 sm:mt-10"
+              >
                 <SoftStar
                   className="pointer-events-none absolute -top-3.5 right-[18%] h-5 w-5 opacity-90"
                   fill="#8EBFDE"
@@ -462,15 +518,8 @@ export function SkyLetterScene({ payload, onComplete }: SkyMomentsSceneProps) {
                     boxShadow:
                       "0 14px 32px -10px rgba(30,58,95,0.5), 0 0 0 2px rgba(255,255,255,0.45)",
                   }}
+                  whileHover={reduceMotion ? undefined : { scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  animate={
-                    reduceMotion ? { scale: 1 } : { scale: [1, 1.02, 1] }
-                  }
-                  transition={{
-                    duration: 2.4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
                 >
                   Unlock Memories
                 </motion.button>

@@ -4,10 +4,16 @@ import type { ReactNode } from "react";
 
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
 import { SCENE_SCROLL_PANE } from "@/features/experience/scene-engine/scene-viewport";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 
 const editorial = Cormorant_Garamond({
   weight: ["400", "500", "600", "700"],
@@ -21,8 +27,6 @@ const label = Outfit({
   subsets: ["latin"],
   display: "swap",
 });
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Warm luxury palette — quiet contrast, velvet field. */
 const CREAM = "#FFFBF5";
@@ -45,17 +49,24 @@ function Reveal({
   children,
   delay,
   className,
+  reduceMotion,
+  duration = MOTION_DURATION.ceremony,
 }: {
   children: ReactNode;
   delay: number;
   className?: string;
+  reduceMotion: boolean;
+  duration?: number;
 }) {
+  if (reduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
   return (
     <motion.div
       className={className}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.75, delay, ease: EASE }}
+      transition={{ duration, delay, ease: MOTION_EASE.out }}
     >
       {children}
     </motion.div>
@@ -154,20 +165,22 @@ const RAIN = buildRain();
  * Founder ref: design-references/warm/moments/scene-06-letter-reference.png
  */
 export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
-  const reduceMotion = useReducedMotion() ?? false;
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   const { experience } = payload;
   const toName = experience.greeting_name || "You";
   const fromName = experience.closing_name || "Someone who loves you";
   const closing = experience.letter_closing?.trim() || "With love,";
   const bodyChunks = splitLetterBody(experience.letter_content ?? "");
 
-  const d = (n: number) => (reduceMotion ? Math.min(n * 0.2, 0.12) : n);
-  const bodyStart = d(0.85);
-  const bodyStep = reduceMotion ? 0.06 : 0.35;
+  // Deliberate stationery pacing — slightly slower than Bloom/Sky
+  const pace = (n: number) => (reduceMotion ? 0 : n);
+  const bodyStart = pace(0.95);
+  const bodyStep = reduceMotion ? 0 : 0.4;
   const afterBody = bodyStart + bodyChunks.length * bodyStep;
-  const closingDelay = afterBody + d(0.15);
-  const signatureDelay = closingDelay + d(0.28);
-  const ctaDelay = signatureDelay + d(0.32);
+  const closingDelay = afterBody + pace(0.22);
+  const signatureDelay = closingDelay + pace(0.34);
+  const ctaDelay = signatureDelay + pace(0.38);
 
   return (
     <div
@@ -191,59 +204,45 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
       />
 
       {/* Soft rising petal rain — behind the card */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
-      >
-        {RAIN.map((petal, i) => (
-          <motion.div
-            key={i}
-            className="absolute"
-            style={{
-              left: petal.left,
-              top: "-8%",
-              width: petal.size,
-              filter: `blur(${petal.blur}px)`,
-            }}
-            initial={
-              reduceMotion
-                ? {
-                    y: "45vh",
-                    opacity: petal.opacity * 0.7,
-                    rotate: petal.rotateFrom / 2,
-                  }
-                : { y: "-10vh", opacity: 0, rotate: petal.rotateFrom }
-            }
-            animate={
-              reduceMotion
-                ? undefined
-                : {
-                    y: ["-10vh", "110vh"],
-                    x: [0, petal.x * 0.5, petal.x],
-                    rotate: [petal.rotateFrom, petal.rotateTo],
-                    opacity: [0, petal.opacity, petal.opacity, 0],
-                  }
-            }
-            transition={
-              reduceMotion
-                ? undefined
-                : {
-                    duration: petal.duration,
-                    delay: petal.delay,
-                    repeat: Infinity,
-                    ease: "linear",
-                    times: [0, 0.12, 0.82, 1],
-                  }
-            }
-          >
-            <SoftPetal
-              tone={petal.tone}
-              gradId={`warmS6rain-${i}`}
-              className="h-auto w-full"
-            />
-          </motion.div>
-        ))}
-      </div>
+      {ambient ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
+        >
+          {RAIN.map((petal, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              style={{
+                left: petal.left,
+                top: "-8%",
+                width: petal.size,
+                filter: `blur(${petal.blur}px)`,
+              }}
+              initial={{ y: "-10vh", opacity: 0, rotate: petal.rotateFrom }}
+              animate={{
+                y: ["-10vh", "110vh"],
+                x: [0, petal.x * 0.5, petal.x],
+                rotate: [petal.rotateFrom, petal.rotateTo],
+                opacity: [0, petal.opacity, petal.opacity, 0],
+              }}
+              transition={{
+                duration: petal.duration,
+                delay: petal.delay,
+                repeat: Infinity,
+                ease: "linear",
+                times: [0, 0.12, 0.82, 1],
+              }}
+            >
+              <SoftPetal
+                tone={petal.tone}
+                gradId={`warmS6rain-${i}`}
+                className="h-auto w-full"
+              />
+            </motion.div>
+          ))}
+        </div>
+      ) : null}
 
       {/* Scrollable hanging card — sole scrollport (host must not also scroll) */}
       <div className={SCENE_SCROLL_PANE}>
@@ -252,9 +251,14 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
           <motion.div
             aria-hidden
             className="relative z-[2] flex h-10 w-px flex-col items-center sm:h-12"
-            initial={{ scaleY: 0, opacity: 0 }}
+            initial={reduceMotion ? false : { scaleY: 0, opacity: 0 }}
             animate={{ scaleY: 1, opacity: 1 }}
-            transition={{ duration: 0.7, ease: EASE }}
+            transition={{
+              duration: reduceMotion
+                ? MOTION_DURATION.instant
+                : MOTION_DURATION.ceremony,
+              ease: MOTION_EASE.out,
+            }}
             style={{
               transformOrigin: "top",
               background: `linear-gradient(180deg, transparent 0%, ${GOLD_SOFT} 20%, ${GOLD} 100%)`,
@@ -280,9 +284,15 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                 "inset 0 1px 0 rgba(255,255,255,0.85)",
               ].join(", "),
             }}
-            initial={{ opacity: 0, y: 22 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, delay: d(0.08), ease: EASE }}
+            transition={{
+              duration: reduceMotion
+                ? MOTION_DURATION.instant
+                : MOTION_DURATION.ceremony,
+              delay: pace(0.1),
+              ease: MOTION_EASE.out,
+            }}
           >
             {/* Soft paper grain */}
             <div
@@ -295,7 +305,7 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
             />
 
             <div className="relative text-center">
-              <Reveal delay={d(0.22)}>
+              <Reveal delay={pace(0.28)} reduceMotion={reduceMotion}>
                 <p
                   className={`${label.className} text-[10px] font-medium tracking-[0.28em] uppercase sm:text-[11px]`}
                   style={{ color: ROSE_SOFT }}
@@ -311,7 +321,11 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
               </Reveal>
 
               {/* Clean gold rule — no flower icon */}
-              <Reveal delay={d(0.4)} className="mt-5 mb-5">
+              <Reveal
+                delay={pace(0.48)}
+                reduceMotion={reduceMotion}
+                className="mt-5 mb-5"
+              >
                 <div className="mx-auto flex max-w-[11rem] items-center gap-2.5">
                   <span
                     className="h-px flex-1"
@@ -332,7 +346,7 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                 </div>
               </Reveal>
 
-              <Reveal delay={d(0.55)}>
+              <Reveal delay={pace(0.68)} reduceMotion={reduceMotion}>
                 <p
                   className="text-[15px] italic sm:text-base"
                   style={{ color: INK_SOFT }}
@@ -346,6 +360,7 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                   <Reveal
                     key={`${i}-${chunk.slice(0, 12)}`}
                     delay={bodyStart + i * bodyStep}
+                    reduceMotion={reduceMotion}
                   >
                     <p
                       className="text-[14.5px] leading-[1.85] sm:text-[15.5px] sm:leading-[1.9]"
@@ -357,7 +372,11 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                 ))}
               </div>
 
-              <Reveal delay={closingDelay} className="mt-8">
+              <Reveal
+                delay={closingDelay}
+                reduceMotion={reduceMotion}
+                className="mt-8"
+              >
                 <p
                   className={`${label.className} text-[10px] font-medium tracking-[0.28em] uppercase sm:text-[11px]`}
                   style={{ color: ROSE_SOFT }}
@@ -367,7 +386,11 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                 </p>
               </Reveal>
 
-              <Reveal delay={signatureDelay} className="mt-1.5">
+              <Reveal
+                delay={signatureDelay}
+                reduceMotion={reduceMotion}
+                className="mt-1.5"
+              >
                 <p
                   className="text-[1.35rem] font-medium tracking-tight sm:text-[1.5rem]"
                   style={{ color: ROSE }}
@@ -376,7 +399,11 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                 </p>
               </Reveal>
 
-              <Reveal delay={ctaDelay} className="mt-8 sm:mt-9">
+              <Reveal
+                delay={ctaDelay}
+                reduceMotion={reduceMotion}
+                className="mt-8 sm:mt-9"
+              >
                 <motion.button
                   type="button"
                   aria-label="Unlock Memory Album"

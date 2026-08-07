@@ -5,6 +5,12 @@ import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import {
+  allowAmbientLoop,
+  MOTION_DURATION,
+  MOTION_EASE,
+  useCelebrateReducedMotion,
+} from "@/features/experience/scene-engine/shared/motion";
 
 const FALLING_PETALS = [
   { left: "6%", delay: 0.2, duration: 10, size: 16, x: 18, blur: 0 },
@@ -103,7 +109,15 @@ function SakuraBloom({ className }: { className?: string }) {
 }
 
 /** Curling satin ribbon — filled band with forked tip (not a stroke line). */
-function SatinRibbon({ side }: { side: "left" | "right" }) {
+function SatinRibbon({
+  side,
+  ambient,
+  reduceMotion,
+}: {
+  side: "left" | "right";
+  ambient: boolean;
+  reduceMotion: boolean;
+}) {
   const isLeft = side === "left";
   return (
     <motion.svg
@@ -114,16 +128,28 @@ function SatinRibbon({ side }: { side: "left" | "right" }) {
           ? "pointer-events-none absolute top-[42%] left-[-28%] z-[1] h-[58%] w-[70%] drop-shadow-md sm:left-[-32%] sm:w-[72%]"
           : "pointer-events-none absolute top-[46%] right-[-30%] z-[1] h-[60%] w-[72%] drop-shadow-md sm:right-[-34%] sm:w-[74%]"
       }
-      initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
+      initial={reduceMotion ? false : { opacity: 0, x: isLeft ? -30 : 30 }}
       animate={{
         opacity: 1,
         x: 0,
-        rotate: isLeft ? [-1.5, 1.5, -1.5] : [1.5, -1.5, 1.5],
+        rotate: ambient ? (isLeft ? [-1.5, 1.5, -1.5] : [1.5, -1.5, 1.5]) : 0,
       }}
       transition={{
-        opacity: { delay: 0.2, duration: 0.9 },
-        x: { delay: 0.2, duration: 0.9 },
-        rotate: { duration: 8, repeat: Infinity, ease: "easeInOut" },
+        opacity: {
+          delay: reduceMotion ? 0 : 0.2,
+          duration: reduceMotion
+            ? MOTION_DURATION.instant
+            : MOTION_DURATION.ceremony,
+        },
+        x: {
+          delay: reduceMotion ? 0 : 0.2,
+          duration: reduceMotion
+            ? MOTION_DURATION.instant
+            : MOTION_DURATION.ceremony,
+        },
+        rotate: ambient
+          ? { duration: 8, repeat: Infinity, ease: "easeInOut" }
+          : { duration: MOTION_DURATION.instant },
       }}
     >
       <defs>
@@ -210,14 +236,19 @@ function SatinRibbon({ side }: { side: "left" | "right" }) {
 }
 
 /** Open envelope — flap above letter, pocket peeking at sides/bottom. */
-function OpenEnvelope() {
+function OpenEnvelope({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <motion.div
       aria-hidden
       className="pointer-events-none absolute -inset-x-7 -top-14 bottom-[-1.75rem] -z-10 sm:-inset-x-9 sm:-top-16 sm:bottom-[-2rem]"
-      initial={{ opacity: 0, y: 28, scale: 0.97 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        duration: reduceMotion
+          ? MOTION_DURATION.instant
+          : MOTION_DURATION.ceremony,
+        ease: MOTION_EASE.out,
+      }}
     >
       {/* Contact shadow */}
       <div className="absolute inset-x-6 bottom-0 h-8 rounded-full bg-[#B05070]/30 blur-2xl" />
@@ -311,22 +342,27 @@ function RevealText({
   children,
   delay,
   className,
-  duration = 0.75,
+  duration = MOTION_DURATION.ceremony,
+  reduceMotion,
 }: {
   children: ReactNode;
   delay: number;
   className?: string;
   duration?: number;
+  reduceMotion: boolean;
 }) {
+  if (reduceMotion) {
+    return <div className={className}>{children}</div>;
+  }
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 14, filter: "blur(4px)" }}
+      initial={{ opacity: 0, y: 10, filter: "blur(3px)" }}
       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       transition={{
         duration,
         delay,
-        ease: [0.22, 1, 0.36, 1],
+        ease: MOTION_EASE.out,
       }}
     >
       {children}
@@ -349,23 +385,26 @@ function LockIcon({ className }: { className?: string }) {
 
 /**
  * moments.letter — living recreation of Founder Scene 6.
- * Letter body reveals slowly (sentence by sentence) for emotion.
+ * Soft luminous reading rhythm (sentence stagger) — presentation only.
  */
 export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
+  const reduceMotion = useCelebrateReducedMotion();
+  const ambient = allowAmbientLoop(reduceMotion);
   const { experience } = payload;
   const toName = experience.greeting_name;
   const fromName = experience.closing_name;
   const closing = experience.letter_closing?.trim() || "With love,";
   const bodyChunks = splitLetterBody(experience.letter_content ?? "");
 
-  // Stagger: header → sakura → dear → body lines → closing → signature → CTA
-  const dearDelay = 1.15;
-  const bodyStart = 1.75;
-  const bodyStep = 1.05;
+  // Soft Bloom pacing: header → dear → body → closing → signature → CTA
+  const pace = (n: number) => (reduceMotion ? 0 : n);
+  const dearDelay = pace(0.48);
+  const bodyStart = pace(0.72);
+  const bodyStep = reduceMotion ? 0 : 0.26;
   const afterBody = bodyStart + bodyChunks.length * bodyStep;
-  const closingDelay = afterBody + 0.35;
-  const signatureDelay = closingDelay + 0.65;
-  const ctaDelay = signatureDelay + 0.8;
+  const closingDelay = afterBody + pace(0.22);
+  const signatureDelay = closingDelay + pace(0.28);
+  const ctaDelay = signatureDelay + pace(0.32);
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F8E4E7]">
@@ -402,9 +441,14 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
         style={{
           background:
             "conic-gradient(from 210deg at 78% 8%, transparent 0deg, rgba(255,255,255,0.22) 18deg, transparent 36deg, rgba(255,255,255,0.12) 52deg, transparent 70deg)",
+          opacity: ambient ? undefined : 0.45,
         }}
-        animate={{ opacity: [0.35, 0.6, 0.35] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        animate={ambient ? { opacity: [0.35, 0.6, 0.35] } : undefined}
+        transition={
+          ambient
+            ? { duration: 7, repeat: Infinity, ease: "easeInOut" }
+            : undefined
+        }
       />
       {/* Center glow behind letter */}
       <motion.div
@@ -413,9 +457,14 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
         style={{
           background:
             "radial-gradient(ellipse 55% 48% at 50% 42%, rgba(255,255,255,0.7) 0%, transparent 70%)",
+          opacity: ambient ? undefined : 0.55,
         }}
-        animate={{ opacity: [0.45, 0.75, 0.45] }}
-        transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+        animate={ambient ? { opacity: [0.45, 0.75, 0.45] } : undefined}
+        transition={
+          ambient
+            ? { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
+            : undefined
+        }
       />
       {/* Leaf dappling (right) */}
       <div
@@ -451,16 +500,24 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
               rotate: p.rotate,
               filter: i % 3 === 0 ? "blur(1.5px)" : undefined,
             }}
-            animate={{
-              y: [0, -6, 0],
-              rotate: [p.rotate, p.rotate + 8, p.rotate],
-            }}
-            transition={{
-              duration: 5 + (i % 3),
-              delay: i * 0.25,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            animate={
+              ambient
+                ? {
+                    y: [0, -6, 0],
+                    rotate: [p.rotate, p.rotate + 8, p.rotate],
+                  }
+                : undefined
+            }
+            transition={
+              ambient
+                ? {
+                    duration: 5 + (i % 3),
+                    delay: i * 0.25,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }
+                : undefined
+            }
           >
             {i % 2 === 0 ? (
               <Petal
@@ -475,78 +532,92 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
       </div>
 
       {/* Falling petals */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-      >
-        {FALLING_PETALS.map((petal, i) => (
-          <motion.div
-            key={`fall-${i}`}
-            className="absolute"
-            style={{
-              left: petal.left,
-              top: "-8%",
-              width: petal.size,
-              height: petal.size * 1.35,
-              filter: petal.blur ? `blur(${petal.blur}px)` : undefined,
-            }}
-            animate={{
-              opacity: [0, 0.85, 0.85, 0],
-              y: ["0vh", "115vh"],
-              x: [0, petal.x],
-              rotate: [0, 50, -25],
-            }}
-            transition={{
-              duration: petal.duration,
-              delay: petal.delay,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          >
-            <Petal className="h-full w-full" />
-          </motion.div>
-        ))}
-      </div>
+      {ambient ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+        >
+          {FALLING_PETALS.map((petal, i) => (
+            <motion.div
+              key={`fall-${i}`}
+              className="absolute"
+              style={{
+                left: petal.left,
+                top: "-8%",
+                width: petal.size,
+                height: petal.size * 1.35,
+                filter: petal.blur ? `blur(${petal.blur}px)` : undefined,
+              }}
+              animate={{
+                opacity: [0, 0.85, 0.85, 0],
+                y: ["0vh", "115vh"],
+                x: [0, petal.x],
+                rotate: [0, 50, -25],
+              }}
+              transition={{
+                duration: petal.duration,
+                delay: petal.delay,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              <Petal className="h-full w-full" />
+            </motion.div>
+          ))}
+        </div>
+      ) : null}
 
       {/* Sparkles */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        {SPARKLES.map((s, i) => (
-          <motion.span
-            key={i}
-            className="absolute rounded-full bg-white"
-            style={{
-              top: s.top,
-              left: s.left,
-              width: s.size,
-              height: s.size,
-              boxShadow: "0 0 8px rgba(255,255,255,0.9)",
-            }}
-            animate={{ opacity: [0.1, 0.95, 0.1], scale: [0.7, 1.35, 0.7] }}
-            transition={{
-              duration: 2.6,
-              delay: s.delay,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
+      {ambient ? (
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          {SPARKLES.map((s, i) => (
+            <motion.span
+              key={i}
+              className="absolute rounded-full bg-white"
+              style={{
+                top: s.top,
+                left: s.left,
+                width: s.size,
+                height: s.size,
+                boxShadow: "0 0 8px rgba(255,255,255,0.9)",
+              }}
+              animate={{ opacity: [0.1, 0.95, 0.1], scale: [0.7, 1.35, 0.7] }}
+              transition={{
+                duration: 2.6,
+                delay: s.delay,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
 
       <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-4 py-10 sm:px-6 sm:py-12">
         <div className="relative w-full max-w-[20rem] sm:max-w-[22rem]">
-          <OpenEnvelope />
+          <OpenEnvelope reduceMotion={reduceMotion} />
           {/* Ribbons tucked under the letter, curling out from the envelope */}
-          <SatinRibbon side="left" />
-          <SatinRibbon side="right" />
+          <SatinRibbon
+            side="left"
+            ambient={ambient}
+            reduceMotion={reduceMotion}
+          />
+          <SatinRibbon
+            side="right"
+            ambient={ambient}
+            reduceMotion={reduceMotion}
+          />
 
           <motion.article
             className="relative z-[2] rounded-sm border border-[#E8D0D6] bg-[#FFFCFB] px-6 pt-8 pb-6 shadow-[0_24px_55px_-18px_rgba(160,70,100,0.5)] sm:px-8 sm:pt-9 sm:pb-7"
-            initial={{ opacity: 0, y: 42, scale: 0.94 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 28, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{
-              duration: 0.85,
-              delay: 0.12,
-              ease: [0.22, 1, 0.36, 1],
+              duration: reduceMotion
+                ? MOTION_DURATION.instant
+                : MOTION_DURATION.ceremony,
+              delay: reduceMotion ? 0 : 0.08,
+              ease: MOTION_EASE.out,
             }}
           >
             <div
@@ -555,7 +626,11 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
             />
 
             <div className="relative">
-              <RevealText delay={0.35} className="text-center">
+              <RevealText
+                delay={pace(0.28)}
+                reduceMotion={reduceMotion}
+                className="text-center"
+              >
                 <SakuraMark className="mx-auto mb-3 h-6 w-6" />
                 <p className="font-serif text-sm text-[#C45B7A]">To.</p>
                 <p className="mt-0.5 font-serif text-3xl font-semibold tracking-tight text-[#8B2E3E] sm:text-4xl">
@@ -564,7 +639,11 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
                 <div className="mx-auto mt-4 h-px w-16 bg-gradient-to-r from-transparent via-[#E8B0C0] to-transparent" />
               </RevealText>
 
-              <RevealText delay={dearDelay} className="mt-5 text-left">
+              <RevealText
+                delay={dearDelay}
+                reduceMotion={reduceMotion}
+                className="mt-5 text-left"
+              >
                 <p className="font-serif text-[15px] text-[#6B4450] sm:text-base">
                   Dear {toName},
                 </p>
@@ -575,7 +654,8 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
                   <RevealText
                     key={`${i}-${chunk.slice(0, 12)}`}
                     delay={bodyStart + i * bodyStep}
-                    duration={0.95}
+                    duration={MOTION_DURATION.ceremony}
+                    reduceMotion={reduceMotion}
                   >
                     <p className="font-serif text-[15px] leading-[1.75] text-[#6B4450] sm:text-base sm:leading-[1.8]">
                       {chunk}
@@ -584,13 +664,21 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
                 ))}
               </div>
 
-              <RevealText delay={closingDelay} className="mt-6 text-left">
+              <RevealText
+                delay={closingDelay}
+                reduceMotion={reduceMotion}
+                className="mt-6 text-left"
+              >
                 <p className="font-serif text-lg text-[#C45B7A] italic">
                   {closing}
                 </p>
               </RevealText>
 
-              <RevealText delay={signatureDelay} className="mt-1 text-left">
+              <RevealText
+                delay={signatureDelay}
+                reduceMotion={reduceMotion}
+                className="mt-1 text-left"
+              >
                 <p className="font-serif text-xl font-semibold text-[#8B2E3E] sm:text-2xl">
                   {fromName}
                 </p>
@@ -601,14 +689,16 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
                 aria-label="Unlock Memories"
                 onClick={onComplete}
                 className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#F7A0B8] to-[#E05A7A] px-5 py-3.5 text-xs font-bold tracking-[0.14em] text-white uppercase shadow-[0_14px_32px_-8px_rgba(196,91,122,0.75)] ring-1 ring-white/45 focus-visible:ring-2 focus-visible:ring-[#C45B7A] focus-visible:outline-none sm:text-[13px]"
-                initial={{ opacity: 0, y: 16 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
                   delay: ctaDelay,
-                  duration: 0.65,
-                  ease: [0.22, 1, 0.36, 1],
+                  duration: reduceMotion
+                    ? MOTION_DURATION.instant
+                    : MOTION_DURATION.base,
+                  ease: MOTION_EASE.out,
                 }}
-                whileHover={{ scale: 1.02 }}
+                whileHover={reduceMotion ? undefined : { scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <LockIcon className="h-3.5 w-3.5 shrink-0 text-white" />
