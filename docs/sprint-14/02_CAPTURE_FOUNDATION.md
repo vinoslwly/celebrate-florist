@@ -119,19 +119,25 @@ Note: Bloom Connection / Memories / Treasures reuse this Moments scene wrapper, 
 
 ## 10. Browser results
 
-| Check                                  | Result                                                          |
-| -------------------------------------- | --------------------------------------------------------------- |
-| Mobile `390×844` layout mount          | ✅ Enable camera / layout / strip chrome (no overflow expected) |
-| Desktop `1280×800` three-column chrome | ✅ left controls · center preview · right strip                 |
-| Permission accepted                    | Manual / real device — documented below                         |
-| Permission denied                      | UI path present (status + Try again)                            |
-| Layout B → 3 slots                     | ✅                                                              |
-| Layout K → 2 slots                     | ✅                                                              |
-| Countdown / flash UI                   | ✅ wired                                                        |
-| Retake last / Reset                    | ✅ revoke URLs                                                  |
-| Stop camera / unmount cleanup          | ✅ track stop                                                   |
-| Graph / scene IDs                      | Unchanged                                                       |
-| Material console errors                | None from build/typecheck                                       |
+Playwright MCP smoke (2026-08-08) on
+`/theme-lab/bloom?connectionScene=connection.photobooth` — **15/15 passed**.
+
+| Check                                  | Result                                          |
+| -------------------------------------- | ----------------------------------------------- |
+| Mobile `390×844` layout mount          | ✅ no horizontal overflow (`390×844`)           |
+| Desktop `1280×800` three-column chrome | ✅ left controls · center preview · right strip |
+| Permission accepted                    | Manual / real device — documented below         |
+| Permission denied                      | UI path present (status + Try again)            |
+| Layout B → 3 slots                     | ✅ Playwright                                   |
+| Layout K → 2 slots                     | ✅ Playwright                                   |
+| Mirror / Flash toggle                  | ✅ Playwright                                   |
+| Enable camera CTA                      | ✅ visible (grant still manual)                 |
+| Countdown / flash UI                   | ✅ wired                                        |
+| Retake last / Reset                    | ✅ revoke URLs                                  |
+| Stop camera / unmount cleanup          | ✅ track stop                                   |
+| Restart journey                        | ✅ no crash                                     |
+| Graph / scene IDs                      | Unchanged                                       |
+| Material console errors                | None from build/typecheck                       |
 
 ### Manual-only
 
