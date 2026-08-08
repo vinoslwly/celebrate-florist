@@ -42,6 +42,10 @@ const securityHeaders = [
  * during the Sprint 02A architecture audit. Storage/Realtime aren't used
  * yet, but the policy is ready for both without needing to be touched
  * again when they ship — that is the point of hardening it now.
+ *
+ * Photobooth (Sprint 14) uses client-only `blob:` object URLs for pose
+ * thumbnails and strip composition — never uploaded/stored. Allow `blob:`
+ * on `img-src` (preview `<img>`) and `connect-src` (`fetch` → ImageBitmap).
  */
 function buildContentSecurityPolicy(isDev: boolean): string {
   const supabaseHttp = "https://*.supabase.co";
@@ -51,9 +55,9 @@ function buildContentSecurityPolicy(isDev: boolean): string {
     "default-src": "'self'",
     "script-src": isDev ? "'self' 'unsafe-eval' 'unsafe-inline'" : "'self'",
     "style-src": "'self' 'unsafe-inline'",
-    "img-src": `'self' data: ${supabaseHttp}`,
+    "img-src": `'self' data: blob: ${supabaseHttp}`,
     "font-src": "'self' data:",
-    "connect-src": `'self' ${supabaseHttp} ${supabaseWebSocket}`,
+    "connect-src": `'self' blob: ${supabaseHttp} ${supabaseWebSocket}`,
     "frame-ancestors": "'self'",
     "base-uri": "'self'",
     "form-action": "'self'",

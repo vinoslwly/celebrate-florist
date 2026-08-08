@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { useCamera } from "@/features/photobooth/hooks/use-camera";
 import { useCaptureSequence } from "@/features/photobooth/hooks/use-capture-sequence";
+import { composeStrip } from "@/features/photobooth/lib/compose-strip";
 import {
+  getLayoutAspectCss,
   getLayoutMeta,
   PHOTOBOOTH_LAYOUTS,
 } from "@/features/photobooth/lib/layouts";
@@ -24,9 +26,9 @@ export type PhotoboothCaptureFoundationProps = {
 };
 
 /**
- * Sprint 14.2 — shared capture foundation UI.
+ * Sprint 14.2–14.3 — shared capture + layout composition preview.
  * Center preview · right raw strip thumbs · left layout / mirror / flash.
- * No final frame/sticker/watermark/download composition yet.
+ * Composition uses Canvas 2D cover-crop into B/K geometry (no themed art yet).
  */
 export function PhotoboothCaptureFoundation({
   greetingName,
@@ -37,8 +39,13 @@ export function PhotoboothCaptureFoundation({
   const [mirrorPreview, setMirrorPreview] = useState(true);
   const [flashEnabled, setFlashEnabled] = useState(true);
   const [countdownSeconds, setCountdownSeconds] = useState<CountdownSeconds>(3);
+  const [compositionUrl, setCompositionUrl] = useState<string | null>(null);
+  const [compositionError, setCompositionError] = useState<string | null>(null);
+  const [composing, setComposing] = useState(false);
+  const compositionUrlRef = useRef<string | null>(null);
 
   const layout = getLayoutMeta(layoutId);
+  const aspectCss = getLayoutAspectCss(layoutId);
   const {
     videoRef,
     status: cameraStatus,
@@ -65,6 +72,16 @@ export function PhotoboothCaptureFoundation({
     videoRef,
   });
 
+  const poseUrlsKey = poses.map((p) => p.objectUrl).join("|");
+
+  const replaceCompositionUrl = useCallback((next: string | null) => {
+    if (compositionUrlRef.current) {
+      URL.revokeObjectURL(compositionUrlRef.current);
+    }
+    compositionUrlRef.current = next;
+    setCompositionUrl(next);
+  }, []);
+
   /** Changing layout resets captures so pose counts stay consistent. */
   useEffect(() => {
     resetAll();
@@ -74,8 +91,69 @@ export function PhotoboothCaptureFoundation({
     return () => {
       stopCamera();
       resetAll();
+      if (compositionUrlRef.current) {
+        URL.revokeObjectURL(compositionUrlRef.current);
+        compositionUrlRef.current = null;
+      }
     };
   }, [stopCamera, resetAll]);
+
+  /** Drop composition when capture set is incomplete (retake / reset / layout). */
+  useEffect(() => {
+    if (isComplete && poses.length >= layout.poseCount) return;
+    const id = window.setTimeout(() => {
+      replaceCompositionUrl(null);
+      setCompositionError(null);
+      setComposing(false);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [isComplete, layout.poseCount, poses.length, replaceCompositionUrl]);
+
+  /** Compose when all poses ready; revoke prior composition URLs. */
+  useEffect(() => {
+    if (!isComplete || poses.length < layout.poseCount) return;
+
+    let cancelled = false;
+    const urls = poses.map((p) => p.objectUrl);
+
+    const id = window.setTimeout(() => {
+      if (cancelled) return;
+      setComposing(true);
+      setCompositionError(null);
+
+      void composeStrip(layoutId, urls)
+        .then((result) => {
+          if (cancelled) {
+            if (result) URL.revokeObjectURL(result.objectUrl);
+            return;
+          }
+          if (!result) {
+            setCompositionError("Could not compose the strip. Try Reset.");
+            setComposing(false);
+            return;
+          }
+          replaceCompositionUrl(result.objectUrl);
+          setComposing(false);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setCompositionError("Could not compose the strip. Try Reset.");
+          setComposing(false);
+        });
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
+  }, [
+    isComplete,
+    layout.poseCount,
+    layoutId,
+    poseUrlsKey,
+    poses,
+    replaceCompositionUrl,
+  ]);
 
   const busy =
     phase === "counting" || phase === "flashing" || phase === "capturing";
@@ -92,7 +170,8 @@ export function PhotoboothCaptureFoundation({
           nothing is uploaded.
         </p>
         <p className="mt-1 font-mono text-[10px] tracking-wide text-muted-foreground uppercase">
-          Capture foundation · {layout.label}
+          Layout system · {layout.label} · {layout.canvas.width}×
+          {layout.canvas.height}px
         </p>
       </header>
 
@@ -303,15 +382,61 @@ export function PhotoboothCaptureFoundation({
             of {layout.poseCount}
             {isComplete ? " · complete" : ""}
             {" · "}
-            Preview mirror does not bake into capture yet (export decision in
-            14.3/14.5).
+            Live preview may mirror; composition uses raw (unmirrored) captures.
+            Final export mirroring still open.
           </p>
+
+          {/* Composition preview — geometric frame only (14.3) */}
+          {isComplete ? (
+            <div
+              className="mt-2 w-full max-w-md"
+              data-testid="composition-preview"
+              data-layout-id={layoutId}
+              data-aspect={`${layout.aspectRatio.w}:${layout.aspectRatio.h}`}
+            >
+              <p className="mb-2 text-center font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+                Composition preview · geometric · not final art
+              </p>
+              {composing ? (
+                <p className="text-center text-sm text-muted-foreground">
+                  Composing strip…
+                </p>
+              ) : null}
+              {compositionError ? (
+                <p
+                  className="text-center text-sm text-destructive"
+                  role="alert"
+                >
+                  {compositionError}
+                </p>
+              ) : null}
+              {compositionUrl ? (
+                <div
+                  className="mx-auto max-h-[min(70vh,36rem)] w-full overflow-hidden rounded-lg border border-border bg-muted/30"
+                  style={{
+                    aspectRatio: aspectCss,
+                    maxWidth: layoutId === "B" ? "12rem" : "18rem",
+                  }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={compositionUrl}
+                    alt={`Layout ${layoutId} composition`}
+                    className="h-full w-full object-contain"
+                    data-testid="composition-image"
+                  />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
-        {/* Right strip thumbs */}
+        {/* Right strip thumbs — raw captures */}
         <aside
           className="mx-auto flex w-full max-w-[9rem] flex-col gap-2 rounded-xl border border-border bg-card p-2"
           aria-label="Captured poses"
+          data-testid="raw-strip"
+          data-pose-count={layout.poseCount}
         >
           <p className="text-center font-mono text-[9px] tracking-widest text-muted-foreground uppercase">
             Strip preview
@@ -322,6 +447,7 @@ export function PhotoboothCaptureFoundation({
               <div
                 key={`slot-${layoutId}-${i}`}
                 className="relative aspect-square overflow-hidden rounded-lg border border-dashed border-border bg-muted/40"
+                data-testid={`raw-slot-${i}`}
               >
                 {pose ? (
                   // eslint-disable-next-line @next/next/no-img-element

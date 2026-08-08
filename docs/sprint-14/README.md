@@ -1,6 +1,6 @@
 # Sprint 14 — Experience Components (Photobooth)
 
-> **Status:** ✅ **14.1 LOCKED** · ✅ **14.2 Capture Foundation** complete · [01](./01_PHOTOBOOTH_ENTRY_PLAN.md) · [02](./02_CAPTURE_FOUNDATION.md)  
+> **Status:** ✅ **14.1 LOCKED** · ✅ **14.2 Capture Foundation** (pushed) · ✅ **14.3 Layout System** complete (awaiting Founder review) · [01](./01_PHOTOBOOTH_ENTRY_PLAN.md) · [02](./02_CAPTURE_FOUNDATION.md) · [03](./03_LAYOUT_SYSTEM.md)  
 > **After:** Sprint 13 Motion System 🔒 LOCKED ([09](../sprint-13/09_SPRINT_13_FINAL_REGRESSION_AND_LOCK.md))  
 > **Primary scope:** Photobooth redesign — Layout B · Layout K · countdown · flash · stickers · watermark · download  
 > **Themes:** Bloom · Warm · Sky (Playful / Pure frozen)  
@@ -10,10 +10,10 @@
 
 ## Locked layouts
 
-| Layout | Physical                    | Orientation | Poses |
-| ------ | --------------------------- | ----------- | ----- |
-| **B**  | 2×6 inch classic photostrip | Portrait    | 3     |
-| **K**  | 4×6 inch photo-card         | Portrait    | 2     |
+| Layout | Physical                    | Orientation | Poses | Aspect | Working canvas |
+| ------ | --------------------------- | ----------- | ----- | ------ | -------------- |
+| **B**  | 2×6 inch classic photostrip | Portrait    | 3     | 1:3    | 400×1200       |
+| **K**  | 4×6 inch photo-card         | Portrait    | 2     | 2:3    | 600×900        |
 
 Do not reinterpret as landscape unless Founder changes this.
 
@@ -21,8 +21,8 @@ Do not reinterpret as landscape unless Founder changes this.
 
 - One shared Photobooth engine · theme packs only for Bloom/Warm/Sky
 - `getUserMedia` + Canvas 2D · no html2canvas · no V1 dependency by default
-- Preview may mirror · export mirroring decided later
-- Stickers limited · resize/rotate deferred
+- Preview may mirror · **export mirroring still open**
+- Stickers / watermark / download deferred (14.4–14.5)
 - Terminal scene · `?noPhotos=1` safe · CF-R2 intact
 - Full lock list: [01 §0](./01_PHOTOBOOTH_ENTRY_PLAN.md#0-locked-decisions-do-not-reinterpret)
 
@@ -46,19 +46,20 @@ Mocks: [`references/`](./references/) · details in [01 plan §3](./01_PHOTOBOOT
 | #   | Document                                                     | Purpose                                       |
 | --- | ------------------------------------------------------------ | --------------------------------------------- |
 | 01  | [01_PHOTOBOOTH_ENTRY_PLAN.md](./01_PHOTOBOOTH_ENTRY_PLAN.md) | Entry audit · architecture · locked decisions |
-| 02  | [02_CAPTURE_FOUNDATION.md](./02_CAPTURE_FOUNDATION.md)       | 14.2 capture foundation (when complete)       |
+| 02  | [02_CAPTURE_FOUNDATION.md](./02_CAPTURE_FOUNDATION.md)       | 14.2 capture foundation                       |
+| 03  | [03_LAYOUT_SYSTEM.md](./03_LAYOUT_SYSTEM.md)                 | 14.3 B/K geometry · crop · composition        |
 
 ## Phases
 
-| Phase | Focus                                    | Status      |
-| ----- | ---------------------------------------- | ----------- |
-| 14.1  | Entry audit + architecture + layouts     | ✅ Locked   |
-| 14.2  | Camera / capture foundation              | ✅ Complete |
-| 14.3  | Layout B + Layout K composition          | Planned     |
-| 14.4  | Frame / sticker / watermark              | Planned     |
-| 14.5  | Preview + download                       | Planned     |
-| 14.6  | Bloom / Warm / Sky Theme Lab integration | Planned     |
-| 14.7  | Regression & lock                        | Planned     |
+| Phase | Focus                                    | Status               |
+| ----- | ---------------------------------------- | -------------------- |
+| 14.1  | Entry audit + architecture + layouts     | ✅ Locked            |
+| 14.2  | Camera / capture foundation              | ✅ Complete (pushed) |
+| 14.3  | Layout B + Layout K composition          | ✅ Complete (review) |
+| 14.4  | Frame / sticker / watermark              | Planned              |
+| 14.5  | Preview + download                       | Planned              |
+| 14.6  | Bloom / Warm / Sky Theme Lab integration | Planned              |
+| 14.7  | Regression & lock                        | Planned              |
 
 ## Hard boundaries
 
