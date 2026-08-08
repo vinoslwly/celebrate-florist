@@ -1,6 +1,6 @@
 # Sprint 14 — Experience Components (Photobooth)
 
-> **Status:** ✅ **14.1 LOCKED** · 📋 **14.2 Capture Foundation** in progress · [01 plan](./01_PHOTOBOOTH_ENTRY_PLAN.md)  
+> **Status:** ✅ **14.1 LOCKED** · ✅ **14.2 Capture Foundation** complete · [01](./01_PHOTOBOOTH_ENTRY_PLAN.md) · [02](./02_CAPTURE_FOUNDATION.md)  
 > **After:** Sprint 13 Motion System 🔒 LOCKED ([09](../sprint-13/09_SPRINT_13_FINAL_REGRESSION_AND_LOCK.md))  
 > **Primary scope:** Photobooth redesign — Layout B · Layout K · countdown · flash · stickers · watermark · download  
 > **Themes:** Bloom · Warm · Sky (Playful / Pure frozen)  
@@ -50,15 +50,15 @@ Mocks: [`references/`](./references/) · details in [01 plan §3](./01_PHOTOBOOT
 
 ## Phases
 
-| Phase | Focus                                    | Status    |
-| ----- | ---------------------------------------- | --------- |
-| 14.1  | Entry audit + architecture + layouts     | ✅ Locked |
-| 14.2  | Camera / capture foundation              | 📋 Next   |
-| 14.3  | Layout B + Layout K composition          | Planned   |
-| 14.4  | Frame / sticker / watermark              | Planned   |
-| 14.5  | Preview + download                       | Planned   |
-| 14.6  | Bloom / Warm / Sky Theme Lab integration | Planned   |
-| 14.7  | Regression & lock                        | Planned   |
+| Phase | Focus                                    | Status      |
+| ----- | ---------------------------------------- | ----------- |
+| 14.1  | Entry audit + architecture + layouts     | ✅ Locked   |
+| 14.2  | Camera / capture foundation              | ✅ Complete |
+| 14.3  | Layout B + Layout K composition          | Planned     |
+| 14.4  | Frame / sticker / watermark              | Planned     |
+| 14.5  | Preview + download                       | Planned     |
+| 14.6  | Bloom / Warm / Sky Theme Lab integration | Planned     |
+| 14.7  | Regression & lock                        | Planned     |
 
 ## Hard boundaries
 

@@ -1,32 +1,32 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
 import { Photobooth } from "@/features/photobooth/components/photobooth";
 
-/** Terminal Moments scene — existing Photobooth wrapper; Sprint 14 redesign deferred. */
+/**
+ * Terminal Moments scene — Sprint 14.2 capture foundation host (Bloom Theme Lab).
+ * Scene ID / graph unchanged. Warm/Sky wrappers still use their own shells + legacy default.
+ */
 export function PhotoboothScene({ payload }: MomentsSceneProps) {
   const { experience, theme } = payload;
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-10 sm:px-6">
-      <p
-        className="mb-4 text-center font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
-        data-production-pending="moments-photobooth"
-      >
-        Scene 10 · Photobooth · Production Pending (Sprint 14)
-      </p>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
+    <div className={SCENE_VIEWPORT_SCROLL}>
+      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-3 py-6 sm:px-6 sm:py-8">
+        <p
+          className="mb-3 text-center font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
+          data-production-pending="moments-photobooth"
+        >
+          Scene 10 · Photobooth · Capture foundation (Sprint 14.2)
+        </p>
         <Photobooth
+          variant="capture"
           greetingName={experience.greeting_name}
           themeEmoji={theme.emoji}
+          initialLayoutId="B"
         />
-      </motion.div>
+      </div>
     </div>
   );
 }

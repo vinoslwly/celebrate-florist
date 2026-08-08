@@ -3,31 +3,75 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { PhotoboothCaptureFoundation } from "@/features/photobooth/components/photobooth-capture-foundation";
+import type { PhotoboothLayoutId } from "@/features/photobooth/lib/types";
 
-type PhotoboothProps = {
+export type PhotoboothProps = {
   greetingName: string;
   themeEmoji?: string;
+  /**
+   * `legacy` — single-shot card (default) for existing production imports.
+   * `capture` — Sprint 14.2 multi-pose foundation (Theme Lab host).
+   */
+  variant?: "legacy" | "capture";
+  /** Used when variant is `capture`. Default Layout B. */
+  initialLayoutId?: PhotoboothLayoutId;
 };
 
-export function Photobooth({ greetingName, themeEmoji }: PhotoboothProps) {
+/**
+ * Shared Photobooth entry.
+ * Default API unchanged for legacy experience flows.
+ * Theme Lab Sprint 14.2 uses `variant="capture"`.
+ */
+export function Photobooth({
+  greetingName,
+  themeEmoji,
+  variant = "legacy",
+  initialLayoutId,
+}: PhotoboothProps) {
+  if (variant === "capture") {
+    return (
+      <PhotoboothCaptureFoundation
+        greetingName={greetingName}
+        themeEmoji={themeEmoji}
+        initialLayoutId={initialLayoutId}
+      />
+    );
+  }
+
+  return (
+    <LegacyPhotobooth greetingName={greetingName} themeEmoji={themeEmoji} />
+  );
+}
+
+/** Pre-14.2 single-shot UI — preserved for legacy imports. */
+function LegacyPhotobooth({
+  greetingName,
+  themeEmoji,
+}: {
+  greetingName: string;
+  themeEmoji?: string;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [active, setActive] = useState(false);
 
   const stopStream = useCallback(() => {
-    stream?.getTracks().forEach((track) => track.stop());
-    setStream(null);
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
     setActive(false);
-  }, [stream]);
+  }, []);
 
   useEffect(() => {
     return () => {
-      stream?.getTracks().forEach((track) => track.stop());
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
     };
-  }, [stream]);
+  }, []);
 
   async function startCamera() {
     setError(null);
@@ -35,10 +79,10 @@ export function Photobooth({ greetingName, themeEmoji }: PhotoboothProps) {
 
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
+        video: { facingMode: { ideal: "user" } },
         audio: false,
       });
-      setStream(mediaStream);
+      streamRef.current = mediaStream;
       setActive(true);
 
       if (videoRef.current) {
@@ -64,7 +108,7 @@ export function Photobooth({ greetingName, themeEmoji }: PhotoboothProps) {
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 space-y-4">
+    <section className="space-y-4 rounded-2xl border border-border bg-card p-6">
       <div>
         <h2 className="flex items-center gap-2 font-serif text-xl font-semibold">
           {themeEmoji ? <span aria-hidden>{themeEmoji}</span> : null}
