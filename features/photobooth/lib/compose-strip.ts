@@ -2,6 +2,12 @@ import {
   paintStripBackground,
   paintStripDecoration,
 } from "@/features/photobooth/lib/draw-frame";
+import {
+  PHOTOBOOTH_EXPORT_MIME,
+  PHOTOBOOTH_EXPORT_MIRROR,
+  PHOTOBOOTH_EXPORT_QUALITY,
+  PHOTOBOOTH_EXPORT_SCALE,
+} from "@/features/photobooth/lib/export";
 import { getFilterPreset } from "@/features/photobooth/lib/filters";
 import {
   getLayoutMeta,
@@ -53,17 +59,17 @@ export function drawImageCover(
 }
 
 /**
- * Decode a pose object URL for Canvas draw.
+ * Decode a pose / optional frame asset URL for Canvas draw.
  * Prefers ImageBitmap via fetch; falls back to HTMLImageElement.
- * Requires CSP `blob:` on `img-src` and `connect-src`.
+ * Requires CSP `blob:` / `https:` as configured for img-src + connect-src.
  */
-async function loadPoseBitmap(
+async function loadBitmap(
   url: string,
 ): Promise<ImageBitmap | HTMLImageElement> {
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error("Failed to fetch pose image");
+      throw new Error("Failed to fetch image");
     }
     const blob = await response.blob();
     return await createImageBitmap(blob);
@@ -71,7 +77,7 @@ async function loadPoseBitmap(
     return await new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error("Failed to load pose image"));
+      img.onerror = () => reject(new Error("Failed to load image"));
       img.src = url;
     });
   }
@@ -94,14 +100,52 @@ function paintNeutralFrame(
   }
 }
 
+/** Scale working layout geometry for export masters (exact aspect preserved). */
+export function scaleLayoutConfig(
+  layout: PhotoboothLayoutConfig,
+  scale: number,
+): PhotoboothLayoutConfig {
+  if (scale === 1) return layout;
+  const s = (n: number) => Math.round(n * scale);
+  return {
+    ...layout,
+    canvas: {
+      width: s(layout.canvas.width),
+      height: s(layout.canvas.height),
+    },
+    margins: {
+      top: s(layout.margins.top),
+      right: s(layout.margins.right),
+      bottom: s(layout.margins.bottom),
+      left: s(layout.margins.left),
+    },
+    gap: s(layout.gap),
+    slots: layout.slots.map((slot) => ({
+      x: s(slot.x),
+      y: s(slot.y),
+      width: s(slot.width),
+      height: s(slot.height),
+    })),
+    safeFrame: {
+      x: s(layout.safeFrame.x),
+      y: s(layout.safeFrame.y),
+      width: s(layout.safeFrame.width),
+      height: s(layout.safeFrame.height),
+    },
+  };
+}
+
 export type ComposeStripResult = {
-  /** Object URL of the composed JPEG — caller must revoke. */
+  /** Object URL of the composed image — caller must revoke when previewing. */
   objectUrl: string;
+  /** Raw blob for download without re-fetching the object URL. */
+  blob: Blob;
   width: number;
   height: number;
   layoutId: PhotoboothLayoutId;
   presetId?: string;
   filterId?: PhotoboothFilterId;
+  mirrored: boolean;
 };
 
 export type ComposeStripOptions = {
@@ -111,14 +155,27 @@ export type ComposeStripOptions = {
   preset?: PhotoboothStripPreset | null;
   /** Universal filter applied to photo slots only (not strip chrome). */
   filterId?: PhotoboothFilterId;
+  /**
+   * Pixel scale vs working canvas. Preview uses 1; download uses
+   * PHOTOBOOTH_EXPORT_SCALE (2×).
+   */
+  scale?: number;
+  /**
+   * Mirror photo slots horizontally. V1 download default is false
+   * (see PHOTOBOOTH_EXPORT_MIRROR).
+   */
+  mirrorPhotos?: boolean;
+  mimeType?: string;
+  quality?: number;
 };
 
 /**
  * Compose order:
- * background → photo slots (cover crop + filter) → frame decoration
+ * background → photo slots (cover crop + filter [+ optional mirror]) → frame
  *
- * Captures stay raw; filter is applied at compose time so it can change
- * without retakes. Does **not** apply preview mirroring or app watermark.
+ * Captures stay raw; filter/mirror applied at compose time.
+ * Optional `preset.frameSrc` overlays Founder strip art when present.
+ * No application watermark.
  */
 export async function composeStrip(
   layoutIdOrOptions: PhotoboothLayoutId | ComposeStripOptions,
@@ -132,9 +189,20 @@ export async function composeStrip(
         }
       : layoutIdOrOptions;
 
-  const { layoutId, poseObjectUrls, preset, filterId = "original" } = options;
-  const layout = getLayoutMeta(layoutId);
-  if (poseObjectUrls.length < layout.poseCount) return null;
+  const {
+    layoutId,
+    poseObjectUrls,
+    preset,
+    filterId = "original",
+    scale = 1,
+    mirrorPhotos = PHOTOBOOTH_EXPORT_MIRROR,
+    mimeType = PHOTOBOOTH_EXPORT_MIME,
+    quality = PHOTOBOOTH_EXPORT_QUALITY,
+  } = options;
+
+  const baseLayout = getLayoutMeta(layoutId);
+  if (poseObjectUrls.length < baseLayout.poseCount) return null;
+  const layout = scaleLayoutConfig(baseLayout, scale);
 
   const canvas = document.createElement("canvas");
   canvas.width = layout.canvas.width;
@@ -149,7 +217,7 @@ export async function composeStrip(
   }
 
   const urls = poseObjectUrls.slice(0, layout.poseCount);
-  const bitmaps = await Promise.all(urls.map(loadPoseBitmap));
+  const bitmaps = await Promise.all(urls.map(loadBitmap));
   const filter = getFilterPreset(filterId);
 
   try {
@@ -158,7 +226,21 @@ export async function composeStrip(
       const slot = layout.slots[i]!;
       const bitmap = bitmaps[i];
       if (!bitmap) continue;
-      drawImageCover(ctx, bitmap, slot);
+
+      if (mirrorPhotos) {
+        ctx.save();
+        ctx.translate(slot.x + slot.width, slot.y);
+        ctx.scale(-1, 1);
+        drawImageCover(ctx, bitmap, {
+          x: 0,
+          y: 0,
+          width: slot.width,
+          height: slot.height,
+        });
+        ctx.restore();
+      } else {
+        drawImageCover(ctx, bitmap, slot);
+      }
     }
   } finally {
     ctx.filter = "none";
@@ -169,21 +251,47 @@ export async function composeStrip(
     });
   }
 
-  if (preset) {
+  if (preset?.frameSrc) {
+    try {
+      const frame = await loadBitmap(preset.frameSrc);
+      try {
+        ctx.drawImage(frame, 0, 0, layout.canvas.width, layout.canvas.height);
+      } finally {
+        if ("close" in frame && typeof frame.close === "function") {
+          frame.close();
+        }
+      }
+    } catch {
+      paintStripDecoration(ctx, layout, preset);
+    }
+  } else if (preset) {
     paintStripDecoration(ctx, layout, preset);
   }
 
   const blob = await new Promise<Blob | null>((resolve) => {
-    canvas.toBlob((b) => resolve(b), "image/jpeg", 0.92);
+    canvas.toBlob((b) => resolve(b), mimeType, quality);
   });
   if (!blob) return null;
 
   return {
     objectUrl: URL.createObjectURL(blob),
+    blob,
     width: layout.canvas.width,
     height: layout.canvas.height,
     layoutId,
     presetId: preset?.id,
     filterId,
+    mirrored: mirrorPhotos,
   };
+}
+
+/** Convenience: compose at export scale for download. */
+export async function composeStripForDownload(
+  options: Omit<ComposeStripOptions, "scale" | "mirrorPhotos">,
+): Promise<ComposeStripResult | null> {
+  return composeStrip({
+    ...options,
+    scale: PHOTOBOOTH_EXPORT_SCALE,
+    mirrorPhotos: PHOTOBOOTH_EXPORT_MIRROR,
+  });
 }

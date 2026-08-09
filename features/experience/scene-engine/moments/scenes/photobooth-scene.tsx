@@ -18,7 +18,7 @@ export function PhotoboothScene({ payload }: MomentsSceneProps) {
           className="mb-3 text-center font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
           data-production-pending="moments-photobooth"
         >
-          Scene 10 · Photobooth · Strip + filters (Sprint 14.4)
+          Scene 10 · Photobooth · Preview + download (Sprint 14.5)
         </p>
         <Photobooth
           variant="capture"

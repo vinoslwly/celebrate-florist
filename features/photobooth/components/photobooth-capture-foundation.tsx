@@ -7,7 +7,16 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useCamera } from "@/features/photobooth/hooks/use-camera";
 import { useCaptureSequence } from "@/features/photobooth/hooks/use-capture-sequence";
-import { composeStrip } from "@/features/photobooth/lib/compose-strip";
+import {
+  composeStrip,
+  composeStripForDownload,
+} from "@/features/photobooth/lib/compose-strip";
+import {
+  buildPhotoboothFilename,
+  downloadBlob,
+  getExportPixelSize,
+  PHOTOBOOTH_EXPORT_MIRROR,
+} from "@/features/photobooth/lib/export";
 import {
   getDefaultFilterId,
   getFilterPreset,
@@ -39,9 +48,9 @@ export type PhotoboothCaptureFoundationProps = {
 };
 
 /**
- * Shared capture + strip + universal filters (Sprint 14.2–14.4 revision).
- * Left: layout / mirror / flash · Center: live filtered camera · Right: strip + filter.
- * No sticker editor · no app watermark (branding lives in Founder strip art).
+ * Shared Photobooth (Sprint 14.2–14.5).
+ * Capture → strip + filter → final preview → client-side download.
+ * No stickers · no app watermark · branding in Founder strip art.
  */
 export function PhotoboothCaptureFoundation({
   greetingName,
@@ -58,6 +67,8 @@ export function PhotoboothCaptureFoundation({
   const [compositionUrl, setCompositionUrl] = useState<string | null>(null);
   const [compositionError, setCompositionError] = useState<string | null>(null);
   const [composing, setComposing] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadMessage, setDownloadMessage] = useState<string | null>(null);
   const compositionUrlRef = useRef<string | null>(null);
 
   const compatiblePresets = useMemo(
@@ -205,6 +216,42 @@ export function PhotoboothCaptureFoundation({
 
   const busy =
     phase === "counting" || phase === "flashing" || phase === "capturing";
+
+  const exportPixels = getExportPixelSize(layoutId);
+
+  const handleDownload = async () => {
+    if (!isComplete || poses.length < layout.poseCount || downloading) return;
+    setDownloading(true);
+    setDownloadMessage(null);
+    setCompositionError(null);
+    try {
+      const result = await composeStripForDownload({
+        layoutId,
+        poseObjectUrls: poses.map((p) => p.objectUrl),
+        preset: stripPreset,
+        filterId,
+      });
+      if (!result) {
+        setCompositionError("Could not prepare download. Try again.");
+        return;
+      }
+      const filename = buildPhotoboothFilename(layoutId);
+      downloadBlob(result.blob, filename);
+      // Preview URL is separate — revoke only the export object URL.
+      URL.revokeObjectURL(result.objectUrl);
+      setDownloadMessage(`Saved ${filename}`);
+    } catch {
+      setCompositionError("Download failed. Try again.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleStartOver = () => {
+    resetAll();
+    setDownloadMessage(null);
+    setCompositionError(null);
+  };
 
   return (
     <section className="flex w-full flex-col gap-4">
@@ -434,52 +481,99 @@ export function PhotoboothCaptureFoundation({
             of {layout.poseCount}
             {isComplete ? " · complete" : ""}
             {" · "}
-            Live filter on preview · captures stay raw · compose reapplies
-            filter. Export mirroring still open.
+            Live preview may mirror for aiming · download is{" "}
+            {PHOTOBOOTH_EXPORT_MIRROR ? "mirrored" : "unmirrored"} (Option A).
           </p>
 
           {isComplete ? (
             <div
-              className="mt-2 w-full max-w-md"
-              data-testid="composition-preview"
+              className="mt-3 w-full max-w-md rounded-2xl border border-[#F5B8C8]/80 bg-gradient-to-b from-[#FFF8FA] to-card p-4 shadow-sm"
+              data-testid="final-preview"
               data-layout-id={layoutId}
               data-strip-id={stripPreset?.id ?? ""}
               data-filter-id={filterId}
               data-aspect={`${layout.aspectRatio.w}:${layout.aspectRatio.h}`}
+              data-export-mirror={PHOTOBOOTH_EXPORT_MIRROR ? "1" : "0"}
+              data-export-size={`${exportPixels.width}x${exportPixels.height}`}
             >
-              <p className="mb-2 text-center font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-                Composition · {stripPreset?.label ?? "strip"} · {filter.label}
+              <p className="text-center font-serif text-lg font-semibold text-[#7A2436]">
+                Your keepsake for {greetingName}
               </p>
+              <p className="mt-1 text-center text-xs text-muted-foreground">
+                {layout.label}
+                {stripPreset ? ` · ${stripPreset.label}` : ""} · {filter.label}
+              </p>
+              <p className="mt-0.5 text-center font-mono text-[10px] tracking-wide text-muted-foreground uppercase">
+                Final preview · download {exportPixels.width}×
+                {exportPixels.height} JPEG
+              </p>
+
               {composing ? (
-                <p className="text-center text-sm text-muted-foreground">
-                  Composing strip…
+                <p className="mt-3 text-center text-sm text-muted-foreground">
+                  Preparing preview…
                 </p>
               ) : null}
               {compositionError ? (
                 <p
-                  className="text-center text-sm text-destructive"
+                  className="mt-3 text-center text-sm text-destructive"
                   role="alert"
                 >
                   {compositionError}
                 </p>
               ) : null}
+
               {compositionUrl ? (
                 <div
-                  className="mx-auto max-h-[min(70vh,36rem)] w-full overflow-hidden rounded-lg border border-border bg-muted/30"
+                  className="mx-auto mt-4 max-h-[min(70vh,36rem)] w-full overflow-hidden rounded-lg border border-border bg-white/70"
                   style={{
                     aspectRatio: aspectCss,
                     maxWidth: layoutId === "B" ? "12rem" : "18rem",
                   }}
+                  data-testid="composition-preview"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={compositionUrl}
-                    alt={`Layout ${layoutId} composition`}
+                    alt={`Photobooth keepsake for ${greetingName}`}
                     className="h-full w-full object-contain"
                     data-testid="composition-image"
                     draggable={false}
                   />
                 </div>
+              ) : null}
+
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <Button
+                  type="button"
+                  className="min-w-[10rem] rounded-full bg-[#C45B7A] hover:bg-[#A84566]"
+                  disabled={downloading || composing || !compositionUrl}
+                  data-testid="download-button"
+                  onClick={() => void handleDownload()}
+                >
+                  {downloading ? "Preparing…" : "Download"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-full"
+                  disabled={busy || downloading}
+                  data-testid="start-over-button"
+                  onClick={handleStartOver}
+                >
+                  Start over
+                </Button>
+              </div>
+
+              <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                Change strip or filter on the right anytime — no retake needed.
+              </p>
+              {downloadMessage ? (
+                <p
+                  className="mt-2 text-center text-xs text-[#7A2436]"
+                  data-testid="download-message"
+                >
+                  {downloadMessage}
+                </p>
               ) : null}
             </div>
           ) : null}
