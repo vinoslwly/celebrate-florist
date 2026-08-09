@@ -4,30 +4,36 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { PhotoboothCaptureFoundation } from "@/features/photobooth/components/photobooth-capture-foundation";
-import type { PhotoboothLayoutId } from "@/features/photobooth/lib/types";
+import type {
+  PhotoboothLayoutId,
+  PhotoboothThemeId,
+} from "@/features/photobooth/lib/types";
 
 export type PhotoboothProps = {
   greetingName: string;
   themeEmoji?: string;
   /**
    * `legacy` — single-shot card (default) for existing production imports.
-   * `capture` — Sprint 14.2 multi-pose foundation (Theme Lab host).
+   * `capture` — Sprint 14 multi-pose + strip composition (Theme Lab host).
    */
   variant?: "legacy" | "capture";
   /** Used when variant is `capture`. Default Layout B. */
   initialLayoutId?: PhotoboothLayoutId;
+  /** Strip pack theme — Bloom in 14.4; Warm/Sky packs later. */
+  themeId?: PhotoboothThemeId;
 };
 
 /**
  * Shared Photobooth entry.
  * Default API unchanged for legacy experience flows.
- * Theme Lab Sprint 14.2 uses `variant="capture"`.
+ * Theme Lab uses `variant="capture"`.
  */
 export function Photobooth({
   greetingName,
   themeEmoji,
   variant = "legacy",
   initialLayoutId,
+  themeId = "bloom",
 }: PhotoboothProps) {
   if (variant === "capture") {
     return (
@@ -35,6 +41,7 @@ export function Photobooth({
         greetingName={greetingName}
         themeEmoji={themeEmoji}
         initialLayoutId={initialLayoutId}
+        themeId={themeId}
       />
     );
   }

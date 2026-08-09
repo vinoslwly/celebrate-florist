@@ -5,7 +5,7 @@ import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-
 import { Photobooth } from "@/features/photobooth/components/photobooth";
 
 /**
- * Terminal Moments scene — Sprint 14.2 capture foundation host (Bloom Theme Lab).
+ * Terminal Moments scene — Sprint 14 strip composition host (Bloom Theme Lab).
  * Scene ID / graph unchanged. Warm/Sky wrappers still use their own shells + legacy default.
  */
 export function PhotoboothScene({ payload }: MomentsSceneProps) {
@@ -18,10 +18,11 @@ export function PhotoboothScene({ payload }: MomentsSceneProps) {
           className="mb-3 text-center font-mono text-[10px] font-bold tracking-widest text-muted-foreground uppercase"
           data-production-pending="moments-photobooth"
         >
-          Scene 10 · Photobooth · Capture foundation (Sprint 14.2)
+          Scene 10 · Photobooth · Strip + filters (Sprint 14.4)
         </p>
         <Photobooth
           variant="capture"
+          themeId="bloom"
           greetingName={experience.greeting_name}
           themeEmoji={theme.emoji}
           initialLayoutId="B"

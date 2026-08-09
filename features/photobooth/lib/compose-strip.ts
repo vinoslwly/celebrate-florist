@@ -1,9 +1,18 @@
 import {
+  paintStripBackground,
+  paintStripDecoration,
+} from "@/features/photobooth/lib/draw-frame";
+import { getFilterPreset } from "@/features/photobooth/lib/filters";
+import {
   getLayoutMeta,
   type LayoutRect,
   type PhotoboothLayoutConfig,
 } from "@/features/photobooth/lib/layouts";
-import type { PhotoboothLayoutId } from "@/features/photobooth/lib/types";
+import type {
+  PhotoboothFilterId,
+  PhotoboothLayoutId,
+  PhotoboothStripPreset,
+} from "@/features/photobooth/lib/types";
 
 /**
  * Cover-style draw: preserve source aspect, fill dest rect, crop center.
@@ -75,12 +84,9 @@ function paintNeutralFrame(
   const { width, height } = layout.canvas;
   ctx.fillStyle = layout.background;
   ctx.fillRect(0, 0, width, height);
-
-  // Light outer edge so Founder can judge margins without themed art.
   ctx.strokeStyle = layout.slotBorder;
   ctx.lineWidth = 2;
   ctx.strokeRect(1, 1, width - 2, height - 2);
-
   for (const slot of layout.slots) {
     ctx.strokeStyle = layout.slotBorder;
     ctx.lineWidth = 1;
@@ -94,16 +100,39 @@ export type ComposeStripResult = {
   width: number;
   height: number;
   layoutId: PhotoboothLayoutId;
+  presetId?: string;
+  filterId?: PhotoboothFilterId;
+};
+
+export type ComposeStripOptions = {
+  layoutId: PhotoboothLayoutId;
+  poseObjectUrls: string[];
+  /** When omitted, uses neutral 14.3 geometric frame. */
+  preset?: PhotoboothStripPreset | null;
+  /** Universal filter applied to photo slots only (not strip chrome). */
+  filterId?: PhotoboothFilterId;
 };
 
 /**
- * Compose captured poses into Layout B or K using Canvas 2D.
- * Uses cover crop from center. Does **not** apply preview mirroring.
+ * Compose order:
+ * background → photo slots (cover crop + filter) → frame decoration
+ *
+ * Captures stay raw; filter is applied at compose time so it can change
+ * without retakes. Does **not** apply preview mirroring or app watermark.
  */
 export async function composeStrip(
-  layoutId: PhotoboothLayoutId,
-  poseObjectUrls: string[],
+  layoutIdOrOptions: PhotoboothLayoutId | ComposeStripOptions,
+  poseObjectUrlsArg?: string[],
 ): Promise<ComposeStripResult | null> {
+  const options: ComposeStripOptions =
+    typeof layoutIdOrOptions === "string"
+      ? {
+          layoutId: layoutIdOrOptions,
+          poseObjectUrls: poseObjectUrlsArg ?? [],
+        }
+      : layoutIdOrOptions;
+
+  const { layoutId, poseObjectUrls, preset, filterId = "original" } = options;
   const layout = getLayoutMeta(layoutId);
   if (poseObjectUrls.length < layout.poseCount) return null;
 
@@ -113,12 +142,18 @@ export async function composeStrip(
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  paintNeutralFrame(ctx, layout);
+  if (preset) {
+    paintStripBackground(ctx, layout, preset);
+  } else {
+    paintNeutralFrame(ctx, layout);
+  }
 
   const urls = poseObjectUrls.slice(0, layout.poseCount);
   const bitmaps = await Promise.all(urls.map(loadPoseBitmap));
+  const filter = getFilterPreset(filterId);
 
   try {
+    ctx.filter = filter.canvasFilter;
     for (let i = 0; i < layout.slots.length; i += 1) {
       const slot = layout.slots[i]!;
       const bitmap = bitmaps[i];
@@ -126,11 +161,16 @@ export async function composeStrip(
       drawImageCover(ctx, bitmap, slot);
     }
   } finally {
+    ctx.filter = "none";
     bitmaps.forEach((b) => {
       if ("close" in b && typeof b.close === "function") {
         b.close();
       }
     });
+  }
+
+  if (preset) {
+    paintStripDecoration(ctx, layout, preset);
   }
 
   const blob = await new Promise<Blob | null>((resolve) => {
@@ -143,5 +183,7 @@ export async function composeStrip(
     width: layout.canvas.width,
     height: layout.canvas.height,
     layoutId,
+    presetId: preset?.id,
+    filterId,
   };
 }
