@@ -8,6 +8,7 @@ import { hasMemoryKeyPepper, serverEnv } from "@/config/env.server";
 
 import {
   assertMemoryCodeAttemptsAllowed,
+  lockExperienceIfMemoryCodeExhausted,
   recordMemoryCodeAttempt,
 } from "@/features/access/services/memory-code-rate-limit.service";
 import {
@@ -66,6 +67,15 @@ export async function verifyRecipientMemoryCode(
     throw new ValidationError("Memory Code is not configured for this gift.");
   }
 
+  const alreadyExhausted = await lockExperienceIfMemoryCodeExhausted(
+    client,
+    experience.id,
+    params.ipHash,
+  );
+  if (alreadyExhausted) {
+    throw new ValidationError("This experience is temporarily locked.");
+  }
+
   await assertMemoryCodeAttemptsAllowed(client, experience.id, params.ipHash);
 
   const submittedHash = hashSubmittedMemoryCode(params.memoryCode);
@@ -80,6 +90,11 @@ export async function verifyRecipientMemoryCode(
   });
 
   if (!isValid) {
+    await lockExperienceIfMemoryCodeExhausted(
+      client,
+      experience.id,
+      params.ipHash,
+    );
     throw new ValidationError("Incorrect Memory Code. Please try again.");
   }
 

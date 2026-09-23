@@ -25,6 +25,18 @@ export function buildExperienceQrPath(experienceId: string): string {
   return `${experienceId}/qr.png`;
 }
 
+export function buildWebsiteAssetPath(
+  kind:
+    "logo" | "favicon" | "hero" | "theme-bloom" | "theme-warm" | "theme-sky",
+  extension: string,
+): string {
+  const ext = extension.replace(/^\./, "").toLowerCase();
+  if (kind === "logo") return `brand/logo.${ext}`;
+  if (kind === "favicon") return `brand/favicon.${ext}`;
+  if (kind === "hero") return `hero.${ext}`;
+  return `themes/${kind.replace("theme-", "")}.${ext}`;
+}
+
 /**
  * Parses a storage path back to its bucket and object key.
  */

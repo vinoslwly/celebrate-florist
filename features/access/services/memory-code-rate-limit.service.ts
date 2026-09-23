@@ -4,12 +4,48 @@ import { ForbiddenError } from "@/lib/errors";
 
 import {
   MAX_MEMORY_CODE_ATTEMPTS_PER_HOUR,
+  MAX_MEMORY_CODE_FAILURES_BEFORE_LOCK,
   MEMORY_CODE_RATE_LIMIT_WINDOW_MS,
 } from "@/features/access/config/constants";
 import { AccessAttemptsRepository } from "@/features/access/repositories/access-attempts.repository";
 import { SecurityEventsRepository } from "@/features/access/repositories/security-events.repository";
+import { ExperiencesRepository } from "@/features/studio/repositories/experiences.repository";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+/**
+ * Locks the experience after too many failed Memory Code attempts.
+ * The count is per experience and does not use the client IP.
+ * Returns true when the experience is now locked.
+ */
+export async function lockExperienceIfMemoryCodeExhausted(
+  client: SupabaseClient,
+  experienceId: string,
+  ipHash: string,
+): Promise<boolean> {
+  const attemptsRepo = new AccessAttemptsRepository(client);
+  const failedCount = await attemptsRepo.countFailedAttempts(experienceId);
+
+  if (failedCount < MAX_MEMORY_CODE_FAILURES_BEFORE_LOCK) {
+    return false;
+  }
+
+  const experiencesRepo = new ExperiencesRepository(client);
+  const lockedNow =
+    await experiencesRepo.lockForMemoryCodeExhaustion(experienceId);
+
+  if (lockedNow) {
+    const securityRepo = new SecurityEventsRepository(client);
+    await securityRepo.insertEvent({
+      eventType: "experience_locked",
+      experienceId,
+      ipHash,
+      metadata: { failedCount },
+    });
+  }
+
+  return true;
+}
 
 export async function assertMemoryCodeAttemptsAllowed(
   client: SupabaseClient,

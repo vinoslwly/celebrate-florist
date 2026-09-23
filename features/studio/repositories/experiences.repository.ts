@@ -173,4 +173,19 @@ export class ExperiencesRepository extends Repository {
     this.assertNoError(error);
     return data as ExperienceRow;
   }
+
+  async lockForMemoryCodeExhaustion(id: string): Promise<boolean> {
+    const { data, error } = await this.client
+      .from("experiences")
+      .update({
+        is_locked: true,
+        locked_reason: "memory_code_exhausted",
+      })
+      .eq("id", id)
+      .eq("is_locked", false)
+      .select("id");
+
+    this.assertNoError(error);
+    return (data?.length ?? 0) > 0;
+  }
 }

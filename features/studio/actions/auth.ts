@@ -12,6 +12,10 @@ import type { ActionResult } from "@/types/api";
 
 import { STUDIO_LOGIN_FAILURE_MESSAGE } from "@/features/studio/config/auth-messages";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
+import {
+  assertStudioLoginAllowed,
+  recordStudioLoginFailure,
+} from "@/features/studio/services/studio-login-throttle.service";
 import { studioLoginSchema } from "@/schemas/studio-auth";
 
 type LoginSuccess = {
@@ -23,16 +27,14 @@ type LoginSuccess = {
  * Non-admin emails are signed out immediately after credential verification.
  *
  * All client-visible failures return STUDIO_LOGIN_FAILURE_MESSAGE.
- * securityLogger records the real reason server-side only.
- *
- * Rate limiting extension point (future sprint): insert a throttle check
- * here before signInWithPassword, keyed on email and request IP.
+ * securityLogger records the reason server-side without the password or email.
  */
 export async function loginAction(
   input: unknown,
 ): Promise<ActionResult<LoginSuccess>> {
   return withActionHandler(async () => {
     const { email, password } = validateActionInput(studioLoginSchema, input);
+    const emailHash = await assertStudioLoginAllowed(email);
     const supabase = await createClient();
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -41,18 +43,18 @@ export async function loginAction(
     });
 
     if (error || !data.user) {
+      await recordStudioLoginFailure(emailHash);
       securityLogger.warn("Admin login failed", {
-        email,
-        reason: error?.message ?? "no_user",
+        reason: error ? "rejected" : "no_user",
       });
       throw new UnauthorizedError(STUDIO_LOGIN_FAILURE_MESSAGE);
     }
 
     if (!isAdminEmail(data.user.email ?? "")) {
       await supabase.auth.signOut();
+      await recordStudioLoginFailure(emailHash);
       securityLogger.warn("Non-admin login rejected", {
         userId: data.user.id,
-        email: data.user.email,
         reason: "email_not_admin",
       });
       throw new UnauthorizedError(STUDIO_LOGIN_FAILURE_MESSAGE);

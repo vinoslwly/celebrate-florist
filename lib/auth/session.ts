@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 
 import { serverEnv } from "@/config/env.server";
 
+import { ensureStudioAdminEmail } from "@/features/studio/services/sync-studio-admin-email.service";
+
 import type { User } from "@supabase/supabase-js";
 
 /**
@@ -63,5 +65,6 @@ export async function requireAdminUser(): Promise<User> {
     throw new ForbiddenError("Admin access required");
   }
 
+  await ensureStudioAdminEmail(user.id);
   return user;
 }

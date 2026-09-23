@@ -13,6 +13,11 @@ import {
 } from "@/features/access/config/constants";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
 
+/**
+ * Process-local only. On Vercel this Map is not shared across isolates, so it
+ * is not the production abuse control. Memory Code locking is enforced in the
+ * database. This counter is a best-effort secondary signal.
+ */
 const experienceRouteHits = new Map<
   string,
   { count: number; resetAt: number }
@@ -57,7 +62,17 @@ function getProxyAdminEmail(): string | null {
  * Rate limiting extension point (future sprint): insert IP/email throttle
  * at the start of the Studio branch below, before session checks.
  */
+function isThemeLabPath(pathname: string): boolean {
+  return pathname === "/theme-lab" || pathname.startsWith("/theme-lab/");
+}
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (process.env.NODE_ENV === "production" && isThemeLabPath(pathname)) {
+    return new NextResponse(null, { status: 404, statusText: "Not Found" });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -85,13 +100,11 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-
   if (pathname.startsWith("/e/")) {
+    const forwarded = request.headers.get("x-forwarded-for");
+    const forwardedLast = forwarded?.split(",").at(-1)?.trim();
     const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      request.headers.get("x-real-ip") ??
-      "unknown";
+      request.headers.get("x-real-ip")?.trim() || forwardedLast || "unknown";
 
     if (isExperienceRouteRateLimited(ip)) {
       return new NextResponse("Too many requests", { status: 429 });
@@ -130,5 +143,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/studio", "/studio/:path*", "/e/:path*"],
+  matcher: [
+    "/studio",
+    "/studio/:path*",
+    "/e/:path*",
+    "/theme-lab",
+    "/theme-lab/:path*",
+  ],
 };

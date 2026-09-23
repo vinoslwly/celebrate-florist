@@ -3,6 +3,7 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
 import { ConfigError } from "@/lib/errors";
+import { securityLogger } from "@/lib/logger";
 
 import { env } from "@/config/env";
 import { getServiceRoleKey, hasServiceRoleKey } from "@/config/env.server";
@@ -17,9 +18,10 @@ import { getServiceRoleKey, hasServiceRoleKey } from "@/config/env.server";
  */
 export function createAdminClient() {
   if (!hasServiceRoleKey()) {
-    throw new ConfigError(
-      "SUPABASE_SERVICE_ROLE_KEY is not configured. Set it in .env.local for privileged server operations.",
-    );
+    securityLogger.error("Privileged database client is not configured", {
+      missing: "SUPABASE_SERVICE_ROLE_KEY",
+    });
+    throw new ConfigError("A required server configuration is missing.");
   }
 
   return createClient(env.NEXT_PUBLIC_SUPABASE_URL, getServiceRoleKey(), {

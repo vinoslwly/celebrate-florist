@@ -9,6 +9,17 @@ export class AccessAttemptsRepository extends Repository {
     super(client);
   }
 
+  async countFailedAttempts(experienceId: string): Promise<number> {
+    const { count, error } = await this.client
+      .from("access_attempts")
+      .select("id", { count: "exact", head: true })
+      .eq("experience_id", experienceId)
+      .eq("was_successful", false);
+
+    this.assertNoError(error);
+    return count ?? 0;
+  }
+
   async countFailedAttemptsSince(
     experienceId: string,
     ipHash: string,

@@ -11,6 +11,22 @@ export class SecurityEventsRepository extends Repository {
     super(client);
   }
 
+  async countEventsSince(params: {
+    eventType: SecurityEventType;
+    sinceIso: string;
+    metadataContains: Record<string, unknown>;
+  }): Promise<number> {
+    const { count, error } = await this.client
+      .from("security_events")
+      .select("id", { count: "exact", head: true })
+      .eq("event_type", params.eventType)
+      .gte("created_at", params.sinceIso)
+      .contains("metadata", params.metadataContains);
+
+    this.assertNoError(error);
+    return count ?? 0;
+  }
+
   async insertEvent(params: {
     eventType: SecurityEventType;
     experienceId?: string | null;

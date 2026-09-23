@@ -18,10 +18,12 @@ export { uploadStorageObject } from "@/lib/storage/upload";
 export {
   buildExperiencePhotoPath,
   buildExperienceQrPath,
+  buildWebsiteAssetPath,
   isValidPhotoExtension,
   parseStoragePath,
   type PhotoExtension,
 } from "@/lib/storage/paths";
+export { buildPublicStorageUrl } from "@/lib/storage/public-url";
 export {
   createSignedReadUrl,
   createSignedUploadUrl,

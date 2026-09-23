@@ -33,10 +33,9 @@ export async function getAccessRequestContext(): Promise<AccessRequestContext> {
   const headerStore = await headers();
   const cookieStore = await cookies();
 
-  const ip =
-    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    headerStore.get("x-real-ip") ??
-    "unknown";
+  const forwarded = headerStore.get("x-forwarded-for");
+  const forwardedLast = forwarded?.split(",").at(-1)?.trim();
+  const ip = headerStore.get("x-real-ip")?.trim() || forwardedLast || "unknown";
   const userAgent = headerStore.get("user-agent") ?? "unknown";
   const sessionCookieValue =
     cookieStore.get(SESSION_COOKIE_NAME)?.value ?? null;
