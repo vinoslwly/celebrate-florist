@@ -9,7 +9,11 @@
  */
 const WHATSAPP_BUSINESS_NUMBER = "6280000000000";
 
-export function buildWhatsAppLink(message: string): string {
+export function buildWhatsAppLink(
+  message: string,
+  number = WHATSAPP_BUSINESS_NUMBER,
+): string {
+  const digits = number.replace(/\D/g, "") || WHATSAPP_BUSINESS_NUMBER;
   const encodedMessage = encodeURIComponent(message);
-  return `https://wa.me/${WHATSAPP_BUSINESS_NUMBER}?text=${encodedMessage}`;
+  return `https://wa.me/${digits}?text=${encodedMessage}`;
 }

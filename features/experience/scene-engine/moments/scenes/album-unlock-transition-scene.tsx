@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
 
 /**
  * Scene 7 — continuous 3-keyframe unlock, ~3s total.
@@ -743,7 +744,7 @@ function SceneAtmosphere() {
         {FALLING_PETALS.map((petal, i) => (
           <motion.div
             key={i}
-            className="absolute"
+            className={i > 2 ? "absolute hidden sm:block" : "absolute"}
             style={{
               left: petal.left,
               top: "-6%",
@@ -787,7 +788,7 @@ export function AlbumUnlockTransitionScene(_props: MomentsSceneProps) {
   }, []);
 
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F8E4E7]">
+    <div className={`${SCENE_VIEWPORT_LOCK} bg-[#F8E4E7]`}>
       <SceneAtmosphere />
 
       <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-4 py-10">

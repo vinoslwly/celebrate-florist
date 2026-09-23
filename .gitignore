@@ -57,3 +57,6 @@ next-env.d.ts
 /scene-*.png
 /phase2a-*.png
 /anticelebrate-*.png
+
+.vercel
+.env*

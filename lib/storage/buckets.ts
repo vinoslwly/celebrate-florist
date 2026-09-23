@@ -5,7 +5,9 @@
 export const StorageBucket = {
   EXPERIENCE_PHOTOS: "experience-photos",
   EXPERIENCE_QR: "experience-qr",
+  PHOTOBOOTH_STRIPS: "photobooth-strips",
   WEBSITE_ASSETS: "website-assets",
+  CATALOG_PHOTOBOOTH_STRIPS: "catalog-photobooth-strips",
 } as const;
 
 export type StorageBucket = (typeof StorageBucket)[keyof typeof StorageBucket];

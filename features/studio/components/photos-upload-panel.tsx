@@ -1,12 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import type { ExperiencePhotoRow } from "@/types/database";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { parsePhotoCaption } from "@/features/experience/lib/photo-caption";
 import {
   deleteExperiencePhotoAction,
+  updateExperiencePhotoCaptionAction,
   uploadExperiencePhotoAction,
 } from "@/features/studio/actions/photos";
 
@@ -34,6 +39,17 @@ export function PhotosUploadPanel({
 
   function photoForSlot(slot: number): ExperiencePhotoRow | undefined {
     return photos.find((photo) => photo.sort_order === slot);
+  }
+
+  function replacePhoto(updated: ExperiencePhotoRow) {
+    let next: ExperiencePhotoRow[] = [];
+    setPhotos((current) => {
+      next = current
+        .map((row) => (row.id === updated.id ? updated : row))
+        .sort((a, b) => a.sort_order - b.sort_order);
+      return next;
+    });
+    onPhotosChange?.(next);
   }
 
   async function handleUpload(slot: number, file: File) {
@@ -97,6 +113,7 @@ export function PhotosUploadPanel({
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Up to 6 photos per experience. Images are resized and saved as WebP.
+        Title and description appear next to each photo on the gallery.
       </p>
 
       {error ? (
@@ -108,7 +125,7 @@ export function PhotosUploadPanel({
         </div>
       ) : null}
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {SLOTS.map((slot) => {
           const photo = photoForSlot(slot);
           const isBusy = busySlot === slot;
@@ -116,58 +133,171 @@ export function PhotosUploadPanel({
           return (
             <div
               key={slot}
-              className="flex aspect-square flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 p-3 text-center"
+              className="flex flex-col rounded-xl border border-dashed border-border bg-muted/20 p-3"
             >
-              <span className="text-xs font-medium text-muted-foreground">
-                Slot {slot}
-              </span>
-              <span className="mt-1 text-xs text-muted-foreground">
-                {photo ? "Uploaded" : "Empty"}
-              </span>
+              <div className="flex min-h-28 flex-col items-center justify-center text-center">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Slot {slot}
+                </span>
+                <span className="mt-1 text-xs text-muted-foreground">
+                  {photo ? "Uploaded" : "Empty"}
+                </span>
 
-              <input
-                ref={(el) => {
-                  inputRefs.current[slot] = el;
-                }}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-                disabled={disabled || isBusy}
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) {
-                    void handleUpload(slot, file);
-                  }
-                  event.target.value = "";
-                }}
-              />
-
-              <div className="mt-3 flex flex-wrap justify-center gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
+                <input
+                  ref={(el) => {
+                    inputRefs.current[slot] = el;
+                  }}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
                   disabled={disabled || isBusy}
-                  onClick={() => inputRefs.current[slot]?.click()}
-                >
-                  {photo ? "Replace" : "Upload"}
-                </Button>
-                {photo ? (
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) {
+                      void handleUpload(slot, file);
+                    }
+                    event.target.value = "";
+                  }}
+                />
+
+                <div className="mt-3 flex flex-wrap justify-center gap-2">
                   <Button
                     type="button"
                     size="sm"
-                    variant="ghost"
+                    variant="outline"
                     disabled={disabled || isBusy}
-                    onClick={() => void handleDelete(photo)}
+                    onClick={() => inputRefs.current[slot]?.click()}
                   >
-                    Remove
+                    {photo ? "Replace" : "Upload"}
                   </Button>
-                ) : null}
+                  {photo ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      disabled={disabled || isBusy}
+                      onClick={() => void handleDelete(photo)}
+                    >
+                      Remove
+                    </Button>
+                  ) : null}
+                </div>
               </div>
+
+              {photo ? (
+                <PhotoCaptionFields
+                  key={photo.id}
+                  orderId={orderId}
+                  experienceId={experienceId}
+                  photo={photo}
+                  disabled={disabled || isBusy}
+                  onError={setError}
+                  onSaved={replacePhoto}
+                />
+              ) : null}
             </div>
           );
         })}
       </div>
     </section>
+  );
+}
+
+function PhotoCaptionFields({
+  orderId,
+  experienceId,
+  photo,
+  disabled,
+  onError,
+  onSaved,
+}: {
+  orderId: string;
+  experienceId: string;
+  photo: ExperiencePhotoRow;
+  disabled: boolean;
+  onError: (message: string | null) => void;
+  onSaved: (photo: ExperiencePhotoRow) => void;
+}) {
+  const parsed = parsePhotoCaption(photo.caption);
+  const titleId = useId();
+  const descriptionId = useId();
+  const [title, setTitle] = useState(parsed.title);
+  const [description, setDescription] = useState(parsed.body);
+  const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function handleSave() {
+    setBusy(true);
+    onError(null);
+    setSaved(false);
+
+    const result = await updateExperiencePhotoCaptionAction({
+      orderId,
+      experienceId,
+      photoId: photo.id,
+      title,
+      description,
+    });
+
+    setBusy(false);
+
+    if (!result.ok) {
+      onError(result.error.message);
+      return;
+    }
+
+    onSaved(result.data.photo);
+    setSaved(true);
+  }
+
+  return (
+    <div className="mt-3 space-y-2 border-t border-border/70 pt-3 text-left">
+      <div className="space-y-1">
+        <Label htmlFor={titleId} className="text-xs">
+          Title
+        </Label>
+        <Input
+          id={titleId}
+          value={title}
+          maxLength={80}
+          placeholder="First Hello"
+          disabled={disabled || busy}
+          onChange={(event) => {
+            setTitle(event.target.value);
+            setSaved(false);
+          }}
+        />
+      </div>
+      <div className="space-y-1">
+        <Label htmlFor={descriptionId} className="text-xs">
+          Description
+        </Label>
+        <Textarea
+          id={descriptionId}
+          value={description}
+          maxLength={240}
+          rows={3}
+          placeholder="The sky felt wider the moment you walked in."
+          disabled={disabled || busy}
+          onChange={(event) => {
+            setDescription(event.target.value);
+            setSaved(false);
+          }}
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          size="sm"
+          disabled={disabled || busy}
+          onClick={() => void handleSave()}
+        >
+          {busy ? "Saving…" : "Save copy"}
+        </Button>
+        {saved ? (
+          <span className="text-xs text-muted-foreground">Saved</span>
+        ) : null}
+      </div>
+    </div>
   );
 }

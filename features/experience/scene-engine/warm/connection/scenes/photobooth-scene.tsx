@@ -6,7 +6,7 @@ import { WarmPhotoboothScene } from "@/features/experience/scene-engine/warm/mom
 
 /**
  * warm.connection.photobooth — Scene 15 (terminal).
- * Reuses Warm Moments photobooth stub (Sprint 14 redesign deferred).
+ * Reuses Warm Moments photobooth (Layout B, 3-step flow).
  */
 export function WarmConnectionPhotoboothScene({
   payload,

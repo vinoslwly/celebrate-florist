@@ -13,15 +13,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { NAV_ITEMS } from "@/features/landing/config/nav-items";
+import { buildNavItems } from "@/features/landing/config/nav-items";
+import type { WebsiteContent } from "@/features/website/config/types";
 
-/**
- * Client island for the mobile navigation drawer. Isolated from
- * SiteNavbar (a Server Component) so only this small piece of
- * interactivity ships client-side JavaScript.
- */
-export function MobileNav() {
+type MobileNavProps = {
+  content: WebsiteContent;
+};
+
+export function MobileNav({ content }: MobileNavProps) {
   const [open, setOpen] = useState(false);
+  const navItems = buildNavItems(content);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -43,7 +44,7 @@ export function MobileNav() {
           aria-label="Mobile navigation"
           className="flex flex-col gap-1 px-4"
         >
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <SheetClose asChild key={item.href}>
               <a
                 href={item.href}

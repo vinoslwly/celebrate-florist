@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 
@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
 import { SCENE_SCROLL_PANE } from "@/features/experience/scene-engine/scene-viewport";
+import { LetterTypewriterBody } from "@/features/experience/scene-engine/shared/letter-typewriter";
 import {
   allowAmbientLoop,
   MOTION_DURATION,
@@ -172,15 +173,10 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
   const fromName = experience.closing_name || "Someone who loves you";
   const closing = experience.letter_closing?.trim() || "With love,";
   const bodyChunks = splitLetterBody(experience.letter_content ?? "");
+  const [signOff, setSignOff] = useState(reduceMotion);
+  const finishBody = useCallback(() => setSignOff(true), []);
 
-  // Deliberate stationery pacing — slightly slower than Bloom/Sky
   const pace = (n: number) => (reduceMotion ? 0 : n);
-  const bodyStart = pace(0.95);
-  const bodyStep = reduceMotion ? 0 : 0.4;
-  const afterBody = bodyStart + bodyChunks.length * bodyStep;
-  const closingDelay = afterBody + pace(0.22);
-  const signatureDelay = closingDelay + pace(0.34);
-  const ctaDelay = signatureDelay + pace(0.38);
 
   return (
     <div
@@ -212,7 +208,7 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
           {RAIN.map((petal, i) => (
             <motion.div
               key={i}
-              className="absolute"
+              className={i > 7 ? "absolute hidden sm:block" : "absolute"}
               style={{
                 left: petal.left,
                 top: "-8%",
@@ -355,27 +351,26 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                 </p>
               </Reveal>
 
-              <div className="mt-4 space-y-3.5 text-left sm:mt-5 sm:space-y-4">
-                {bodyChunks.map((chunk, i) => (
-                  <Reveal
-                    key={`${i}-${chunk.slice(0, 12)}`}
-                    delay={bodyStart + i * bodyStep}
-                    reduceMotion={reduceMotion}
-                  >
-                    <p
-                      className="text-[14.5px] leading-[1.85] sm:text-[15.5px] sm:leading-[1.9]"
-                      style={{ color: INK }}
-                    >
-                      {chunk}
-                    </p>
-                  </Reveal>
-                ))}
+              <div className="mt-4 text-left sm:mt-5">
+                <LetterTypewriterBody
+                  chunks={bodyChunks}
+                  startDelayMs={reduceMotion ? 0 : 720}
+                  reduceMotion={reduceMotion}
+                  onDone={finishBody}
+                  ink={INK}
+                  caretColor={GOLD}
+                />
               </div>
 
-              <Reveal
-                delay={closingDelay}
-                reduceMotion={reduceMotion}
+              <motion.div
                 className="mt-8"
+                initial={false}
+                animate={{ opacity: signOff ? 1 : 0 }}
+                transition={{
+                  duration: reduceMotion ? 0 : MOTION_DURATION.base,
+                  delay: signOff && !reduceMotion ? 0.35 : 0,
+                  ease: MOTION_EASE.out,
+                }}
               >
                 <p
                   className={`${label.className} text-[10px] font-medium tracking-[0.28em] uppercase sm:text-[11px]`}
@@ -384,12 +379,17 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                   {closing.replace(/,$/, "").toUpperCase()}
                   {closing.endsWith(",") ? "," : ""}
                 </p>
-              </Reveal>
+              </motion.div>
 
-              <Reveal
-                delay={signatureDelay}
-                reduceMotion={reduceMotion}
+              <motion.div
                 className="mt-1.5"
+                initial={false}
+                animate={{ opacity: signOff ? 1 : 0 }}
+                transition={{
+                  duration: reduceMotion ? 0 : MOTION_DURATION.base,
+                  delay: signOff && !reduceMotion ? 0.7 : 0,
+                  ease: MOTION_EASE.out,
+                }}
               >
                 <p
                   className="text-[1.35rem] font-medium tracking-tight sm:text-[1.5rem]"
@@ -397,34 +397,40 @@ export function WarmLetterScene({ payload, onComplete }: MomentsSceneProps) {
                 >
                   {fromName}
                 </p>
-              </Reveal>
+              </motion.div>
 
-              <Reveal
-                delay={ctaDelay}
-                reduceMotion={reduceMotion}
-                className="mt-8 sm:mt-9"
+              <motion.button
+                type="button"
+                aria-label="Unlock Memory Album"
+                onClick={onComplete}
+                disabled={!signOff}
+                className={`${label.className} relative mt-8 flex w-full items-center justify-center gap-2 rounded-full px-5 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase sm:mt-9 sm:py-4 sm:text-xs disabled:pointer-events-none`}
+                style={{
+                  background:
+                    "linear-gradient(105deg, #7A121C 0%, #B81E2C 38%, #D4A24A 78%, #E8C96A 100%)",
+                  boxShadow: [
+                    "0 12px 28px -12px rgba(120,20,30,0.65)",
+                    "0 0 24px -8px rgba(212,162,74,0.45)",
+                    "inset 0 1px 0 rgba(255,255,255,0.28)",
+                  ].join(", "),
+                }}
+                initial={false}
+                animate={{ opacity: signOff ? 1 : 0, y: signOff ? 0 : 12 }}
+                transition={{
+                  delay: signOff && !reduceMotion ? 1.15 : 0,
+                  duration: reduceMotion
+                    ? MOTION_DURATION.instant
+                    : MOTION_DURATION.base,
+                  ease: MOTION_EASE.out,
+                }}
+                whileHover={
+                  reduceMotion || !signOff ? undefined : { scale: 1.018 }
+                }
+                whileTap={{ scale: 0.985 }}
               >
-                <motion.button
-                  type="button"
-                  aria-label="Unlock Memory Album"
-                  onClick={onComplete}
-                  className={`${label.className} relative flex w-full items-center justify-center gap-2 rounded-full px-5 py-3.5 text-[11px] font-semibold tracking-[0.14em] text-white uppercase sm:py-4 sm:text-xs`}
-                  style={{
-                    background:
-                      "linear-gradient(105deg, #7A121C 0%, #B81E2C 38%, #D4A24A 78%, #E8C96A 100%)",
-                    boxShadow: [
-                      "0 12px 28px -12px rgba(120,20,30,0.65)",
-                      "0 0 24px -8px rgba(212,162,74,0.45)",
-                      "inset 0 1px 0 rgba(255,255,255,0.28)",
-                    ].join(", "),
-                  }}
-                  whileHover={reduceMotion ? undefined : { scale: 1.018 }}
-                  whileTap={{ scale: 0.985 }}
-                >
-                  Unlock Memory Album
-                  <HeartIcon className="h-3.5 w-3.5 shrink-0 opacity-95" />
-                </motion.button>
-              </Reveal>
+                Unlock Memory Album
+                <HeartIcon className="h-3.5 w-3.5 shrink-0 opacity-95" />
+              </motion.button>
             </div>
           </motion.article>
         </div>

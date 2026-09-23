@@ -25,7 +25,6 @@ import {
 import {
   getLayoutAspectCss,
   getLayoutMeta,
-  PHOTOBOOTH_LAYOUTS,
 } from "@/features/photobooth/lib/layouts";
 import {
   getCompatibleStripPresets,
@@ -35,6 +34,7 @@ import type {
   CountdownSeconds,
   PhotoboothFilterId,
   PhotoboothLayoutId,
+  PhotoboothStripPreset,
   PhotoboothThemeId,
 } from "@/features/photobooth/lib/types";
 
@@ -45,6 +45,10 @@ export type PhotoboothCaptureFoundationProps = {
   initialLayoutId?: PhotoboothLayoutId;
   /** Theme pack for strip presets — Bloom only in 14.4. */
   themeId?: PhotoboothThemeId;
+  /** When set, replaces the theme catalog (custom event PNG overlays). */
+  customStripPresets?: PhotoboothStripPreset[];
+  /** Scene Engine advance — Selesai / Lewati (Bloom Moments production). */
+  onComplete?: () => void;
 };
 
 /**
@@ -57,8 +61,11 @@ export function PhotoboothCaptureFoundation({
   themeEmoji,
   initialLayoutId = "B",
   themeId = "bloom",
+  customStripPresets,
+  onComplete,
 }: PhotoboothCaptureFoundationProps) {
-  const [layoutId, setLayoutId] = useState<PhotoboothLayoutId>(initialLayoutId);
+  const layoutId: PhotoboothLayoutId = "B";
+  void initialLayoutId;
   const [mirrorPreview, setMirrorPreview] = useState(true);
   const [flashEnabled, setFlashEnabled] = useState(true);
   const [countdownSeconds, setCountdownSeconds] = useState<CountdownSeconds>(3);
@@ -72,8 +79,13 @@ export function PhotoboothCaptureFoundation({
   const compositionUrlRef = useRef<string | null>(null);
 
   const compatiblePresets = useMemo(
-    () => getCompatibleStripPresets(themeId, layoutId),
-    [themeId, layoutId],
+    () =>
+      customStripPresets
+        ? customStripPresets.filter((preset) =>
+            preset.supportedLayouts.includes(layoutId),
+          )
+        : getCompatibleStripPresets(themeId, layoutId),
+    [customStripPresets, layoutId, themeId],
   );
   const [stripPresetId, setStripPresetId] = useState(
     () =>
@@ -123,18 +135,6 @@ export function PhotoboothCaptureFoundation({
     compositionUrlRef.current = next;
     setCompositionUrl(next);
   }, []);
-
-  /** Layout change resets captures (filter + strip preference preserved where possible). */
-  useEffect(() => {
-    resetAll();
-  }, [layoutId, resetAll]);
-
-  const selectLayout = (id: PhotoboothLayoutId) => {
-    if (id === layoutId) return;
-    const next = resolveDefaultStripPreset(themeId, id, stripPresetId);
-    if (next) setStripPresetId(next.id);
-    setLayoutId(id);
-  };
 
   useEffect(() => {
     return () => {
@@ -296,31 +296,12 @@ export function PhotoboothCaptureFoundation({
           <p className="w-full text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
             Layout
           </p>
-          {(Object.keys(PHOTOBOOTH_LAYOUTS) as PhotoboothLayoutId[]).map(
-            (id) => {
-              const meta = PHOTOBOOTH_LAYOUTS[id];
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  disabled={busy}
-                  onClick={() => selectLayout(id)}
-                  className={cn(
-                    "rounded-xl border px-3 py-2 text-left text-sm transition-colors",
-                    layoutId === id
-                      ? "border-[#C45B7A] bg-[#C45B7A]/10 text-[#7A2436]"
-                      : "border-border bg-card hover:bg-muted/50",
-                  )}
-                >
-                  <span className="font-semibold">{meta.shortLabel}</span>
-                  <span className="mt-0.5 block text-[11px] text-muted-foreground">
-                    {meta.physicalInches.width}×{meta.physicalInches.height}{" "}
-                    portrait
-                  </span>
-                </button>
-              );
-            },
-          )}
+          <div className="rounded-xl border border-[#C45B7A] bg-[#C45B7A]/10 px-3 py-2 text-left text-sm text-[#7A2436]">
+            <span className="font-semibold">3 photos</span>
+            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+              5.5 × 15.5 cm strip
+            </span>
+          </div>
 
           <button
             type="button"
@@ -590,6 +571,11 @@ export function PhotoboothCaptureFoundation({
               Strip design
             </p>
             <div className="flex max-h-40 flex-col gap-1.5 overflow-y-auto overscroll-contain">
+              {compatiblePresets.length === 0 ? (
+                <p className="px-1 py-2 text-center text-[10px] text-muted-foreground">
+                  No strip for this layout. Upload a matching PNG in Studio.
+                </p>
+              ) : null}
               {compatiblePresets.map((preset) => {
                 const selected = stripPreset?.id === preset.id;
                 return (
@@ -704,6 +690,31 @@ export function PhotoboothCaptureFoundation({
           </div>
         </aside>
       </div>
+
+      {onComplete ? (
+        <div className="flex flex-col items-center gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              stopCamera();
+              onComplete();
+            }}
+            className="w-full max-w-sm rounded-full bg-gradient-to-b from-[#F7A0B8] to-[#E05A7A] py-3 text-sm font-semibold tracking-wide text-white"
+          >
+            Selesai
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              stopCamera();
+              onComplete();
+            }}
+            className="py-2 text-center text-sm text-[#C45B7A] underline-offset-4 hover:underline"
+          >
+            Lewati
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }

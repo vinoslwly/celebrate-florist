@@ -35,12 +35,31 @@ export {
   type SkipPreviewInput,
 } from "@/schemas/studio-publish";
 export {
-  deleteExperiencePhotoSchema,
-  uploadExperiencePhotoSchema,
-  type DeleteExperiencePhotoInput,
-  type UploadExperiencePhotoInput,
-} from "@/schemas/studio-photos";
+  deletePhotoboothStripSchema,
+  photoboothStripLayoutSchema,
+  photoboothStripSourceSchema,
+  setPhotoboothStripSourceSchema,
+  uploadPhotoboothStripSchema,
+  type DeletePhotoboothStripInput,
+  type SetPhotoboothStripSourceInput,
+  type UploadPhotoboothStripInput,
+} from "@/schemas/studio-photobooth-strips";
 export {
+  websiteAssetKindSchema,
+  websiteContentSchema,
+  type WebsiteAssetKind,
+  type WebsiteContentInput,
+} from "@/schemas/studio-website";
+export {
+  CATALOG_STRIP_MAX,
+  deleteCatalogStripSchema,
+  renameCatalogStripSchema,
+  type DeleteCatalogStripInput,
+  type RenameCatalogStripInput,
+} from "@/schemas/studio-catalog-strips";
+export {
+  MEMORY_CODE_PIN_LENGTH,
+  memoryCodePinSchema,
   memoryCodeScopeSchema,
   setMemoryCodeSchema,
   type MemoryCodeScopeInput,

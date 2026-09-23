@@ -42,7 +42,7 @@ export const DEFAULT_WEBSITE_CONTENT: WebsiteContent = {
     lead: "Di balik setiap bunga, selalu ada cerita yang ingin disimpan. Celebrate Florist menghadirkan kuang kecil untuk meninggalkan pesan, berbagi foto, mengabadikan momen bersama, dan membuka kembali kenangan yang pernah berarti.",
     ctaLabel: "Let's Celebrate →",
     demoLabel: "Coba experience",
-    imageUrl: HERO_BOUQUET_PHOTO ?? "",
+    imageUrl: HERO_BOUQUET_PHOTO,
     caption: "Surakarta",
   },
   whatIs: {

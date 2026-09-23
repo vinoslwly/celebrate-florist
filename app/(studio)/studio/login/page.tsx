@@ -1,24 +1,22 @@
+import { marketingFontClassName } from "@/features/landing/config/marketing-fonts";
 import { LoginForm } from "@/features/studio/components/login-form";
 
+import "@/features/landing/styles/marketing.css";
+
 export const metadata = {
-  title: "Studio Login — Celebrate Florist",
-  description: "Admin sign in",
+  title: "Studio login",
+  robots: { index: false, follow: false },
 };
 
 export default function StudioLoginPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
-        <div className="space-y-1 text-center">
-          <p className="font-mono text-xs font-bold tracking-wide text-muted-foreground uppercase">
-            Celebrate Florist
-          </p>
-          <h1 className="font-serif text-2xl font-semibold">Studio</h1>
-          <p className="text-sm text-muted-foreground">Admin sign in</p>
-        </div>
-
+    <div className={`${marketingFontClassName} page-minimal`}>
+      <main className="auth-card">
+        <p className="eyebrow">Celebrate Studio</p>
+        <h1>Selamat datang kembali</h1>
+        <p>Masuk untuk merancang dan menerbitkan greeting digital.</p>
         <LoginForm />
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

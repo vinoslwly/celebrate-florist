@@ -1,11 +1,13 @@
 import "server-only";
 
 import { NotFoundError, ValidationError } from "@/lib/errors";
+import { ThemesRepository } from "@/lib/repositories/themes.repository";
 
 import type { ExperienceRow } from "@/types/database";
 
 import { ExperienceMatchRepository } from "@/features/match/repositories/experience-match.repository";
 import { ExperienceQuizRepository } from "@/features/quiz/repositories/experience-quiz.repository";
+import { assertExperienceModeAllowedForTheme } from "@/features/studio/config/theme-mode-matrix";
 import { ExperiencesRepository } from "@/features/studio/repositories/experiences.repository";
 import { ExperienceEnvelopesRepository } from "@/features/treasures/repositories/experience-envelopes.repository";
 
@@ -35,6 +37,13 @@ export async function changeExperienceMode(
     return existing;
   }
 
+  const themesRepo = new ThemesRepository(client);
+  const theme = await themesRepo.findById(existing.theme_id);
+  if (!theme) {
+    throw new NotFoundError("Theme not found");
+  }
+  assertExperienceModeAllowedForTheme(theme.slug, input.experienceMode);
+
   if (
     existing.experience_mode === "connection" &&
     input.experienceMode !== "connection"
@@ -49,6 +58,7 @@ export async function changeExperienceMode(
       letterClosing: existing.letter_closing,
       quizTitle: null,
       finalUnlockMessage: existing.final_unlock_message,
+      endingMessage: existing.ending_message,
     });
   }
 
@@ -66,6 +76,7 @@ export async function changeExperienceMode(
       letterClosing: existing.letter_closing,
       quizTitle: existing.quiz_title,
       finalUnlockMessage: null,
+      endingMessage: existing.ending_message,
     });
   }
 

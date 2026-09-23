@@ -1,56 +1,45 @@
-import { ScrollReveal } from "@/components/shared/scroll-reveal";
-import { SectionHeading } from "@/components/shared/section-heading";
+import type { WebsiteContent } from "@/features/website/config/types";
 
 const REASONS = [
   {
-    emoji: "✨",
-    title: "Curated by Us",
+    index: "01",
+    title: "Dibuat Khusus",
     description:
-      "Every Celebrate Experience is designed and reviewed by our team before it reaches your recipient.",
+      "Setiap experience ditulis dan ditinjau sebelum sampai ke penerima — bukan template mentah, tapi cerita yang benar-benar milik Anda.",
   },
   {
-    emoji: "🔒",
-    title: "Private by Design",
+    index: "02",
+    title: "Ada Cerita di Dalamnya",
     description:
-      "Only your recipient can open the memory — protected by a Memory Key only they will have.",
+      "Surat, foto, video, dan photobooth dirangkai jadi satu alur yang hangat — seperti membuka amplop dari seseorang yang sayang.",
   },
   {
-    emoji: "🛵",
-    title: "Made for Surakarta",
+    index: "03",
+    title: "Sudah Punya Tanggalnya",
     description:
-      "Fast, local delivery around UNS and surrounding campuses, so timing is never a worry.",
+      "Pre-order minimal H-2 untuk Surakarta — supaya bunga segar, greeting rapi, dan waktu antar bisa diandalkan.",
   },
 ];
 
-export function WhyUsSection() {
-  return (
-    <section
-      id="why-us"
-      className="bg-pink-soft/15 px-4 py-20 sm:px-6 sm:py-28"
-      aria-labelledby="why-us-heading"
-    >
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          id="why-us-heading"
-          eyebrow="Why Celebrate"
-          title="Why choose us?"
-        />
+type WhyUsSectionProps = {
+  content: WebsiteContent;
+};
 
-        <div className="mt-14 grid gap-8 sm:grid-cols-3">
-          {REASONS.map((reason, index) => (
-            <ScrollReveal key={reason.title} delay={index * 0.1}>
-              <div className="flex flex-col items-center gap-3 text-center">
-                <span aria-hidden="true" className="text-4xl">
-                  {reason.emoji}
-                </span>
-                <h3 className="text-base font-semibold text-foreground">
-                  {reason.title}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {reason.description}
-                </p>
-              </div>
-            </ScrollReveal>
+export function WhyUsSection({ content }: WhyUsSectionProps) {
+  return (
+    <section id="why-us" className="section band">
+      <div className="wrap">
+        <header className="section-head">
+          <p className="eyebrow">{content.whyUs.eyebrow}</p>
+          <h2>{content.whyUs.title}</h2>
+        </header>
+        <div className="grid-3">
+          {REASONS.map((reason) => (
+            <article key={reason.index}>
+              <span className="feature-index">{reason.index}</span>
+              <h3>{reason.title}</h3>
+              <p>{reason.description}</p>
+            </article>
           ))}
         </div>
       </div>

@@ -51,6 +51,7 @@ export class ExperiencePhotosRepository extends Repository {
     experienceId: string;
     storagePath: string;
     sortOrder: number;
+    caption?: string | null;
   }): Promise<ExperiencePhotoRow> {
     const { data, error } = await this.client
       .from("experience_photos")
@@ -58,12 +59,26 @@ export class ExperiencePhotosRepository extends Repository {
         experience_id: params.experienceId,
         storage_path: params.storagePath,
         sort_order: params.sortOrder,
+        caption: params.caption ?? null,
       })
       .select("*")
       .single();
 
     this.assertNoError(error);
     return data as ExperiencePhotoRow;
+  }
+
+  async replaceCaption(
+    photo: ExperiencePhotoRow,
+    caption: string | null,
+  ): Promise<ExperiencePhotoRow> {
+    await this.deleteById(photo.id);
+    return this.insertPhoto({
+      experienceId: photo.experience_id,
+      storagePath: photo.storage_path,
+      sortOrder: photo.sort_order,
+      caption,
+    });
   }
 
   async deleteById(id: string): Promise<ExperiencePhotoRow> {

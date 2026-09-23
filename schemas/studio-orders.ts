@@ -8,6 +8,7 @@ import {
   uuidSchema,
 } from "@/schemas/common";
 import { experienceModeSchema } from "@/schemas/experience-mode";
+import { memoryCodePinSchema } from "@/schemas/studio-memory-code";
 
 export const createOrderSchema = z.object({
   experienceMode: experienceModeSchema,
@@ -34,7 +35,8 @@ export const updateExperienceDraftSchema = z.object({
   letterContent: letterContentSchema,
   letterClosing: letterClosingSchema,
   quizTitle: z.string().trim().max(200).optional().nullable(),
-  memoryCode: z.string().trim().min(4).max(64).optional(),
+  endingMessage: letterClosingSchema.optional(),
+  memoryCode: memoryCodePinSchema.optional(),
 });
 
 export type UpdateExperienceDraftInput = z.infer<

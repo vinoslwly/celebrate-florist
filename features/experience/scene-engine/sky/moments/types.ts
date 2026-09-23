@@ -3,11 +3,16 @@ import type { ReactNode } from "react";
 import type { ExperienceRow } from "@/types/database";
 import type { Theme } from "@/types/theme";
 
-import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
+import type {
+  PublishedPhoto,
+  PublishedPhotoboothStrip,
+} from "@/features/experience/services/fetch-published-experience.service";
 
 export type SkyMomentsScenePayload = {
   experience: ExperienceRow;
   photos: PublishedPhoto[];
+  photoboothStrips?: PublishedPhotoboothStrip[];
+  catalogPhotoboothStrips?: PublishedPhotoboothStrip[];
   theme: Theme;
 };
 

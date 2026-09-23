@@ -25,6 +25,21 @@ export function buildExperienceQrPath(experienceId: string): string {
   return `${experienceId}/qr.png`;
 }
 
+/**
+ * Overlay PNG for a custom photobooth strip.
+ * Pattern: {experienceId}/{stripId}.png
+ */
+export function buildPhotoboothStripPath(
+  experienceId: string,
+  stripId: string,
+): string {
+  return `${experienceId}/${stripId}.png`;
+}
+
+export function buildCatalogPhotoboothStripPath(stripId: string): string {
+  return `${stripId}.png`;
+}
+
 export function buildWebsiteAssetPath(
   kind:
     "logo" | "favicon" | "hero" | "theme-bloom" | "theme-warm" | "theme-sky",

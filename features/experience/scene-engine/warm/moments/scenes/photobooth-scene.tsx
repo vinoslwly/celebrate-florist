@@ -1,53 +1,56 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
 import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
+import { WarmExperienceEndingScene } from "@/features/experience/scene-engine/warm/moments/scenes/ending-scene";
 import { Photobooth } from "@/features/photobooth/components/photobooth";
+import { recipientCustomStripPresets } from "@/features/photobooth/lib/recipient-custom-strips";
 
-const FIELD =
-  "radial-gradient(ellipse at 50% 40%, #8B1A22 0%, #6B0F16 50%, #4A0A10 100%)";
-const CREAM = "#E8D4C0";
-const GOLD = "#C9A227";
+const CRIMSON = "#3A080C";
 
 /**
- * Warm Moments terminal photobooth — Bloom Photobooth on a crimson field.
- * Official photobooth redesign deferred to Sprint 14; Theme Lab complement only.
+ * Terminal Warm Moments scene — Layout B, 3 photos, dark crimson Darling field.
+ * Selesai / Lewati open the thank-you ending.
  */
 export function WarmPhotoboothScene({ payload }: MomentsSceneProps) {
-  const { experience, theme } = payload;
+  const { experience, theme, photoboothStrips, catalogPhotoboothStrips } =
+    payload;
+  const [showEnding, setShowEnding] = useState(false);
+  const customStripPresets = recipientCustomStripPresets(
+    experience,
+    "warm",
+    photoboothStrips,
+    catalogPhotoboothStrips,
+  );
+
+  if (showEnding) {
+    return (
+      <WarmExperienceEndingScene endingMessage={experience.ending_message} />
+    );
+  }
 
   return (
-    <div
-      className={SCENE_VIEWPORT_SCROLL}
-      style={{ background: FIELD }}
-      data-production-pending="warm-moments-photobooth"
-    >
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-10 sm:px-6">
-        <p
-          className="mb-2 text-center font-mono text-[10px] font-bold tracking-widest uppercase"
-          style={{ color: `${CREAM}99` }}
-        >
-          Scene 10 · Photobooth · Sprint 14 pending
-        </p>
-        <p
-          className="mb-5 text-center font-serif text-sm"
-          style={{ color: GOLD }}
-        >
-          A crimson keepsake stop — camera stays in your browser.
-        </p>
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-2xl border border-[#C9A227]/35 bg-[#FFF8F0]/95 p-1 shadow-[0_20px_50px_-20px_rgba(20,4,8,0.65)]"
-        >
-          <Photobooth
-            greetingName={experience.greeting_name}
-            themeEmoji={theme.emoji}
-          />
-        </motion.div>
+    <div className={SCENE_VIEWPORT_SCROLL} style={{ background: CRIMSON }}>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 78% 55% at 50% 18%, #8B1A22 0%, #6B0F16 42%, #3A080C 100%)",
+        }}
+      />
+      <div className="relative z-10 mx-auto flex w-full max-w-lg flex-1 flex-col px-3 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-8">
+        <Photobooth
+          greetingName={experience.greeting_name}
+          themeEmoji={theme.emoji}
+          variant="capture"
+          themeId="warm"
+          initialLayoutId="B"
+          customStripPresets={customStripPresets}
+          onComplete={() => setShowEnding(true)}
+        />
       </div>
     </div>
   );

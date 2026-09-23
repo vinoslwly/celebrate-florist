@@ -5,7 +5,7 @@ import type { WarmTreasuresSceneProps } from "@/features/experience/scene-engine
 
 /**
  * warm.treasures.photobooth — Scene 13 (terminal).
- * Reuses Warm Connection photobooth stub (Sprint 14 redesign deferred).
+ * Reuses Warm Connection photobooth (Layout B, 3-step flow).
  */
 export function WarmTreasuresPhotoboothScene({
   payload,

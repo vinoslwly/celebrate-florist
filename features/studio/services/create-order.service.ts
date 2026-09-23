@@ -1,5 +1,9 @@
 import "server-only";
 
+import { NotFoundError } from "@/lib/errors";
+import { ThemesRepository } from "@/lib/repositories/themes.repository";
+
+import { assertExperienceModeAllowedForTheme } from "@/features/studio/config/theme-mode-matrix";
 import { OrdersRepository } from "@/features/studio/repositories/orders.repository";
 import type { CreateOrderRpcResult } from "@/features/studio/repositories/orders.repository";
 import { createPlaceholderMemoryKeyHash } from "@/features/studio/services/memory-code.service";
@@ -11,6 +15,13 @@ export async function createOrderWithExperience(
   client: SupabaseClient,
   input: CreateOrderInput,
 ): Promise<CreateOrderRpcResult> {
+  const themesRepo = new ThemesRepository(client);
+  const theme = await themesRepo.findById(input.themeId);
+  if (!theme) {
+    throw new NotFoundError("Theme not found");
+  }
+  assertExperienceModeAllowedForTheme(theme.slug, input.experienceMode);
+
   const ordersRepo = new OrdersRepository(client);
 
   return ordersRepo.createWithExperience({

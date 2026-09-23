@@ -35,7 +35,10 @@ import { SkyHeartRainScene } from "@/features/experience/scene-engine/sky/moment
 import { SkyLetterConfirmationScene } from "@/features/experience/scene-engine/sky/moments/scenes/letter-confirmation-scene";
 import { SkyLetterScene } from "@/features/experience/scene-engine/sky/moments/scenes/letter-scene";
 import { SkyPhotoboothScene } from "@/features/experience/scene-engine/sky/moments/scenes/photobooth-scene";
-import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
+import type {
+  PublishedPhoto,
+  PublishedPhotoboothStrip,
+} from "@/features/experience/services/fetch-published-experience.service";
 
 export {
   SKY_MOMENTS_BALLOON_BURST_SCENE,
@@ -55,31 +58,42 @@ const SCENE_1_DURATION_MS = 2800;
 type SkyMomentsSceneHostProps = {
   experience: ExperienceRow;
   photos: PublishedPhoto[];
+  photoboothStrips?: PublishedPhotoboothStrip[];
+  catalogPhotoboothStrips?: PublishedPhotoboothStrip[];
   theme: Theme;
   className?: string;
   showLabChrome?: boolean;
+  /** Theme Lab only — jump to a scene without playing the full journey. */
+  initialSceneId?: SkyMomentsLabSceneId;
 };
 
 /**
- * Sky Moments Theme Lab host — Scene 1–9 living (photobooth terminal).
- * Production `/e/[token]` Scene Engine: NOT AUTHORIZED.
- * Does not modify locked Bloom / Warm engines.
+ * Sky Moments host — Scene 1–9 (photobooth terminal).
+ * Production `/e/[token]`: Sky Moments (Cloudie).
+ * Bloom Moments uses MomentsSceneHost; Warm Moments uses WarmMomentsSceneHost.
  */
 export function SkyMomentsSceneHost({
   experience,
   photos,
+  photoboothStrips = [],
+  catalogPhotoboothStrips = [],
   theme,
   className,
   showLabChrome = false,
+  initialSceneId = SKY_MOMENTS_INITIAL_SCENE,
 }: SkyMomentsSceneHostProps) {
-  const [sceneId, setSceneId] = useState<SkyMomentsLabSceneId>(
-    SKY_MOMENTS_INITIAL_SCENE,
-  );
+  const [sceneId, setSceneId] = useState<SkyMomentsLabSceneId>(initialSceneId);
   const [journeyKey, setJourneyKey] = useState(0);
   const reduceMotion = useCelebrateReducedMotion();
   const sceneFade = getHostSceneFade(reduceMotion);
 
-  const payload = { experience, photos, theme };
+  const payload = {
+    experience,
+    photos,
+    photoboothStrips,
+    catalogPhotoboothStrips,
+    theme,
+  };
   const hasPhotos = photos.length > 0;
 
   const advance = useCallback(() => {

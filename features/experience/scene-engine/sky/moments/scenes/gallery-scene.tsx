@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 
+import { galleryCaptionCopy } from "@/features/experience/lib/photo-caption";
 import { SCENE_SCROLL_PANE } from "@/features/experience/scene-engine/scene-viewport";
 import {
   allowAmbientLoop,
@@ -22,20 +23,6 @@ const CTA_TO = "#4A8FBF";
 
 const TORN =
   "polygon(0.8% 1.2%, 12% 0%, 28% 1.5%, 47% 0.2%, 68% 1.8%, 86% 0.4%, 99.2% 1%, 100% 18%, 99% 42%, 100% 68%, 98.8% 92%, 86% 100%, 62% 98.5%, 38% 100%, 14% 98.8%, 0% 99%, 1% 72%, 0% 38%, 1.2% 12%)";
-
-function splitCaption(caption: string | null): { title: string; body: string } {
-  if (!caption?.trim()) {
-    return {
-      title: "A memory",
-      body: "A moment worth keeping under a clear sky.",
-    };
-  }
-  const parts = caption.split(" · ");
-  if (parts.length >= 2) {
-    return { title: parts[0]!.trim(), body: parts.slice(1).join(" · ").trim() };
-  }
-  return { title: "A memory", body: caption.trim() };
-}
 
 function SoftStar({
   className,
@@ -136,7 +123,10 @@ function MemoryCard({
   index: number;
   reduceMotion: boolean;
 }) {
-  const { title, body } = splitCaption(photo.caption);
+  const { title, body } = galleryCaptionCopy(photo.caption, {
+    title: "A memory",
+    body: "A moment worth keeping under a clear sky.",
+  });
   const photoLeft = index % 2 === 0;
   const tilt = photoLeft ? -3.5 : 3.5;
   const n = String(index + 1).padStart(2, "0");
@@ -185,6 +175,7 @@ function MemoryCard({
             alt={title}
             className="aspect-square w-full object-cover"
             loading="lazy"
+            decoding="async"
             draggable={false}
           />
           <div

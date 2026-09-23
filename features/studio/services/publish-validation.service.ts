@@ -13,6 +13,7 @@ import type { ExperienceQuiz } from "@/features/quiz/types";
 import { getExperienceModeConfig } from "@/features/studio/config/experience-modes";
 import { isMemoryKeyHashVerifiable } from "@/features/studio/config/memory-code-sentinel";
 import type { PublishChecklistItem } from "@/features/studio/config/publish-checklist";
+import { ExperiencePhotoboothStripsRepository } from "@/features/studio/repositories/experience-photobooth-strips.repository";
 import { ExperiencePhotosRepository } from "@/features/studio/repositories/experience-photos.repository";
 import { mapEnvelopeValidationMessage } from "@/features/treasures/components/envelope-draft";
 import { ExperienceEnvelopesRepository } from "@/features/treasures/repositories/experience-envelopes.repository";
@@ -28,6 +29,7 @@ export type PublishChecklistContext = {
   match?: MatchStudioConfig;
   envelopes?: EnvelopeStudioConfig;
   uploadedPhotoSortOrders?: number[];
+  customStripCount?: number;
 };
 
 function isPublishableMode(mode: ExperienceMode): boolean {
@@ -228,6 +230,19 @@ export function buildPublishChecklist(
       : "Complete greeting, letter body, and closing.",
   });
 
+  if (experience.photobooth_strip_source === "custom") {
+    const customStripCount = context.customStripCount ?? 0;
+    items.push({
+      id: "photobooth_strips",
+      label: "Custom photobooth strips uploaded",
+      status: customStripCount > 0 ? "pass" : "fail",
+      message:
+        customStripCount > 0
+          ? undefined
+          : "Upload at least one PNG strip for Custom event.",
+    });
+  }
+
   const buyerApproved = order.status === "approved" || order.status === "ready";
 
   items.push({
@@ -276,10 +291,17 @@ export async function buildPublishChecklistForExperience(
   order: OrderRow,
   experience: ExperienceRow,
 ): Promise<PublishChecklistItem[]> {
+  const customStripCount =
+    experience.photobooth_strip_source === "custom"
+      ? await new ExperiencePhotoboothStripsRepository(
+          client,
+        ).countByExperienceId(experience.id)
+      : 0;
+
   if (experience.experience_mode === "connection") {
     const quizRepo = new ExperienceQuizRepository(client);
     const quiz = await quizRepo.findCompleteByExperienceId(experience.id);
-    return buildPublishChecklist(order, experience, { quiz });
+    return buildPublishChecklist(order, experience, { quiz, customStripCount });
   }
 
   if (experience.experience_mode === "memories") {
@@ -296,6 +318,7 @@ export async function buildPublishChecklistForExperience(
         finalUnlockMessage: experience.final_unlock_message,
       },
       uploadedPhotoSortOrders: photos.map((photo) => photo.sort_order),
+      customStripCount,
     });
   }
 
@@ -310,10 +333,11 @@ export async function buildPublishChecklistForExperience(
     return buildPublishChecklist(order, experience, {
       envelopes: { envelopes },
       uploadedPhotoSortOrders: photos.map((photo) => photo.sort_order),
+      customStripCount,
     });
   }
 
-  return buildPublishChecklist(order, experience);
+  return buildPublishChecklist(order, experience, { customStripCount });
 }
 
 export function canPublishFromChecklist(
@@ -381,6 +405,17 @@ export async function assertPublishAllowed(
 
     if (!validation.ok) {
       throw new ValidationError(validation.message);
+    }
+  }
+
+  if (experience.photobooth_strip_source === "custom") {
+    const count = await new ExperiencePhotoboothStripsRepository(
+      client,
+    ).countByExperienceId(experience.id);
+    if (count < 1) {
+      throw new ValidationError(
+        "Upload at least one custom photobooth strip before publishing.",
+      );
     }
   }
 }

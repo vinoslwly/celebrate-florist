@@ -4,11 +4,16 @@ import type { ExperienceRow } from "@/types/database";
 import type { Theme } from "@/types/theme";
 
 import type { MomentsSceneId } from "@/features/experience/scene-engine/moments/graph";
-import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
+import type {
+  PublishedPhoto,
+  PublishedPhotoboothStrip,
+} from "@/features/experience/services/fetch-published-experience.service";
 
 export type MomentsScenePayload = {
   experience: ExperienceRow;
   photos: PublishedPhoto[];
+  photoboothStrips?: PublishedPhotoboothStrip[];
+  catalogPhotoboothStrips?: PublishedPhotoboothStrip[];
   theme: Theme;
 };
 

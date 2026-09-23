@@ -4,4 +4,6 @@ export const STUDIO_ROUTES = {
   orders: "/studio/orders",
   ordersNew: "/studio/orders/new",
   orderDetail: (id: string) => `/studio/orders/${id}` as const,
+  settings: "/studio/settings",
+  strips: "/studio/strips",
 } as const;

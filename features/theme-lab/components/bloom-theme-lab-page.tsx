@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-import { useSearchParams } from "next/navigation";
-
 import { cn } from "@/lib/utils";
 
 import type { Theme } from "@/types/theme";
@@ -142,15 +140,20 @@ function withAccentText(theme: Theme, accentText: string): Theme {
   };
 }
 
-export function BloomThemeLabPage() {
-  const searchParams = useSearchParams();
-  const connectionJump = parseConnectionLabScene(
-    searchParams.get("connectionScene"),
-  );
-  const memoriesJump = parseMemoriesLabScene(searchParams.get("memoriesScene"));
-  const treasuresJump = parseTreasuresLabScene(
-    searchParams.get("treasuresScene"),
-  );
+type BloomThemeLabPageProps = {
+  connectionScene?: string | null;
+  memoriesScene?: string | null;
+  treasuresScene?: string | null;
+};
+
+export function BloomThemeLabPage({
+  connectionScene = null,
+  memoriesScene = null,
+  treasuresScene = null,
+}: BloomThemeLabPageProps) {
+  const connectionJump = parseConnectionLabScene(connectionScene ?? null);
+  const memoriesJump = parseMemoriesLabScene(memoriesScene ?? null);
+  const treasuresJump = parseTreasuresLabScene(treasuresScene ?? null);
   const [mode, setMode] = useState<ModeTab>(
     connectionJump
       ? "connection"

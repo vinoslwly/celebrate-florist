@@ -65,3 +65,44 @@ export async function processImageForStorage(
     height: result.info.height,
   };
 }
+
+const STRIP_PNG_MAX_EDGE = 2400;
+
+/**
+ * Store Founder strip overlays as PNG so photo-hole transparency survives.
+ * Do not reuse processImageForStorage (WebP) for these files.
+ */
+export async function processPhotoboothStripPng(
+  input: ImagePipelineInput,
+): Promise<ImagePipelineOutput> {
+  const mime = input.mimeType.toLowerCase();
+  if (mime !== "image/png") {
+    throw new Error("Photobooth strip must be a PNG.");
+  }
+
+  const pipeline = sharp(Buffer.from(input.buffer)).rotate();
+  const meta = await pipeline.metadata();
+  if (meta.format !== "png") {
+    throw new Error("Photobooth strip must be a PNG.");
+  }
+
+  const result = await pipeline
+    .resize(STRIP_PNG_MAX_EDGE, STRIP_PNG_MAX_EDGE, {
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .png({ compressionLevel: 9 })
+    .toBuffer({ resolveWithObject: true });
+
+  const arrayBuffer = result.data.buffer.slice(
+    result.data.byteOffset,
+    result.data.byteOffset + result.data.byteLength,
+  ) as ArrayBuffer;
+
+  return {
+    buffer: arrayBuffer,
+    mimeType: "image/png",
+    width: result.info.width,
+    height: result.info.height,
+  };
+}

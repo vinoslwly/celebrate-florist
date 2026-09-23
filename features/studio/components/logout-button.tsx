@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/features/studio/actions/auth";
 
 export function LogoutButton() {
@@ -15,13 +14,8 @@ export function LogoutButton() {
   }
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={handleLogout}
-      disabled={isLoading}
-    >
-      {isLoading ? "Signing out…" : "Sign out"}
-    </Button>
+    <button type="button" onClick={handleLogout} disabled={isLoading}>
+      {isLoading ? "Keluar…" : "Keluar"}
+    </button>
   );
 }

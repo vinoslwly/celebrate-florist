@@ -1,0 +1,503 @@
+/* Studio chrome — ported from celebrateflorist.id, scoped to .page-studio. */
+
+.page-studio {
+  min-height: 100dvh;
+  background: var(--cream-deep);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.page-studio h1,
+.page-studio h2,
+.page-studio h3,
+.page-studio h4 {
+  font-family: var(--serif-display);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  margin: 0 0 0.65rem;
+  color: var(--rose-deep);
+}
+
+.page-studio p {
+  margin: 0 0 1rem;
+}
+
+.page-studio p:last-child {
+  margin-bottom: 0;
+}
+
+.page-studio a {
+  color: inherit;
+}
+
+.page-studio button,
+.page-studio input,
+.page-studio select,
+.page-studio textarea {
+  font: inherit;
+  color: inherit;
+}
+
+.page-studio input,
+.page-studio select,
+.page-studio textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.72rem 0.85rem;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+}
+
+.page-studio input:focus,
+.page-studio select:focus,
+.page-studio textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 164, 92, 0.18);
+  outline: none;
+}
+
+.page-studio .muted {
+  color: var(--muted);
+}
+
+.page-studio .studio-shell {
+  display: grid;
+  min-height: 100vh;
+}
+
+.page-studio .studio-sidebar {
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+  padding: 1.1rem 1.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-studio .studio-sidebar nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+
+.page-studio .studio-sidebar a {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--muted);
+  padding: 0.35rem 0;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.page-studio .studio-sidebar a:hover {
+  color: var(--rose-deep);
+  border-bottom-color: var(--rose-soft);
+}
+
+.page-studio .studio-sidebar a.is-active {
+  color: var(--rose-deep);
+  border-bottom-color: var(--rose);
+}
+
+.page-studio .studio-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--serif-display);
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  color: var(--rose-deep);
+}
+
+.page-studio .studio-brand .brand-logo {
+  width: 2.15rem;
+  height: 2.15rem;
+  object-fit: cover;
+  border-radius: 50%;
+  flex: 0 0 2.15rem;
+}
+
+.page-studio .studio-logout button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  padding: 0;
+}
+
+.page-studio .studio-logout button:hover {
+  color: var(--rose);
+}
+
+.page-studio .studio-main {
+  padding: 1.6rem 1.15rem 3.5rem;
+}
+
+.page-studio .studio-page-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.page-studio .studio-page-head h1 {
+  font-size: 1.75rem;
+}
+
+.page-studio .studio-panel {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.3rem 1.2rem;
+  margin-bottom: 1.1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.page-studio .studio-panel h2 {
+  font-size: 1.3rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.page-studio .table-wrap {
+  overflow-x: auto;
+}
+
+.page-studio .table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  min-width: 36rem;
+}
+
+.page-studio .table th,
+.page-studio .table td {
+  text-align: left;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.page-studio .table th {
+  font-weight: 600;
+  color: var(--rose-deep);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.page-studio .table a {
+  font-weight: 600;
+  color: var(--rose);
+  text-decoration: none;
+}
+
+.page-studio .table a:hover {
+  color: var(--rose-deep);
+  text-decoration: underline;
+}
+
+.page-studio .filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+  align-items: end;
+}
+
+.page-studio .filters input,
+.page-studio .filters select {
+  width: auto;
+  min-width: 9rem;
+}
+
+.page-studio .status {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-radius: var(--radius-pill);
+  background: var(--cream-deep);
+}
+
+.page-studio .status-ready,
+.page-studio .status-approved {
+  color: var(--ok);
+  background: rgba(61, 107, 69, 0.1);
+}
+
+.page-studio .status-delivered,
+.page-studio .status-completed {
+  color: #4a6080;
+  background: rgba(74, 96, 128, 0.1);
+}
+
+@media (min-width: 760px) {
+  .page-studio .studio-shell {
+    grid-template-columns: 15rem 1fr;
+  }
+
+  .page-studio .studio-sidebar {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    border-bottom: 0;
+    border-right: 1px solid var(--line);
+    padding: 1.6rem 1.15rem;
+    box-shadow: 2px 0 12px rgba(74, 8, 8, 0.03);
+  }
+
+  .page-studio .studio-sidebar nav {
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-top: 1.5rem;
+    width: 100%;
+  }
+
+  .page-studio .studio-sidebar a {
+    padding: 0.5rem 0;
+    border-bottom: none;
+    border-left: 2px solid transparent;
+    padding-left: 0.65rem;
+  }
+
+  .page-studio .studio-sidebar a:hover {
+    border-left-color: var(--rose);
+    border-bottom-color: transparent;
+  }
+
+  .page-studio .studio-sidebar a.is-active {
+    border-bottom-color: transparent;
+    border-left-color: var(--rose);
+  }
+
+  .page-studio .studio-logout {
+    margin-top: auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 759px) {
+  .page-studio .studio-main {
+    padding: 1.15rem 0.85rem 2.5rem;
+  }
+
+  .page-studio .studio-page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-studio .studio-page-head h1 {
+    font-size: 1.45rem;
+    word-break: break-word;
+  }
+
+  .page-studio .studio-sidebar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.85rem 0.85rem 0.75rem;
+  }
+
+  .page-studio .studio-sidebar nav {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.15rem;
+  }
+
+  .page-studio .studio-sidebar nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-pill);
+    font-size: 0.82rem;
+  }
+
+  .page-studio .studio-logout {
+    width: 100%;
+    text-align: right;
+  }
+
+  .page-studio .filters {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .page-studio .filters input,
+  .page-studio .filters select,
+  .page-studio .filters button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .page-studio .studio-panel {
+    padding: 1.05rem 0.9rem;
+  }
+}
+
+.page-studio .studio-form-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.page-studio .studio-form-grid label,
+.page-studio .studio-asset-field,
+.page-studio .studio-color-row label,
+.page-studio .studio-faq-editor label,
+.page-studio .studio-theme-editor label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--rose-deep);
+}
+
+.page-studio .studio-asset-row,
+.page-studio .studio-color-row,
+.page-studio .studio-theme-editors,
+.page-studio .studio-strip-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.page-studio .studio-color-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.page-studio .studio-color-input input[type="color"] {
+  width: 3rem;
+  height: 2.5rem;
+  padding: 0.2rem;
+}
+
+.page-studio .studio-asset-preview,
+.page-studio .studio-strip-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.page-studio .studio-asset-preview {
+  width: 6rem;
+  height: 6rem;
+}
+
+.page-studio .studio-asset-preview img,
+.page-studio .studio-strip-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.page-studio .studio-strip-preview {
+  aspect-ratio: 1 / 2.6;
+  background:
+    linear-gradient(45deg, #eee 25%, transparent 25%) 0 0 / 12px 12px,
+    linear-gradient(-45deg, #eee 25%, transparent 25%) 0 6px / 12px 12px,
+    #fff;
+}
+
+.page-studio .studio-theme-editor,
+.page-studio .studio-faq-editor,
+.page-studio .studio-strip-card {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  background: #fff;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.page-studio .studio-strip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.page-studio .studio-banner {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+}
+
+.page-studio .studio-banner--bad {
+  background: rgba(196, 77, 114, 0.1);
+  color: var(--pink-deep);
+}
+
+.page-studio .studio-banner--ok {
+  background: rgba(61, 107, 69, 0.1);
+  color: var(--ok);
+}
+
+.page-studio .studio-sticky-save {
+  position: sticky;
+  bottom: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+
+.page-studio .studio-catalog-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.page-studio .studio-catalog-thumbs img {
+  width: 2.4rem;
+  height: 6.2rem;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  background: #fff;
+}
+
+@media (min-width: 760px) {
+  .page-studio .studio-asset-row,
+  .page-studio .studio-color-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-studio .studio-theme-editors,
+  .page-studio .studio-strip-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -44,6 +44,7 @@ export async function updateExperienceDraft(
     letterContent: input.letterContent,
     letterClosing: input.letterClosing,
     quizTitle: input.quizTitle,
+    endingMessage: input.endingMessage,
     memoryKeyHash,
   });
 }

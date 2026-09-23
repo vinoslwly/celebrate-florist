@@ -2,7 +2,12 @@
 
 import { motion } from "framer-motion";
 
+import { galleryCaptionCopy } from "@/features/experience/lib/photo-caption";
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import {
+  SCENE_SCROLL_PANE,
+  SCENE_VIEWPORT_LOCK,
+} from "@/features/experience/scene-engine/scene-viewport";
 import {
   allowAmbientLoop,
   MOTION_DURATION,
@@ -98,17 +103,6 @@ function Flourish({ className, flip }: { className?: string; flip?: boolean }) {
   );
 }
 
-function splitCaption(caption: string | null): { title: string; body: string } {
-  if (!caption?.trim()) {
-    return { title: "A memory", body: "A moment worth keeping." };
-  }
-  const parts = caption.split(" · ");
-  if (parts.length >= 2) {
-    return { title: parts[0]!.trim(), body: parts.slice(1).join(" · ").trim() };
-  }
-  return { title: "A memory", body: caption.trim() };
-}
-
 function PolaroidCard({
   photo,
   index,
@@ -118,7 +112,10 @@ function PolaroidCard({
   index: number;
   reduceMotion: boolean;
 }) {
-  const { title, body } = splitCaption(photo.caption);
+  const { title, body } = galleryCaptionCopy(photo.caption, {
+    title: "A memory",
+    body: "A moment worth keeping.",
+  });
   const photoLeft = index % 2 === 0;
   const tilt = photoLeft ? -4 : 4;
 
@@ -242,7 +239,7 @@ export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
   );
 
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-[#F0C8D4]">
+    <div className={`${SCENE_VIEWPORT_LOCK} bg-[#F0C8D4]`}>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -269,7 +266,11 @@ export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
           {FALLING.map((p, i) => (
             <motion.div
               key={i}
-              className="absolute opacity-70"
+              className={
+                i > 1
+                  ? "absolute hidden opacity-70 sm:block"
+                  : "absolute opacity-70"
+              }
               style={{
                 left: p.left,
                 top: "-6%",
@@ -295,8 +296,8 @@ export function GalleryScene({ payload, onComplete }: MomentsSceneProps) {
         </div>
       ) : null}
 
-      <div className="relative z-10 h-0 min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-y-contain [-webkit-overflow-scrolling:touch]">
-        <div className="mx-auto flex w-full max-w-xl flex-col px-5 pt-12 pb-0 sm:px-8 sm:pt-14">
+      <div className={SCENE_SCROLL_PANE}>
+        <div className="mx-auto flex w-full max-w-xl flex-col px-5 pt-12 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-8 sm:pt-14">
           <header className="mb-12 text-center sm:mb-16">
             <motion.div
               className="mb-4 flex items-center justify-center gap-3"

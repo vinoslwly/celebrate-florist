@@ -1,14 +1,18 @@
+import type { WebsiteContent } from "@/features/website/config/types";
+
 export type NavItem = {
   href: string;
   label: string;
+  external?: boolean;
 };
 
-export const NAV_ITEMS: NavItem[] = [
-  { href: "#what-is-celebrate", label: "What is Celebrate" },
-  { href: "#why-us", label: "Why Us" },
-  { href: "#bouquet", label: "Bouquet" },
-  { href: "#experience", label: "Experience" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#demo", label: "Demo" },
-  { href: "#faq", label: "FAQ" },
-];
+export function buildNavItems(content: WebsiteContent): NavItem[] {
+  return [
+    { href: "#what-is-celebrate", label: "Tentang" },
+    { href: content.links.bouquetUrl, label: "Bouquet", external: true },
+    { href: "#experience", label: "Experience" },
+    { href: "#how-it-works", label: "Proses" },
+    { href: content.links.demoHref, label: "Demo" },
+    { href: "#faq", label: "FAQ" },
+  ];
+}

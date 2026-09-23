@@ -82,5 +82,6 @@ export async function uploadExperiencePhoto(
     experienceId: input.experienceId,
     storagePath,
     sortOrder: input.sortOrder,
+    caption: existingAtSlot?.caption ?? null,
   });
 }

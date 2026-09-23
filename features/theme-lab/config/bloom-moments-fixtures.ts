@@ -29,6 +29,9 @@ export const BLOOM_MOMENTS_LAB_EXPERIENCE = {
   last_accessed_at: null,
   published_at: null,
   archived_at: null,
+  photobooth_strip_source: "catalog",
+  ending_message:
+    "Hadiah ini milikmu. Buka lagi kapan saja —\nkenangannya tetap di sini.",
   created_at: "2026-07-19T00:00:00.000Z",
   updated_at: "2026-07-19T00:00:00.000Z",
 } satisfies ExperienceRow;

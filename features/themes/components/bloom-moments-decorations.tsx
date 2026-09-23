@@ -161,7 +161,7 @@ export function MomentsPersistentShell({
         className={cn(
           "relative z-10 flex flex-col overflow-hidden",
           heightClass,
-          fillParent && "min-h-0",
+          fillParent && "h-full min-h-0",
         )}
       >
         {showBrandChip ? (

@@ -39,4 +39,5 @@ export { fetchPublishedExperience } from "@/features/experience/services/fetch-p
 export type {
   PublishedExperiencePayload,
   PublishedPhoto,
+  PublishedPhotoboothStrip,
 } from "@/features/experience/services/fetch-published-experience.service";

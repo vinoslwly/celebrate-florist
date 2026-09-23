@@ -36,7 +36,10 @@ import { WarmLetterConfirmationScene } from "@/features/experience/scene-engine/
 import { WarmLetterScene } from "@/features/experience/scene-engine/warm/moments/scenes/letter-scene";
 import { WarmLetterTransitionScene } from "@/features/experience/scene-engine/warm/moments/scenes/letter-transition-scene";
 import { WarmPhotoboothScene } from "@/features/experience/scene-engine/warm/moments/scenes/photobooth-scene";
-import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
+import type {
+  PublishedPhoto,
+  PublishedPhotoboothStrip,
+} from "@/features/experience/services/fetch-published-experience.service";
 
 export {
   WARM_MOMENTS_ALBUM_UNLOCK_SCENE,
@@ -57,30 +60,41 @@ const SCENE_1_DURATION_MS = 2800;
 type WarmMomentsSceneHostProps = {
   experience: ExperienceRow;
   photos: PublishedPhoto[];
+  photoboothStrips?: PublishedPhotoboothStrip[];
+  catalogPhotoboothStrips?: PublishedPhotoboothStrip[];
   theme: Theme;
   className?: string;
   showLabChrome?: boolean;
+  /** Theme Lab only — jump to a scene without playing the full journey. */
+  initialSceneId?: WarmMomentsLabSceneId;
 };
 
 /**
- * Warm Moments Theme Lab host — Scenes 1–10 living (photobooth = Sprint 14 stub).
- * Does not modify locked Bloom Moments engine.
+ * Warm Moments host — Scene 1–10 (photobooth terminal).
+ * Production `/e/[token]` for warm/Darling Moments.
  */
 export function WarmMomentsSceneHost({
   experience,
   photos,
+  photoboothStrips = [],
+  catalogPhotoboothStrips = [],
   theme,
   className,
   showLabChrome = false,
+  initialSceneId = WARM_MOMENTS_INITIAL_SCENE,
 }: WarmMomentsSceneHostProps) {
-  const [sceneId, setSceneId] = useState<WarmMomentsLabSceneId>(
-    WARM_MOMENTS_INITIAL_SCENE,
-  );
+  const [sceneId, setSceneId] = useState<WarmMomentsLabSceneId>(initialSceneId);
   const [journeyKey, setJourneyKey] = useState(0);
   const reduceMotion = useCelebrateReducedMotion();
   const sceneFade = getHostSceneFade(reduceMotion);
 
-  const payload = { experience, photos, theme };
+  const payload = {
+    experience,
+    photos,
+    photoboothStrips,
+    catalogPhotoboothStrips,
+    theme,
+  };
   const hasPhotos = photos.length > 0;
 
   const advance = useCallback(() => {
@@ -134,13 +148,13 @@ export function WarmMomentsSceneHost({
       <div
         className={cn(
           "relative min-h-0 w-full overflow-hidden",
-          showLabChrome ? "h-full flex-1" : "min-h-[100svh]",
+          showLabChrome ? "h-full flex-1" : "h-[100svh] min-h-[100svh]",
         )}
       >
         <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
-            className="absolute inset-0 z-10 flex min-h-0 flex-col overflow-hidden"
+            className="absolute inset-0 z-10 flex h-full min-h-0 flex-col overflow-hidden"
             initial={sceneFade.initial}
             animate={sceneFade.animate}
             exit={sceneFade.exit}

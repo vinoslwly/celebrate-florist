@@ -3,9 +3,9 @@ import { Suspense } from "react";
 import Link from "next/link";
 
 import { requireAdminUser } from "@/lib/auth";
+import { ThemesRepository } from "@/lib/repositories/themes.repository";
 import { createClient } from "@/lib/supabase/server";
 
-import { Button } from "@/components/ui/button";
 import { OrdersListFilters } from "@/features/studio/components/orders-list-filters";
 import { OrdersTable } from "@/features/studio/components/orders-table";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
@@ -15,8 +15,8 @@ import { orderStatusSchema } from "@/schemas/common";
 import { experienceModeSchema } from "@/schemas/experience-mode";
 
 export const metadata = {
-  title: "Orders — Celebrate Florist Studio",
-  description: "Manage orders",
+  title: "Order · Celebrate Studio",
+  description: "Kelola order Celebrate Florist",
 };
 
 type OrdersPageProps = {
@@ -24,6 +24,7 @@ type OrdersPageProps = {
     status?: string;
     mode?: string;
     deliveryDate?: string;
+    q?: string;
   }>;
 };
 
@@ -33,6 +34,7 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
   const params = await searchParams;
   const supabase = await createClient();
   const ordersRepo = new OrdersRepository(supabase);
+  const themesRepo = new ThemesRepository(supabase);
 
   const filters: Parameters<OrdersRepository["findMany"]>[0] = {};
 
@@ -56,27 +58,44 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
     filters.scheduledOnOrBefore = end;
   }
 
-  const orders = await ordersRepo.findMany(filters);
+  const [orders, themes] = await Promise.all([
+    ordersRepo.findMany(filters),
+    themesRepo.findAllActive(),
+  ]);
+
+  const themeLabels = Object.fromEntries(
+    themes.map((theme) => [theme.id, theme.slug]),
+  );
+
+  const query = params.q?.trim().toLowerCase();
+  const visibleOrders = query
+    ? orders.filter((order) => {
+        const haystack =
+          `${order.order_number} ${order.receiver_name} ${order.sender_name}`.toLowerCase();
+        return haystack.includes(query);
+      })
+    : orders;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <>
+      <header className="studio-page-head">
         <div>
-          <h1 className="font-serif text-2xl font-semibold">Orders</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Browse and filter all orders.
+          <p className="eyebrow">Order</p>
+          <h1>Semua order</h1>
+          <p className="muted">
+            Cari, saring, lalu buka order untuk mengedit experience.
           </p>
         </div>
-        <Button asChild>
-          <Link href={STUDIO_ROUTES.ordersNew}>New order</Link>
-        </Button>
-      </div>
+        <Link className="btn btn-brand" href={STUDIO_ROUTES.ordersNew}>
+          Order baru
+        </Link>
+      </header>
 
       <Suspense fallback={null}>
         <OrdersListFilters />
       </Suspense>
 
-      <OrdersTable orders={orders} />
-    </div>
+      <OrdersTable orders={visibleOrders} themeLabels={themeLabels} />
+    </>
   );
 }

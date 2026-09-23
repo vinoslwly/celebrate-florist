@@ -20,12 +20,17 @@ import {
   getHostSceneFade,
   useCelebrateReducedMotion,
 } from "@/features/experience/scene-engine/shared/motion";
-import type { PublishedPhoto } from "@/features/experience/services/fetch-published-experience.service";
+import type {
+  PublishedPhoto,
+  PublishedPhotoboothStrip,
+} from "@/features/experience/services/fetch-published-experience.service";
 import { MomentsPersistentShell } from "@/features/themes/components/bloom-moments-decorations";
 
 type MomentsSceneHostProps = {
   experience: ExperienceRow;
   photos: PublishedPhoto[];
+  photoboothStrips?: PublishedPhotoboothStrip[];
+  catalogPhotoboothStrips?: PublishedPhotoboothStrip[];
   theme: Theme;
   className?: string;
   /** Lab-only: show scene id chip + restart control. */
@@ -33,9 +38,15 @@ type MomentsSceneHostProps = {
   initialScene?: MomentsSceneId;
 };
 
+/**
+ * Bloom Moments host — Scene 1–10 (photobooth terminal).
+ * Production `/e/[token]` for bloom/Lovey Moments.
+ */
 export function MomentsSceneHost({
   experience,
   photos,
+  photoboothStrips = [],
+  catalogPhotoboothStrips = [],
   theme,
   className,
   showLabChrome = false,
@@ -46,7 +57,13 @@ export function MomentsSceneHost({
   const reduceMotion = useCelebrateReducedMotion();
   const sceneFade = getHostSceneFade(reduceMotion);
 
-  const payload = { experience, photos, theme };
+  const payload = {
+    experience,
+    photos,
+    photoboothStrips,
+    catalogPhotoboothStrips,
+    theme,
+  };
   const hasPhotos = photos.length > 0;
 
   const advance = useCallback(() => {
@@ -70,9 +87,7 @@ export function MomentsSceneHost({
   }, [sceneId, hasPhotos, journeyKey]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [sceneId]);
 
   const Scene = momentsSceneRegistry[sceneId];
@@ -85,7 +100,8 @@ export function MomentsSceneHost({
     sceneId === "moments.letter" ||
     sceneId === "moments.album-unlock-transition" ||
     sceneId === "moments.gallery" ||
-    sceneId === "moments.gallery-ending";
+    sceneId === "moments.gallery-ending" ||
+    sceneId === "moments.photobooth";
 
   function restartJourney() {
     setSceneId(MOMENTS_INITIAL_SCENE);
@@ -93,7 +109,9 @@ export function MomentsSceneHost({
   }
 
   return (
-    <div className={cn("relative flex w-full flex-col", className)}>
+    <div
+      className={cn("relative flex h-full min-h-0 w-full flex-col", className)}
+    >
       {showLabChrome ? (
         <div className="z-40 flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/60 bg-card/90 px-3 py-2 text-xs backdrop-blur-sm">
           <p className="font-mono text-[11px] text-muted-foreground">
@@ -113,16 +131,15 @@ export function MomentsSceneHost({
         theme={theme}
         showBrandChip={false}
         bare={bareShell}
-        className={showLabChrome ? "min-h-0 flex-1" : undefined}
-        fillParent={showLabChrome}
+        fillParent
+        className={
+          showLabChrome ? "min-h-0 flex-1" : "h-[100svh] min-h-[100svh]"
+        }
       >
         <AnimatePresence mode={sceneFade.presenceMode} initial={false}>
           <motion.div
             key={`${journeyKey}:${sceneId}`}
-            className={cn(
-              "flex min-h-0 flex-col overflow-hidden",
-              showLabChrome ? "h-full w-full flex-1" : "min-h-[100svh]",
-            )}
+            className="absolute inset-0 flex h-full min-h-0 flex-col overflow-hidden"
             initial={sceneFade.initial}
             animate={sceneFade.animate}
             exit={sceneFade.exit}

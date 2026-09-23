@@ -2,140 +2,72 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-import type { OrderStatus } from "@/types/database";
-
-import { Field, FieldGroup } from "@/components/ui/field";
-import { formControlClassName } from "@/components/ui/form-control-styles";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { EXPERIENCE_MODES } from "@/features/studio/config/experience-modes";
+import { ORDER_STATUS_FILTERS } from "@/features/studio/config/labels";
 import { experienceModeSchema } from "@/schemas/experience-mode";
-
-const ORDER_STATUSES: { value: OrderStatus; label: string }[] = [
-  { value: "draft", label: "Draft" },
-  { value: "designing", label: "Designing" },
-  { value: "preview_sent", label: "Preview sent" },
-  { value: "approved", label: "Approved" },
-  { value: "ready", label: "Ready" },
-  { value: "delivered", label: "Delivered" },
-  { value: "completed", label: "Completed" },
-];
 
 export function OrdersListFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const query = searchParams.get("q") ?? "";
   const status = searchParams.get("status") ?? "";
   const mode = searchParams.get("mode") ?? "";
   const deliveryDate = searchParams.get("deliveryDate") ?? "";
 
-  function updateFilters(next: {
-    status?: string;
-    mode?: string;
-    deliveryDate?: string;
-  }) {
-    const params = new URLSearchParams(searchParams.toString());
+  function applyFilters(formData: FormData) {
+    const params = new URLSearchParams();
+    const nextQuery = String(formData.get("q") ?? "").trim();
+    const nextStatus = String(formData.get("status") ?? "");
+    const nextMode = String(formData.get("mode") ?? "");
+    const nextDate = String(formData.get("deliveryDate") ?? "");
 
-    for (const [key, value] of Object.entries(next)) {
-      if (!value) {
-        params.delete(key);
-      } else {
-        params.set(key, value);
-      }
+    if (nextQuery) params.set("q", nextQuery);
+    if (nextStatus) params.set("status", nextStatus);
+    if (nextMode) {
+      const parsed = experienceModeSchema.safeParse(nextMode);
+      if (parsed.success) params.set("mode", parsed.data);
     }
+    if (nextDate) params.set("deliveryDate", nextDate);
 
-    const query = params.toString();
-    router.push(query ? `/studio/orders?${query}` : "/studio/orders");
+    const qs = params.toString();
+    router.push(qs ? `/studio/orders?${qs}` : "/studio/orders");
   }
 
   return (
-    <form
-      className="rounded-xl border border-border bg-card p-4"
-      onSubmit={(event) => event.preventDefault()}
-    >
-      <FieldGroup className="flex flex-wrap items-end gap-3">
-        <Field className="space-y-1">
-          <Label
-            htmlFor="status"
-            className="text-xs font-medium text-muted-foreground"
-          >
-            Status
-          </Label>
-          <select
-            id="status"
-            value={status}
-            onChange={(e) => updateFilters({ status: e.target.value })}
-            className={formControlClassName("w-auto min-w-[8rem]")}
-          >
-            <option value="">All</option>
-            {ORDER_STATUSES.map((entry) => (
-              <option key={entry.value} value={entry.value}>
-                {entry.label}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field className="space-y-1">
-          <Label
-            htmlFor="mode"
-            className="text-xs font-medium text-muted-foreground"
-          >
-            Mode
-          </Label>
-          <select
-            id="mode"
-            value={mode}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (!value) {
-                updateFilters({ mode: "" });
-                return;
-              }
-              const parsed = experienceModeSchema.safeParse(value);
-              if (parsed.success) {
-                updateFilters({ mode: parsed.data });
-              }
-            }}
-            className={formControlClassName("w-auto min-w-[8rem]")}
-          >
-            <option value="">All</option>
-            {EXPERIENCE_MODES.map((entry) => (
-              <option key={entry.value} value={entry.value}>
-                {entry.label}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field className="space-y-1">
-          <Label
-            htmlFor="deliveryDate"
-            className="text-xs font-medium text-muted-foreground"
-          >
-            Delivery date
-          </Label>
-          <Input
-            id="deliveryDate"
-            type="date"
-            value={deliveryDate}
-            onChange={(e) => updateFilters({ deliveryDate: e.target.value })}
-            className="w-auto"
-          />
-        </Field>
-
-        {(status || mode || deliveryDate) && (
-          <button
-            type="button"
-            onClick={() =>
-              updateFilters({ status: "", mode: "", deliveryDate: "" })
-            }
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Clear filters
-          </button>
-        )}
-      </FieldGroup>
+    <form className="filters" action={applyFilters}>
+      <input
+        type="search"
+        name="q"
+        defaultValue={query}
+        placeholder="Nama atau ORD-…"
+        aria-label="Nama atau ORD-…"
+      />
+      <select name="status" defaultValue={status} aria-label="Status">
+        <option value="">Semua status</option>
+        {ORDER_STATUS_FILTERS.map((entry) => (
+          <option key={entry.value} value={entry.value}>
+            {entry.label}
+          </option>
+        ))}
+      </select>
+      <select name="mode" defaultValue={mode} aria-label="Mode">
+        <option value="">Semua mode</option>
+        {EXPERIENCE_MODES.map((entry) => (
+          <option key={entry.value} value={entry.value}>
+            {entry.label}
+          </option>
+        ))}
+      </select>
+      <input
+        type="date"
+        name="deliveryDate"
+        defaultValue={deliveryDate}
+        aria-label="Tanggal pengantaran"
+      />
+      <button className="btn btn-brand" type="submit">
+        Saring
+      </button>
     </form>
   );
 }

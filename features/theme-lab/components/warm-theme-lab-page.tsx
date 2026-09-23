@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 
-import { useSearchParams } from "next/navigation";
-
 import { cn } from "@/lib/utils";
 
 import { WarmConnectionSceneHost } from "@/features/experience/scene-engine/warm/connection/warm-connection-scene-host";
 import { WarmMemoriesSceneHost } from "@/features/experience/scene-engine/warm/memories/warm-memories-scene-host";
-import { WarmMomentsSceneHost } from "@/features/experience/scene-engine/warm/moments/warm-moments-scene-host";
+import {
+  WARM_MOMENTS_LETTER_SCENE,
+  WARM_MOMENTS_LETTER_TRANSITION_SCENE,
+  WARM_MOMENTS_PHOTOBOOTH_SCENE,
+  WarmMomentsSceneHost,
+} from "@/features/experience/scene-engine/warm/moments/warm-moments-scene-host";
 import { WarmTreasuresSceneHost } from "@/features/experience/scene-engine/warm/treasures/warm-treasures-scene-host";
 import {
   WARM_CONNECTION_LAB_EXPERIENCE,
@@ -42,15 +45,22 @@ const IMPLEMENTED_MODES: ModeTab[] = [
 ];
 
 /**
- * Warm Theme Lab — all four modes locked (Moments · Connection · Memories · Treasures).
- * Production `/e/[token]` Scene Engine: NOT AUTHORIZED.
+ * Warm Theme Lab — Moments is also live on `/e/[token]` for Darling orders.
+ * Connection / Memories / Treasures Scene Engines stay lab-only.
  *
- * Lab fixtures: `?noPhotos=1` · `?mode=connection|memories|treasures`
+ * Lab fixtures: `?noPhotos=1` · `?mode=connection|memories|treasures` · `?scene=letter|photobooth`
  */
-export function WarmThemeLabPage() {
-  const searchParams = useSearchParams();
-  const noPhotos = searchParams.get("noPhotos") === "1";
-  const modeParam = searchParams.get("mode");
+type WarmThemeLabPageProps = {
+  noPhotos?: boolean;
+  mode?: string | null;
+  scene?: string | null;
+};
+
+export function WarmThemeLabPage({
+  noPhotos = false,
+  mode: modeParam = null,
+  scene = null,
+}: WarmThemeLabPageProps) {
   const [mode, setMode] = useState<ModeTab>(
     modeParam === "connection" ||
       modeParam === "memories" ||
@@ -90,7 +100,7 @@ export function WarmThemeLabPage() {
           </div>
           {mode === "moments" ? (
             <span className="rounded border border-[#E8D4C0]/35 px-1.5 py-0.5 font-mono text-[10px] text-[#E8D4C0]/90">
-              Scenes 1–10 · photobooth stub
+              Scenes 1–10 · 3-step photobooth
             </span>
           ) : mode === "connection" ? (
             <span className="rounded border border-[#E8D4C0]/35 px-1.5 py-0.5 font-mono text-[10px] text-[#E8D4C0]/90">
@@ -110,8 +120,8 @@ export function WarmThemeLabPage() {
               no-photo fixture
             </span>
           ) : null}
-          <span className="rounded border border-amber-500/40 px-1.5 py-0.5 font-mono text-[10px] text-amber-200/90">
-            /e/ not authorized
+          <span className="rounded border border-emerald-400/40 px-1.5 py-0.5 font-mono text-[10px] text-emerald-100/90">
+            Moments live on /e/
           </span>
         </div>
       </header>
@@ -122,6 +132,15 @@ export function WarmThemeLabPage() {
           photos={momentsPhotos}
           theme={warmMomentsLabTheme}
           showLabChrome
+          initialSceneId={
+            scene === "photobooth"
+              ? WARM_MOMENTS_PHOTOBOOTH_SCENE
+              : scene === "letter"
+                ? WARM_MOMENTS_LETTER_SCENE
+                : scene === "transition"
+                  ? WARM_MOMENTS_LETTER_TRANSITION_SCENE
+                  : undefined
+          }
           className="min-h-0 flex-1"
         />
       ) : mode === "connection" ? (

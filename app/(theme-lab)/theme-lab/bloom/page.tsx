@@ -1,17 +1,26 @@
-import { Suspense } from "react";
-
 import { BloomThemeLabPage } from "@/features/theme-lab/components/bloom-theme-lab-page";
 
-export default function BloomThemeLabRoute() {
+/** Avoid prerendering the Suspense shell — iOS Safari can stay on that HTML. */
+export const dynamic = "force-dynamic";
+
+type BloomThemeLabRouteProps = {
+  searchParams: Promise<{
+    connectionScene?: string;
+    memoriesScene?: string;
+    treasuresScene?: string;
+  }>;
+};
+
+export default async function BloomThemeLabRoute({
+  searchParams,
+}: BloomThemeLabRouteProps) {
+  const params = await searchParams;
+
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">
-          Loading Theme Lab…
-        </div>
-      }
-    >
-      <BloomThemeLabPage />
-    </Suspense>
+    <BloomThemeLabPage
+      connectionScene={params.connectionScene ?? null}
+      memoriesScene={params.memoriesScene ?? null}
+      treasuresScene={params.treasuresScene ?? null}
+    />
   );
 }

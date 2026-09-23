@@ -199,7 +199,7 @@ export function CelebrateLoadingScene(_props: MomentsSceneProps) {
         {FALLING_PETALS.map((petal, i) => (
           <motion.div
             key={i}
-            className="absolute"
+            className={i > 3 ? "absolute hidden sm:block" : "absolute"}
             style={{
               left: petal.left,
               top: "-8%",

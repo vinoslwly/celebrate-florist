@@ -11,6 +11,7 @@ export type UpdateExperienceDraftParams = {
   letterClosing: string;
   quizTitle?: string | null;
   finalUnlockMessage?: string | null;
+  endingMessage?: string;
   memoryKeyHash?: string;
 };
 
@@ -123,6 +124,10 @@ export class ExperiencesRepository extends Repository {
       final_unlock_message: params.finalUnlockMessage ?? null,
     };
 
+    if (params.endingMessage !== undefined) {
+      payload.ending_message = params.endingMessage;
+    }
+
     if (params.memoryKeyHash) {
       payload.memory_key_hash = params.memoryKeyHash;
     }
@@ -187,5 +192,22 @@ export class ExperiencesRepository extends Repository {
 
     this.assertNoError(error);
     return (data?.length ?? 0) > 0;
+  }
+
+  async updatePhotoboothStripSource(
+    id: string,
+    source: "catalog" | "custom",
+  ): Promise<ExperienceRow> {
+    const { data, error } = await this.client
+      .from("experiences")
+      .update({ photobooth_strip_source: source })
+      .eq("id", id)
+      .eq("status", "draft")
+      .is("content_locked_at", null)
+      .select("*")
+      .single();
+
+    this.assertNoError(error);
+    return data as ExperienceRow;
   }
 }

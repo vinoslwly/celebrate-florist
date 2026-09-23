@@ -17,10 +17,10 @@ import { SkyGiftBox } from "@/features/experience/scene-engine/sky/moments/sky-g
 import type { SkyMomentsSceneProps } from "@/features/experience/scene-engine/sky/moments/types";
 
 const SKY_BASE = "#C5DCEF";
-const EASE_POP = [0.18, 1.15, 0.32, 1] as const;
+const EASE_DRIFT = [0.2, 0.32, 0.42, 0.88] as const;
 
-/** Auto-advance after fountain settles. */
-export const SKY_BALLOON_BURST_DURATION_MS = 5000;
+/** Auto-advance while balloons are still exiting the top of the frame. */
+export const SKY_BALLOON_BURST_DURATION_MS = 3500;
 
 type BalloonPattern = "solid" | "stars" | "stripes";
 
@@ -648,7 +648,7 @@ export function SkyBalloonBurstScene({ onComplete }: SkyMomentsSceneProps) {
   const ambient = allowAmbientLoop(reduceMotion);
 
   useEffect(() => {
-    const ms = reduceMotion ? 1600 : SKY_BALLOON_BURST_DURATION_MS;
+    const ms = reduceMotion ? 900 : SKY_BALLOON_BURST_DURATION_MS;
     const t = window.setTimeout(() => onComplete(), ms);
     return () => window.clearTimeout(t);
   }, [onComplete, reduceMotion]);
@@ -714,7 +714,7 @@ export function SkyBalloonBurstScene({ onComplete }: SkyMomentsSceneProps) {
             transition={
               ambient
                 ? {
-                    delay: 1.4 + s.delay,
+                    delay: 0.05 + s.delay * 0.2,
                     duration: 2,
                     repeat: Infinity,
                     ease: "easeInOut",
@@ -736,7 +736,7 @@ export function SkyBalloonBurstScene({ onComplete }: SkyMomentsSceneProps) {
         initial={reduceMotion ? false : { opacity: 0, scale: 0.35 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{
-          delay: reduceMotion ? 0 : 0.5,
+          delay: reduceMotion ? 0 : 0.04,
           duration: reduceMotion
             ? MOTION_DURATION.instant
             : MOTION_DURATION.ceremony,
@@ -752,8 +752,8 @@ export function SkyBalloonBurstScene({ onComplete }: SkyMomentsSceneProps) {
           initial={{ opacity: 0, scale: 0.2 }}
           animate={{ opacity: [0, 0.65, 0], scale: [0.2, 3.6, 4.4] }}
           transition={{
-            delay: 1.05,
-            duration: 1.05,
+            delay: 0.08,
+            duration: 0.7,
             ease: MOTION_EASE.out,
           }}
         />
@@ -777,8 +777,8 @@ export function SkyBalloonBurstScene({ onComplete }: SkyMomentsSceneProps) {
                 rotate: c.rot,
               }}
               transition={{
-                delay: 1.12 + c.delay,
-                duration: 1.7,
+                delay: 0.1 + c.delay * 0.3,
+                duration: 1.2,
                 ease: MOTION_EASE.out,
               }}
             />
@@ -815,33 +815,23 @@ export function SkyBalloonBurstScene({ onComplete }: SkyMomentsSceneProps) {
             }
             animate={{
               opacity: 1,
-              x: b.x,
-              y: b.y,
-              scale: b.scale,
-              rotate: b.rotate,
+              x: [0, b.x * 0.55, b.x * 1.08, b.x * 1.18],
+              y: [18, b.y * 0.42, b.y * 0.95, b.y - 1100],
+              scale: [0.06, b.scale * 0.78, b.scale, b.scale * 0.96],
+              rotate: [0, b.rotate * 0.45, b.rotate, b.rotate * 1.12],
             }}
             transition={
               reduceMotion
                 ? { duration: 0 }
                 : {
-                    delay: 1.05 + b.delay,
-                    duration: 1.15,
-                    ease: EASE_POP,
+                    delay: 0.04 + b.delay * 1.15,
+                    duration: 3.7,
+                    times: [0, 0.12, 0.3, 1],
+                    ease: EASE_DRIFT,
                   }
             }
           >
-            <div
-              className={
-                ambient && b.float
-                  ? "sky-b-float h-full w-full"
-                  : "h-full w-full"
-              }
-              style={
-                ambient && b.float
-                  ? { animationDelay: `${2.4 + b.delay}s` }
-                  : undefined
-              }
-            >
+            <div className="h-full w-full">
               <SkyBalloon pattern={b.pattern} className="h-full w-full" />
             </div>
           </motion.div>
@@ -869,7 +859,7 @@ export function SkyBalloonBurstScene({ onComplete }: SkyMomentsSceneProps) {
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 0, scale: 1.04 }}
                 transition={{
-                  delay: 0.75,
+                  delay: 0.12,
                   duration: MOTION_DURATION.fast,
                   ease: MOTION_EASE.out,
                 }}
@@ -880,7 +870,7 @@ export function SkyBalloonBurstScene({ onComplete }: SkyMomentsSceneProps) {
                 className="absolute inset-0"
                 initial={{ opacity: 0, scale: 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.7, duration: 0.25 }}
+                transition={{ delay: 0.08, duration: 0.2 }}
               >
                 <SkyGiftBox
                   variant="open"

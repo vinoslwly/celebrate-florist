@@ -1,60 +1,136 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
+
+import Image from "next/image";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
-import { MobileNav } from "@/features/landing/components/mobile-nav";
-import { NAV_ITEMS } from "@/features/landing/config/nav-items";
-import { ORDER_LINK } from "@/features/landing/config/whatsapp-messages";
+import { buildNavItems } from "@/features/landing/config/nav-items";
+import { websiteOrderLink } from "@/features/website/config/order-link";
+import type { WebsiteContent } from "@/features/website/config/types";
 
-export function SiteNavbar() {
+function NavAnchor({
+  href,
+  external,
+  children,
+  onClick,
+}: {
+  href: string;
+  external?: boolean;
+  children: ReactNode;
+  onClick?: () => void;
+}) {
+  if (external) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onClick}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  if (href.startsWith("#")) {
+    return (
+      <a href={href} onClick={onClick}>
+        {children}
+      </a>
+    );
+  }
+
   return (
-    <header className="sticky top-0 z-40 border-b border-pink-soft/40 bg-white/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            aria-hidden="true"
-            className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-pink-deep to-peach text-base shadow-soft"
-          >
-            🌸
-          </span>
-          <span className="font-serif text-base font-bold tracking-tight text-foreground">
-            celebrate.florist
+    <Link href={href} onClick={onClick}>
+      {children}
+    </Link>
+  );
+}
+
+type SiteNavbarProps = {
+  content: WebsiteContent;
+};
+
+export function SiteNavbar({ content }: SiteNavbarProps) {
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
+  const navItems = buildNavItems(content);
+  const orderLink = websiteOrderLink(content);
+  const logoIsSvg = content.brand.logoUrl.toLowerCase().includes(".svg");
+
+  return (
+    <header className="site-header">
+      <div className="wrap header-inner">
+        <Link className="brand" href="/">
+          <Image
+            className="brand-logo"
+            src={content.brand.logoUrl}
+            alt="Celebrate Florist"
+            width={40}
+            height={40}
+            unoptimized={logoIsSvg}
+          />
+          <span className="brand-text">
+            <span className="brand-celebrate">Celebrate</span>
+            <span className="brand-florist">Florist</span>
           </span>
         </Link>
-
-        <nav
-          aria-label="Primary navigation"
-          className="hidden items-center gap-7 md:flex"
-        >
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.href}
+        <nav className="nav-desktop" aria-label="Utama">
+          {navItems.map((item) => (
+            <NavAnchor
+              key={item.label}
               href={item.href}
-              className="text-xs font-bold tracking-wide text-foreground/75 uppercase transition-colors hover:text-pink-ink"
+              external={item.external}
             >
               {item.label}
-            </a>
+            </NavAnchor>
           ))}
         </nav>
-
-        <div className="flex items-center gap-2">
-          <Button
-            asChild
-            variant="brand"
-            size="sm"
-            className="hidden sm:inline-flex"
+        <div className="header-actions">
+          <a
+            className="btn btn-brand btn-sm hide-sm"
+            href={orderLink}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            {/*
-             * Goes straight to WhatsApp, same as every other "Order Now"
-             * CTA on the page. Previously scrolled to #final-cta instead,
-             * forcing an extra click before reaching WhatsApp — fixed
-             * during the Sprint 01C review.
-             */}
-            <a href={ORDER_LINK} target="_blank" rel="noopener noreferrer">
-              Order Now <span aria-hidden="true">→</span>
-            </a>
-          </Button>
-          <MobileNav />
+            Let&apos;s Celebrate →
+          </a>
+          <button
+            className="nav-toggle"
+            type="button"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            aria-label={open ? "Tutup menu navigasi" : "Buka menu navigasi"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="nav-toggle-icon" aria-hidden="true">
+              <span />
+            </span>
+            <span className="nav-toggle-label">Menu</span>
+          </button>
         </div>
+      </div>
+      <div id="mobile-nav" className="mobile-nav" hidden={!open}>
+        {navItems.map((item) => (
+          <NavAnchor
+            key={item.label}
+            href={item.href}
+            external={item.external}
+            onClick={close}
+          >
+            {item.label}
+          </NavAnchor>
+        ))}
+        <a
+          className="btn btn-brand"
+          href={orderLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={close}
+        >
+          Let&apos;s Celebrate →
+        </a>
       </div>
     </header>
   );

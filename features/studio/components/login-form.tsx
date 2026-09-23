@@ -2,13 +2,8 @@
 
 import { useState } from "react";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import { Field, FieldError } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { loginAction } from "@/features/studio/actions/auth";
 import { STUDIO_LOGIN_FAILURE_MESSAGE } from "@/features/studio/config/auth-messages";
 
@@ -38,21 +33,20 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      <FieldError
-        id={errorId}
-        className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm"
-      >
-        {error}
-      </FieldError>
+    <form onSubmit={handleSubmit} className="stack" noValidate>
+      {error ? (
+        <p id={errorId} className="form-error" role="alert">
+          {error}
+        </p>
+      ) : null}
 
-      <Field>
-        <Label htmlFor="email">Email</Label>
-        <Input
+      <label htmlFor="email">
+        Email
+        <input
           id="email"
           name="email"
           type="email"
-          autoComplete="email"
+          autoComplete="username"
           required
           value={email}
           onChange={(event) => setEmail(event.target.value)}
@@ -60,11 +54,11 @@ export function LoginForm() {
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
         />
-      </Field>
+      </label>
 
-      <Field>
-        <Label htmlFor="password">Password</Label>
-        <Input
+      <label htmlFor="password">
+        Kata sandi
+        <input
           id="password"
           name="password"
           type="password"
@@ -76,22 +70,16 @@ export function LoginForm() {
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
         />
-      </Field>
+      </label>
 
-      <Button
+      <button
+        className="btn btn-brand btn-lg"
         type="submit"
-        className="w-full min-h-11"
         disabled={isLoading}
         aria-busy={isLoading}
       >
-        {isLoading ? "Signing in…" : "Sign in"}
-      </Button>
-
-      <p className="text-center text-xs text-muted-foreground">
-        <Link href="/" className="underline-offset-4 hover:underline">
-          Back to site
-        </Link>
-      </p>
+        {isLoading ? "Masuk…" : "Masuk"}
+      </button>
     </form>
   );
 }

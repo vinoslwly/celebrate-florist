@@ -1,8 +1,8 @@
+import { getLayoutMeta } from "@/features/photobooth/lib/layouts";
 import type { PhotoboothLayoutId } from "@/features/photobooth/lib/types";
 
 /**
- * Sprint 14.5 export constants.
- * Working canvases (400×1200 / 600×900) × EXPORT_SCALE → download masters.
+ * Working canvas × EXPORT_SCALE → download masters.
  */
 export const PHOTOBOOTH_EXPORT_SCALE = 2;
 
@@ -13,26 +13,19 @@ export const PHOTOBOOTH_EXPORT_MIME = "image/jpeg" as const;
 export const PHOTOBOOTH_EXPORT_QUALITY = 0.92;
 
 /**
- * V1 export mirroring decision (Founder lock for 14.5):
- * Live selfie preview may be CSS-mirrored for aiming;
- * download matches unmirrored capture composition (how others see you).
- * Option A — Preview mirrored → export unmirrored.
+ * Live selfie preview is CSS-mirrored; composed strip flips photos the same
+ * way so a raised left hand stays on the left in both camera and download.
  */
-export const PHOTOBOOTH_EXPORT_MIRROR = false;
+export const PHOTOBOOTH_EXPORT_MIRROR = true;
 
 export function getExportPixelSize(layoutId: PhotoboothLayoutId): {
   width: number;
   height: number;
 } {
-  if (layoutId === "B") {
-    return {
-      width: 400 * PHOTOBOOTH_EXPORT_SCALE,
-      height: 1200 * PHOTOBOOTH_EXPORT_SCALE,
-    };
-  }
+  const { canvas } = getLayoutMeta(layoutId);
   return {
-    width: 600 * PHOTOBOOTH_EXPORT_SCALE,
-    height: 900 * PHOTOBOOTH_EXPORT_SCALE,
+    width: canvas.width * PHOTOBOOTH_EXPORT_SCALE,
+    height: canvas.height * PHOTOBOOTH_EXPORT_SCALE,
   };
 }
 

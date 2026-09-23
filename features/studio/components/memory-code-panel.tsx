@@ -13,6 +13,7 @@ import {
   setMemoryCodeAction,
 } from "@/features/studio/actions/memory-code";
 import { isPlaceholderMemoryKeyHash } from "@/features/studio/config/memory-code-sentinel";
+import { MEMORY_CODE_PIN_LENGTH } from "@/schemas/studio-memory-code";
 
 type MemoryCodePanelProps = {
   orderId: string;
@@ -44,8 +45,8 @@ export function MemoryCodePanel({
   const displayedCode = adminMemoryCodeReference;
 
   async function handleSave() {
-    if (!memoryCode.trim()) {
-      setFieldError("Enter a Memory Code or use Generate.");
+    if (!/^\d{6}$/.test(memoryCode.trim())) {
+      setFieldError("Memory Code must be exactly 6 digits.");
       setError(null);
       return;
     }
@@ -146,7 +147,9 @@ export function MemoryCodePanel({
           <p className="text-sm font-medium">
             Current Memory Code (admin reference)
           </p>
-          <p className="font-mono text-2xl tracking-widest">{displayedCode}</p>
+          <p className="font-mono text-2xl tracking-[0.35em]">
+            {displayedCode}
+          </p>
           <FieldHelper>
             Studio-only note on this order. Share separately from the QR link.
           </FieldHelper>
@@ -177,21 +180,26 @@ export function MemoryCodePanel({
             <Input
               id={memoryCodeInputId}
               type="text"
+              inputMode="numeric"
               autoComplete="off"
+              maxLength={MEMORY_CODE_PIN_LENGTH}
               value={memoryCode}
               onChange={(event) => {
-                setMemoryCode(event.target.value.toUpperCase());
+                const digits = event.target.value
+                  .replace(/\D/g, "")
+                  .slice(0, MEMORY_CODE_PIN_LENGTH);
+                setMemoryCode(digits);
                 if (fieldError) {
                   setFieldError(null);
                 }
               }}
-              placeholder="e.g. ABCD-EFGH"
+              placeholder="060101"
               disabled={busy !== null}
               aria-invalid={fieldError ? true : undefined}
               aria-describedby={describedBy || undefined}
             />
             <FieldHelper id={memoryCodeHelperId}>
-              Use Generate for a random code, or enter one manually.
+              Exactly 6 digits. Use Generate, or type a PIN such as a birthday.
             </FieldHelper>
             <FieldError id={memoryCodeErrorId}>{fieldError}</FieldError>
           </Field>
@@ -208,7 +216,9 @@ export function MemoryCodePanel({
               type="button"
               variant="outline"
               onClick={() => void handleSave()}
-              disabled={busy !== null || !memoryCode.trim()}
+              disabled={
+                busy !== null || memoryCode.length !== MEMORY_CODE_PIN_LENGTH
+              }
             >
               {busy === "save" ? "Saving…" : "Save code"}
             </Button>

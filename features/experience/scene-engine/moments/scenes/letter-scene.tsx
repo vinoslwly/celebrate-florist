@@ -1,10 +1,12 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 
 import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
+import { LetterTypewriterBody } from "@/features/experience/scene-engine/shared/letter-typewriter";
 import {
   allowAmbientLoop,
   MOTION_DURATION,
@@ -395,19 +397,13 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
   const fromName = experience.closing_name;
   const closing = experience.letter_closing?.trim() || "With love,";
   const bodyChunks = splitLetterBody(experience.letter_content ?? "");
+  const [signOff, setSignOff] = useState(reduceMotion);
+  const finishBody = useCallback(() => setSignOff(true), []);
 
-  // Soft Bloom pacing: header → dear → body → closing → signature → CTA
   const pace = (n: number) => (reduceMotion ? 0 : n);
-  const dearDelay = pace(0.48);
-  const bodyStart = pace(0.72);
-  const bodyStep = reduceMotion ? 0 : 0.26;
-  const afterBody = bodyStart + bodyChunks.length * bodyStep;
-  const closingDelay = afterBody + pace(0.22);
-  const signatureDelay = closingDelay + pace(0.28);
-  const ctaDelay = signatureDelay + pace(0.32);
 
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F8E4E7]">
+    <div className={`${SCENE_VIEWPORT_SCROLL} bg-[#F8E4E7]`}>
       {/* Soft peach-pink atmosphere */}
       <div
         aria-hidden
@@ -490,7 +486,7 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
         {SCATTERED_PETALS.map((p, i) => (
           <motion.div
             key={`scatter-${i}`}
-            className="absolute"
+            className={i > 3 ? "absolute hidden sm:block" : "absolute"}
             style={{
               top: p.top,
               left: p.left,
@@ -540,7 +536,7 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
           {FALLING_PETALS.map((petal, i) => (
             <motion.div
               key={`fall-${i}`}
-              className="absolute"
+              className={i > 3 ? "absolute hidden sm:block" : "absolute"}
               style={{
                 left: petal.left,
                 top: "-8%",
@@ -573,7 +569,11 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
           {SPARKLES.map((s, i) => (
             <motion.span
               key={i}
-              className="absolute rounded-full bg-white"
+              className={
+                i > 3
+                  ? "absolute hidden rounded-full bg-white sm:block"
+                  : "absolute rounded-full bg-white"
+              }
               style={{
                 top: s.top,
                 left: s.left,
@@ -593,7 +593,7 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
         </div>
       ) : null}
 
-      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-4 py-10 sm:px-6 sm:py-12">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-4 py-10 pb-[max(2.5rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-12">
         <div className="relative w-full max-w-[20rem] sm:max-w-[22rem]">
           <OpenEnvelope reduceMotion={reduceMotion} />
           {/* Ribbons tucked under the letter, curling out from the envelope */}
@@ -640,7 +640,7 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
               </RevealText>
 
               <RevealText
-                delay={dearDelay}
+                delay={pace(0.48)}
                 reduceMotion={reduceMotion}
                 className="mt-5 text-left"
               >
@@ -649,56 +649,65 @@ export function LetterScene({ payload, onComplete }: MomentsSceneProps) {
                 </p>
               </RevealText>
 
-              <div className="mt-4 space-y-3.5 text-left sm:mt-5">
-                {bodyChunks.map((chunk, i) => (
-                  <RevealText
-                    key={`${i}-${chunk.slice(0, 12)}`}
-                    delay={bodyStart + i * bodyStep}
-                    duration={MOTION_DURATION.ceremony}
-                    reduceMotion={reduceMotion}
-                  >
-                    <p className="font-serif text-[15px] leading-[1.75] text-[#6B4450] sm:text-base sm:leading-[1.8]">
-                      {chunk}
-                    </p>
-                  </RevealText>
-                ))}
+              <div className="mt-4 text-left sm:mt-5">
+                <LetterTypewriterBody
+                  chunks={bodyChunks}
+                  startDelayMs={reduceMotion ? 0 : 720}
+                  reduceMotion={reduceMotion}
+                  onDone={finishBody}
+                  ink="#6B4450"
+                  caretColor="#C45B7A"
+                />
               </div>
 
-              <RevealText
-                delay={closingDelay}
-                reduceMotion={reduceMotion}
+              <motion.div
                 className="mt-6 text-left"
+                initial={false}
+                animate={{ opacity: signOff ? 1 : 0 }}
+                transition={{
+                  duration: reduceMotion ? 0 : MOTION_DURATION.base,
+                  delay: signOff && !reduceMotion ? 0.35 : 0,
+                  ease: MOTION_EASE.out,
+                }}
               >
                 <p className="font-serif text-lg text-[#C45B7A] italic">
                   {closing}
                 </p>
-              </RevealText>
+              </motion.div>
 
-              <RevealText
-                delay={signatureDelay}
-                reduceMotion={reduceMotion}
+              <motion.div
                 className="mt-1 text-left"
+                initial={false}
+                animate={{ opacity: signOff ? 1 : 0 }}
+                transition={{
+                  duration: reduceMotion ? 0 : MOTION_DURATION.base,
+                  delay: signOff && !reduceMotion ? 0.7 : 0,
+                  ease: MOTION_EASE.out,
+                }}
               >
                 <p className="font-serif text-xl font-semibold text-[#8B2E3E] sm:text-2xl">
                   {fromName}
                 </p>
-              </RevealText>
+              </motion.div>
 
               <motion.button
                 type="button"
                 aria-label="Unlock Memories"
                 onClick={onComplete}
-                className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#F7A0B8] to-[#E05A7A] px-5 py-3.5 text-xs font-bold tracking-[0.14em] text-white uppercase shadow-[0_14px_32px_-8px_rgba(196,91,122,0.75)] ring-1 ring-white/45 focus-visible:ring-2 focus-visible:ring-[#C45B7A] focus-visible:outline-none sm:text-[13px]"
-                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
+                disabled={!signOff}
+                className="mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#F7A0B8] to-[#E05A7A] px-5 py-3.5 text-xs font-bold tracking-[0.14em] text-white uppercase shadow-[0_14px_32px_-8px_rgba(196,91,122,0.75)] ring-1 ring-white/45 focus-visible:ring-2 focus-visible:ring-[#C45B7A] focus-visible:outline-none disabled:pointer-events-none sm:text-[13px]"
+                initial={false}
+                animate={{ opacity: signOff ? 1 : 0, y: signOff ? 0 : 12 }}
                 transition={{
-                  delay: ctaDelay,
+                  delay: signOff && !reduceMotion ? 1.15 : 0,
                   duration: reduceMotion
                     ? MOTION_DURATION.instant
                     : MOTION_DURATION.base,
                   ease: MOTION_EASE.out,
                 }}
-                whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+                whileHover={
+                  reduceMotion || !signOff ? undefined : { scale: 1.02 }
+                }
                 whileTap={{ scale: 0.98 }}
               >
                 <LockIcon className="h-3.5 w-3.5 shrink-0 text-white" />

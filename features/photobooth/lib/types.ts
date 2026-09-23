@@ -42,7 +42,7 @@ export type PhotoboothStripPreset = {
 
 /** Universal filter ids — shared across all themes/modes. */
 export type PhotoboothFilterId =
-  "original" | "soft" | "warm" | "cool" | "vintage" | "mono";
+  "original" | "soft" | "warm" | "bloom" | "cool" | "vintage" | "mono";
 
 /**
  * One preset drives live CSS preview and Canvas composition filters.

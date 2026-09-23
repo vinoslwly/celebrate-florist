@@ -42,7 +42,12 @@ export default async function ExperiencePage({ params }: ExperiencePageProps) {
   }
 
   if (gate.status === "memory_code_required") {
-    return <MemoryCodeGate experienceToken={token} />;
+    return (
+      <MemoryCodeGate
+        experienceToken={token}
+        greetingName={gate.experience.greeting_name}
+      />
+    );
   }
 
   if (gate.status === "trust_cookie_required") {

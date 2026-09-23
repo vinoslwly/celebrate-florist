@@ -32,6 +32,15 @@ export const PHOTOBOOTH_FILTERS: PhotoboothFilterPreset[] = [
     swatch: "#E8C4A8",
   },
   {
+    id: "bloom",
+    label: "Bloom",
+    cssFilter:
+      "brightness(1.08) saturate(1.16) contrast(0.96) hue-rotate(-8deg)",
+    canvasFilter:
+      "brightness(1.08) saturate(1.16) contrast(0.96) hue-rotate(-8deg)",
+    swatch: "#F4C4D0",
+  },
+  {
     id: "cool",
     label: "Cool",
     cssFilter:

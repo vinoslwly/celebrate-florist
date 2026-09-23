@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 
-import type { ExperienceMode, ExperienceRow, OrderRow } from "@/types/database";
-import type { ExperiencePhotoRow } from "@/types/database";
+import type {
+  ExperienceMode,
+  ExperiencePhotoboothStripRow,
+  ExperiencePhotoRow,
+  ExperienceRow,
+  OrderRow,
+} from "@/types/database";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup } from "@/components/ui/field";
@@ -22,10 +27,15 @@ import { ExperienceModeBadge } from "@/features/studio/components/experience-mod
 import { MemoryCodePanel } from "@/features/studio/components/memory-code-panel";
 import { ModePanelStub } from "@/features/studio/components/mode-panel-stub";
 import { OrderActionBar } from "@/features/studio/components/order-action-bar";
+import { PhotoboothStripPanel } from "@/features/studio/components/photobooth-strip-panel";
 import { PhotosUploadPanel } from "@/features/studio/components/photos-upload-panel";
 import { PublishChecklist } from "@/features/studio/components/publish-checklist";
-import { EXPERIENCE_MODES } from "@/features/studio/config/experience-modes";
+import { getThemeMarketingLabel } from "@/features/studio/config/labels";
 import type { PublishChecklistItem } from "@/features/studio/config/publish-checklist";
+import {
+  getSelectableExperienceModes,
+  isProductionMomentsTheme,
+} from "@/features/studio/config/theme-mode-matrix";
 import { EnvelopeBuilderPanel } from "@/features/treasures/components/envelope-builder-panel";
 import type { EnvelopeStudioConfig } from "@/features/treasures/types";
 
@@ -33,6 +43,9 @@ type OrderEditorFormProps = {
   order: OrderRow;
   experience: ExperienceRow;
   photos: ExperiencePhotoRow[];
+  initialPhotoboothStrips: ExperiencePhotoboothStripRow[];
+  photoboothStripPreviewUrls: Record<string, string>;
+  catalogStrips?: { id: string; name: string; url: string }[];
   initialQuiz: ExperienceQuiz;
   initialMatch: MatchStudioConfig;
   initialEnvelopes: EnvelopeStudioConfig;
@@ -41,12 +54,16 @@ type OrderEditorFormProps = {
   adminMemoryCodeReference: string | null;
   publishedRecipientUrl: string | null;
   qrDownloadUrl: string | null;
+  themeSlug: string;
 };
 
 export function OrderEditorForm({
   order,
   experience,
   photos,
+  initialPhotoboothStrips,
+  photoboothStripPreviewUrls,
+  catalogStrips = [],
   initialQuiz,
   initialMatch,
   initialEnvelopes,
@@ -55,11 +72,15 @@ export function OrderEditorForm({
   adminMemoryCodeReference,
   publishedRecipientUrl,
   qrDownloadUrl,
+  themeSlug,
 }: OrderEditorFormProps) {
   const [greetingName, setGreetingName] = useState(experience.greeting_name);
   const [closingName, setClosingName] = useState(experience.closing_name);
   const [letterContent, setLetterContent] = useState(experience.letter_content);
   const [letterClosing, setLetterClosing] = useState(experience.letter_closing);
+  const [endingMessage, setEndingMessage] = useState(
+    experience.ending_message ?? "",
+  );
   const [experiencePhotos, setExperiencePhotos] = useState<
     ExperiencePhotoRow[]
   >(photos ?? []);
@@ -73,6 +94,7 @@ export function OrderEditorForm({
 
   const isPublished = experience.status === "published";
   const isLocked = Boolean(experience.content_locked_at);
+  const selectableModes = getSelectableExperienceModes(themeSlug);
 
   async function handleSaveDraft() {
     setIsSaving(true);
@@ -86,6 +108,7 @@ export function OrderEditorForm({
       closingName,
       letterContent,
       letterClosing,
+      endingMessage,
     });
 
     setIsSaving(false);
@@ -262,9 +285,33 @@ export function OrderEditorForm({
             disabled={isSaving}
           />
         </Field>
+        <Field>
+          <Label htmlFor="endingMessage">Photobooth ending message</Label>
+          <Textarea
+            id="endingMessage"
+            rows={3}
+            value={endingMessage}
+            onChange={(e) => setEndingMessage(e.target.value)}
+            disabled={isSaving || isLocked}
+          />
+          <p className="text-xs text-muted-foreground">
+            Shown after Selesai or Lewati. Default: a short thank-you they can
+            reopen anytime.
+          </p>
+        </Field>
       </section>
 
       {modePanel}
+
+      <PhotoboothStripPanel
+        orderId={order.id}
+        experienceId={experience.id}
+        initialSource={experience.photobooth_strip_source ?? "catalog"}
+        initialStrips={initialPhotoboothStrips}
+        initialPreviewUrls={photoboothStripPreviewUrls}
+        catalogStrips={catalogStrips}
+        disabled={isLocked}
+      />
 
       <PhotosUploadPanel
         orderId={order.id}
@@ -299,26 +346,33 @@ export function OrderEditorForm({
           qrDownloadUrl={qrDownloadUrl}
         />
 
-        <div className="space-y-3 border-t border-border pt-4">
-          <h3 className="text-sm font-semibold">Change mode (draft only)</h3>
-          <p className="text-xs text-muted-foreground">
-            Changing mode may remove incompatible configuration in future
-            sprints.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {EXPERIENCE_MODES.map((mode) => (
-              <button
-                key={mode.value}
-                type="button"
-                onClick={() => requestModeChange(mode.value)}
-                disabled={isSaving || mode.value === experienceMode}
-                className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
-              >
-                {mode.label}
-              </button>
-            ))}
+        {selectableModes.length > 1 ? (
+          <div className="space-y-3 border-t border-border pt-4">
+            <h3 className="text-sm font-semibold">Change mode (draft only)</h3>
+            <p className="text-xs text-muted-foreground">
+              Changing mode may remove incompatible configuration in future
+              sprints.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {selectableModes.map((mode) => (
+                <button
+                  key={mode.value}
+                  type="button"
+                  onClick={() => requestModeChange(mode.value)}
+                  disabled={isSaving || mode.value === experienceMode}
+                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : isProductionMomentsTheme(themeSlug) ? (
+          <p className="border-t border-border pt-4 text-xs text-muted-foreground">
+            {getThemeMarketingLabel(themeSlug)} is live as Moments only — the
+            recipient sees the Scene Engine ceremony at /e/[token].
+          </p>
+        ) : null}
 
         {pendingMode ? (
           <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">

@@ -7,8 +7,8 @@ import { OrdersRepository } from "@/features/studio/repositories/orders.reposito
 import { todayRangeIso } from "@/features/studio/utils/dates";
 
 export const metadata = {
-  title: "Dashboard — Celebrate Florist Studio",
-  description: "Studio action queue",
+  title: "Beranda · Celebrate Studio",
+  description: "Antrian tindakan Celebrate Studio",
 };
 
 export default async function StudioDashboardPage() {

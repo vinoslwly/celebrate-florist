@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 
-import { useSearchParams } from "next/navigation";
-
 import { cn } from "@/lib/utils";
 
 import { SkyConnectionSceneHost } from "@/features/experience/scene-engine/sky/connection/sky-connection-scene-host";
 import { SkyMemoriesSceneHost } from "@/features/experience/scene-engine/sky/memories/sky-memories-scene-host";
-import { SkyMomentsSceneHost } from "@/features/experience/scene-engine/sky/moments/sky-moments-scene-host";
+import {
+  SKY_MOMENTS_BALLOON_BURST_SCENE,
+  SKY_MOMENTS_HEART_RAIN_SCENE,
+  SKY_MOMENTS_LETTER_SCENE,
+  SKY_MOMENTS_PHOTOBOOTH_SCENE,
+  SkyMomentsSceneHost,
+} from "@/features/experience/scene-engine/sky/moments/sky-moments-scene-host";
 import { SkyTreasuresSceneHost } from "@/features/experience/scene-engine/sky/treasures/sky-treasures-scene-host";
 import {
   SKY_CONNECTION_LAB_EXPERIENCE,
@@ -35,15 +39,22 @@ import { skyMomentsLabTheme } from "@/features/themes/config/sky-moments-lab-the
 type ModeTab = "moments" | "connection" | "memories" | "treasures";
 
 /**
- * Sky Theme Lab — Moments + Connection + Memories locked · Treasures Scenes 0–13 living.
- * Production `/e/[token]`: NOT AUTHORIZED.
+ * Sky Theme Lab — Moments is also live on `/e/[token]` for Sky orders.
+ * Connection / Memories / Treasures Scene Engines stay lab-only.
  *
  * Lab fixtures: `?noPhotos=1` · `?mode=connection|memories|treasures`
  */
-export function SkyThemeLabPage() {
-  const searchParams = useSearchParams();
-  const noPhotos = searchParams.get("noPhotos") === "1";
-  const modeParam = searchParams.get("mode");
+type SkyThemeLabPageProps = {
+  noPhotos?: boolean;
+  mode?: string | null;
+  scene?: string | null;
+};
+
+export function SkyThemeLabPage({
+  noPhotos = false,
+  mode: modeParam = null,
+  scene = null,
+}: SkyThemeLabPageProps) {
   const [mode, setMode] = useState<ModeTab>(
     modeParam === "connection" ||
       modeParam === "memories" ||
@@ -105,8 +116,8 @@ export function SkyThemeLabPage() {
               no-photo fixture
             </span>
           ) : null}
-          <span className="rounded border border-amber-400/40 px-1.5 py-0.5 font-mono text-[10px] text-amber-100/90">
-            /e/ not authorized
+          <span className="rounded border border-emerald-400/40 px-1.5 py-0.5 font-mono text-[10px] text-emerald-100/90">
+            Moments live on /e/
           </span>
         </div>
       </header>
@@ -117,6 +128,17 @@ export function SkyThemeLabPage() {
           photos={momentsPhotos}
           theme={skyMomentsLabTheme}
           showLabChrome
+          initialSceneId={
+            scene === "photobooth"
+              ? SKY_MOMENTS_PHOTOBOOTH_SCENE
+              : scene === "letter"
+                ? SKY_MOMENTS_LETTER_SCENE
+                : scene === "balloon"
+                  ? SKY_MOMENTS_BALLOON_BURST_SCENE
+                  : scene === "heart"
+                    ? SKY_MOMENTS_HEART_RAIN_SCENE
+                    : undefined
+          }
           className="min-h-0 flex-1 bg-[#C5DCEF]"
         />
       ) : mode === "connection" ? (

@@ -31,6 +31,18 @@ export type DeleteExperiencePhotoInput = z.infer<
   typeof deleteExperiencePhotoSchema
 >;
 
+export const updateExperiencePhotoCaptionSchema = z.object({
+  orderId: uuidSchema,
+  experienceId: uuidSchema,
+  photoId: uuidSchema,
+  title: z.string().trim().max(80),
+  description: z.string().trim().max(240),
+});
+
+export type UpdateExperiencePhotoCaptionInput = z.infer<
+  typeof updateExperiencePhotoCaptionSchema
+>;
+
 export function validatePhotoFile(file: File): void {
   if (
     !allowedPhotoMimeTypes.includes(

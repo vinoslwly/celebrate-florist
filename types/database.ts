@@ -19,6 +19,8 @@ export type OrderStatus =
 
 export type ExperienceStatus = "draft" | "published" | "archived" | "disabled";
 
+export type PhotoboothStripSource = "catalog" | "custom";
+
 export type AnalyticsEvent =
   | "experience_opened"
   | "letter_read"
@@ -94,8 +96,19 @@ export type ExperienceRow = {
   last_accessed_at: string | null;
   published_at: string | null;
   archived_at: string | null;
+  photobooth_strip_source: PhotoboothStripSource;
+  ending_message: string;
   created_at: string;
   updated_at: string;
+};
+
+export type ExperiencePhotoboothStripRow = {
+  id: string;
+  experience_id: string;
+  storage_path: string;
+  sort_order: number;
+  layout_id: "B" | "K";
+  created_at: string;
 };
 
 export type ExperiencePhotoRow = {
@@ -225,6 +238,15 @@ export type AppSettingRow = {
   updated_at: string;
 };
 
+export type CatalogPhotoboothStripRow = {
+  id: string;
+  display_name: string;
+  storage_path: string;
+  sort_order: number;
+  layout_id: "B";
+  created_at: string;
+};
+
 /** Tables addressable by repositories. */
 export type TableName =
   | "themes"
@@ -242,4 +264,5 @@ export type TableName =
   | "experience_analytics"
   | "audit_logs"
   | "security_events"
-  | "app_settings";
+  | "app_settings"
+  | "catalog_photobooth_strips";

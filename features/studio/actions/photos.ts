@@ -8,9 +8,11 @@ import type { ActionResult } from "@/types/api";
 import type { ExperiencePhotoRow } from "@/types/database";
 
 import { deleteExperiencePhoto } from "@/features/studio/services/delete-experience-photo.service";
+import { updateExperiencePhotoCaption } from "@/features/studio/services/update-experience-photo-caption.service";
 import { uploadExperiencePhoto } from "@/features/studio/services/upload-experience-photo.service";
 import {
   deleteExperiencePhotoSchema,
+  updateExperiencePhotoCaptionSchema,
   uploadExperiencePhotoSchema,
   validatePhotoFile,
 } from "@/schemas/studio-photos";
@@ -65,5 +67,22 @@ export async function deleteExperiencePhotoAction(
     });
 
     return { photoId: deleted.id };
+  });
+}
+
+export async function updateExperiencePhotoCaptionAction(
+  input: unknown,
+): Promise<ActionResult<{ photo: ExperiencePhotoRow }>> {
+  return withAdminAction(async () => {
+    const data = validateActionInput(updateExperiencePhotoCaptionSchema, input);
+    const supabase = await createClient();
+    const photo = await updateExperiencePhotoCaption(supabase, data);
+
+    auditLogger.info("Experience photo caption updated", {
+      experienceId: data.experienceId,
+      photoId: photo.id,
+    });
+
+    return { photo };
   });
 }

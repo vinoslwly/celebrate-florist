@@ -14,7 +14,7 @@ export const BLOOM_STRIP_PRESETS: PhotoboothStripPreset[] = [
     id: "bloom-soft",
     themeId: "bloom",
     label: "Bloom Soft",
-    supportedLayouts: ["B", "K"],
+    supportedLayouts: ["B"],
     swatch: "#F7C9D4",
     background: "#FCE8EE",
     accent: "#C45B7A",
@@ -25,7 +25,7 @@ export const BLOOM_STRIP_PRESETS: PhotoboothStripPreset[] = [
     id: "bloom-petal",
     themeId: "bloom",
     label: "Bloom Petal",
-    supportedLayouts: ["B", "K"],
+    supportedLayouts: ["B"],
     swatch: "#E891A8",
     background: "#F9DFE8",
     accent: "#B84466",
@@ -36,7 +36,7 @@ export const BLOOM_STRIP_PRESETS: PhotoboothStripPreset[] = [
     id: "bloom-ribbon",
     themeId: "bloom",
     label: "Bloom Ribbon",
-    supportedLayouts: ["B", "K"],
+    supportedLayouts: ["B"],
     swatch: "#D46A88",
     background: "#FBE6ED",
     accent: "#A84566",
@@ -47,7 +47,7 @@ export const BLOOM_STRIP_PRESETS: PhotoboothStripPreset[] = [
     id: "bloom-classic",
     themeId: "bloom",
     label: "Bloom Classic",
-    supportedLayouts: ["B", "K"],
+    supportedLayouts: ["B"],
     swatch: "#F3B7C8",
     background: "#FFF5F8",
     accent: "#C45B7A",
@@ -56,10 +56,57 @@ export const BLOOM_STRIP_PRESETS: PhotoboothStripPreset[] = [
   },
 ];
 
-/** Future Warm/Sky packs register here — empty until 14.6. */
+export const WARM_STRIP_PRESETS: PhotoboothStripPreset[] = [
+  {
+    id: "warm-velvet",
+    themeId: "warm",
+    label: "Darling Velvet",
+    supportedLayouts: ["B"],
+    swatch: "#8B1A22",
+    background: "#F7EDE3",
+    accent: "#6B0F16",
+    accentSoft: "#C9A227",
+    treatment: "soft",
+  },
+  {
+    id: "warm-gold",
+    themeId: "warm",
+    label: "Darling Gold",
+    supportedLayouts: ["B"],
+    swatch: "#C9A227",
+    background: "#FFF8F0",
+    accent: "#8B1A22",
+    accentSoft: "#E8C96A",
+    treatment: "classic",
+  },
+  {
+    id: "warm-rose",
+    themeId: "warm",
+    label: "Darling Rose",
+    supportedLayouts: ["B"],
+    swatch: "#B81E2C",
+    background: "#F8E8DC",
+    accent: "#7A121C",
+    accentSoft: "#D4A24A",
+    treatment: "petal",
+  },
+  {
+    id: "warm-ribbon",
+    themeId: "warm",
+    label: "Darling Ribbon",
+    supportedLayouts: ["B"],
+    swatch: "#6B0F16",
+    background: "#F3E6D8",
+    accent: "#4A0A10",
+    accentSoft: "#C9A227",
+    treatment: "ribbon",
+  },
+];
+
+/** Sky falls back to Bloom until a Sky pack ships. */
 const THEME_STRIP_PACKS: Record<PhotoboothThemeId, PhotoboothStripPreset[]> = {
   bloom: BLOOM_STRIP_PRESETS,
-  warm: [],
+  warm: WARM_STRIP_PRESETS,
   sky: [],
 };
 

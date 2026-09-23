@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_SCROLL } from "@/features/experience/scene-engine/scene-viewport";
 import { BloomGiftBox } from "@/features/experience/scene-engine/shared/bloom-gift-box";
 import {
   allowAmbientLoop,
@@ -301,7 +302,7 @@ export function GiftOpeningScene({
       : "Tap the gift to open";
 
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F8E4E7]">
+    <div className={`${SCENE_VIEWPORT_SCROLL} bg-[#F8E4E7]`}>
       {/* Single smooth plane — no stitched photo panels */}
       <div
         aria-hidden
@@ -339,7 +340,11 @@ export function GiftOpeningScene({
         {BOKEH.map((blob, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-full"
+            className={
+              i > 2
+                ? "absolute hidden rounded-full sm:block"
+                : "absolute rounded-full"
+            }
             style={{
               top: "top" in blob ? blob.top : undefined,
               bottom: "bottom" in blob ? blob.bottom : undefined,
@@ -392,7 +397,7 @@ export function GiftOpeningScene({
         {FALLING_PETALS.map((petal, i) => (
           <motion.div
             key={i}
-            className="absolute"
+            className={i > 3 ? "absolute hidden sm:block" : "absolute"}
             style={{
               left: petal.left,
               top: "-6%",
@@ -425,7 +430,11 @@ export function GiftOpeningScene({
         {SPARKLES.map((s, i) => (
           <motion.span
             key={i}
-            className="absolute rounded-full bg-white"
+            className={
+              i > 2
+                ? "absolute hidden rounded-full bg-white sm:block"
+                : "absolute rounded-full bg-white"
+            }
             style={{
               top: s.top,
               left: s.left,
@@ -448,7 +457,7 @@ export function GiftOpeningScene({
         ))}
       </div>
 
-      <div className="relative z-10 flex min-h-full w-full flex-col items-center px-4 pt-10 pb-8 sm:pt-14">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center px-4 pt-10 pb-[max(2rem,env(safe-area-inset-bottom))] sm:pt-14">
         <AnimatePresence mode="wait">
           {stage === "wrapped" || lockedOnly ? (
             <motion.div

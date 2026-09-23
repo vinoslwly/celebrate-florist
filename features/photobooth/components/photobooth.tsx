@@ -4,8 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { PhotoboothCaptureFoundation } from "@/features/photobooth/components/photobooth-capture-foundation";
+import { SkyPhotoboothFlow } from "@/features/photobooth/components/sky-photobooth-flow";
 import type {
   PhotoboothLayoutId,
+  PhotoboothStripPreset,
   PhotoboothThemeId,
 } from "@/features/photobooth/lib/types";
 
@@ -19,8 +21,12 @@ export type PhotoboothProps = {
   variant?: "legacy" | "capture";
   /** Used when variant is `capture`. Default Layout B. */
   initialLayoutId?: PhotoboothLayoutId;
-  /** Strip pack theme — Bloom in 14.4; Warm/Sky packs later. */
+  /** Strip pack theme — Bloom, Warm, and Sky (Sky falls back to Bloom frames). */
   themeId?: PhotoboothThemeId;
+  /** Custom event PNG overlays from Studio. */
+  customStripPresets?: PhotoboothStripPreset[];
+  /** Scene Engine advance (Sky capture flow). */
+  onComplete?: () => void;
 };
 
 /**
@@ -34,7 +40,23 @@ export function Photobooth({
   variant = "legacy",
   initialLayoutId,
   themeId = "bloom",
+  customStripPresets,
+  onComplete,
 }: PhotoboothProps) {
+  if (
+    variant === "capture" &&
+    (themeId === "sky" || themeId === "bloom" || themeId === "warm")
+  ) {
+    return (
+      <SkyPhotoboothFlow
+        greetingName={greetingName}
+        themeId={themeId}
+        customStripPresets={customStripPresets}
+        onComplete={onComplete}
+      />
+    );
+  }
+
   if (variant === "capture") {
     return (
       <PhotoboothCaptureFoundation
@@ -42,6 +64,8 @@ export function Photobooth({
         themeEmoji={themeEmoji}
         initialLayoutId={initialLayoutId}
         themeId={themeId}
+        customStripPresets={customStripPresets}
+        onComplete={onComplete}
       />
     );
   }

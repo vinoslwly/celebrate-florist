@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
 
 /** Transparent-cut Founder origami (bg removed) — large dense field. */
 const ORIGAMI_ICON = "/themes/bloom/moments/scene-05-origami-icon.webp";
@@ -193,7 +194,7 @@ const BLOOMS = buildBloomField();
  */
 export function LetterTransitionScene(_props: MomentsSceneProps) {
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#F6D6DE]">
+    <div className={`${SCENE_VIEWPORT_LOCK} bg-[#F6D6DE]`}>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -218,7 +219,7 @@ export function LetterTransitionScene(_props: MomentsSceneProps) {
         {BLOOMS.map((bloom, i) => (
           <motion.div
             key={i}
-            className="absolute"
+            className={i > 22 ? "absolute hidden sm:block" : "absolute"}
             style={{
               left: bloom.left,
               top: bloom.top,

@@ -1,6 +1,5 @@
 /**
- * Warm Moments Theme Lab scene graph — presentation only.
- * Mirrors Bloom Moments: album unlock → gallery or photobooth; gallery ending → photobooth.
+ * Warm Moments scene graph — mirrors Bloom: album unlock → gallery or photobooth.
  */
 
 /** Warm Moments — Theme Lab scenes. */

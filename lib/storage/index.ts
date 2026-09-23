@@ -10,14 +10,17 @@ export {
 } from "@/lib/storage/delete";
 export {
   processImageForStorage,
+  processPhotoboothStripPng,
   type ImagePipelineInput,
   type ImagePipelineOutput,
 } from "@/lib/storage/image-pipeline";
 export { generateQrPngBuffer } from "@/lib/storage/qr";
 export { uploadStorageObject } from "@/lib/storage/upload";
 export {
+  buildCatalogPhotoboothStripPath,
   buildExperiencePhotoPath,
   buildExperienceQrPath,
+  buildPhotoboothStripPath,
   buildWebsiteAssetPath,
   isValidPhotoExtension,
   parseStoragePath,

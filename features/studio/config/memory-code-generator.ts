@@ -2,20 +2,18 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
-/** Characters that are easy to read and type (no 0/O, 1/I/L). */
-const MEMORY_CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+import { MEMORY_CODE_PIN_LENGTH } from "@/schemas/studio-memory-code";
 
 /**
- * Generates a human-friendly Memory Code for admin to share with the recipient.
- * Format: XXXX-XXXX (8 characters).
+ * Generates a 6-digit Memory Code PIN for admin to share with the recipient.
  */
 export function generateReadableMemoryCode(): string {
-  const bytes = randomBytes(8);
+  const bytes = randomBytes(MEMORY_CODE_PIN_LENGTH);
   let raw = "";
 
-  for (let i = 0; i < 8; i += 1) {
-    raw += MEMORY_CODE_CHARS[bytes[i]! % MEMORY_CODE_CHARS.length];
+  for (let i = 0; i < MEMORY_CODE_PIN_LENGTH; i += 1) {
+    raw += String(bytes[i]! % 10);
   }
 
-  return `${raw.slice(0, 4)}-${raw.slice(4)}`;
+  return raw;
 }

@@ -33,6 +33,9 @@ export function rewardLetterToExperienceRow(
     last_accessed_at: null,
     published_at: null,
     archived_at: null,
+    photobooth_strip_source: "catalog",
+    ending_message:
+      "Hadiah ini milikmu. Buka lagi kapan saja —\nkenangannya tetap di sini.",
     created_at: "",
     updated_at: "",
   };

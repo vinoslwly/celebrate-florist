@@ -7,6 +7,7 @@ import { Cormorant_Garamond } from "next/font/google";
 import { motion, useReducedMotion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
 
 const editorial = Cormorant_Garamond({
   weight: ["400", "500", "600", "700"],
@@ -841,7 +842,7 @@ function SceneAtmosphere() {
         {FALLING_PETALS.map((petal, i) => (
           <motion.div
             key={i}
-            className="absolute"
+            className={i > 2 ? "absolute hidden sm:block" : "absolute"}
             style={{
               left: petal.left,
               top: "-6%",
@@ -907,7 +908,7 @@ export function WarmAlbumUnlockTransitionScene({
 
   return (
     <div
-      className={`${editorial.className} relative flex h-full min-h-0 w-full flex-1 flex-col overflow-x-clip overflow-y-auto overscroll-y-contain touch-pan-y [-webkit-overflow-scrolling:touch] bg-[#2A060A]`}
+      className={`${editorial.className} ${SCENE_VIEWPORT_LOCK} bg-[#2A060A]`}
     >
       <SceneAtmosphere />
 

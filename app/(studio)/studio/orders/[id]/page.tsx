@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { requireAdminUser } from "@/lib/auth";
+import { ThemesRepository } from "@/lib/repositories/themes.repository";
+import { StorageBucket, createSignedReadUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 
 import { env } from "@/config/env";
@@ -13,9 +15,11 @@ import { OrderEditorForm } from "@/features/studio/components/order-editor-form"
 import { extractAdminMemoryCode } from "@/features/studio/config/memory-code-admin-ref";
 import { buildExperienceQrDownloadUrl } from "@/features/studio/config/qr-download";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
+import { ExperiencePhotoboothStripsRepository } from "@/features/studio/repositories/experience-photobooth-strips.repository";
 import { ExperiencePhotosRepository } from "@/features/studio/repositories/experience-photos.repository";
 import { ExperiencesRepository } from "@/features/studio/repositories/experiences.repository";
 import { OrdersRepository } from "@/features/studio/repositories/orders.repository";
+import { listCatalogStrips } from "@/features/studio/services/list-catalog-strips.service";
 import {
   buildPublishChecklistForExperience,
   canPublishFromChecklist,
@@ -42,6 +46,7 @@ export default async function OrderDetailPage({
   const ordersRepo = new OrdersRepository(supabase);
   const experiencesRepo = new ExperiencesRepository(supabase);
   const photosRepo = new ExperiencePhotosRepository(supabase);
+  const stripsRepo = new ExperiencePhotoboothStripsRepository(supabase);
   const quizRepo = new ExperienceQuizRepository(supabase);
 
   const [order, experience] = await Promise.all([
@@ -54,6 +59,20 @@ export default async function OrderDetailPage({
   }
 
   const photos = await photosRepo.findByExperienceId(experience.id);
+  const photoboothStrips = await stripsRepo.findByExperienceId(experience.id);
+  const catalogStrips = await listCatalogStrips(supabase);
+  const photoboothStripPreviewUrls: Record<string, string> = {};
+  await Promise.all(
+    photoboothStrips.map(async (strip) => {
+      photoboothStripPreviewUrls[strip.id] = await createSignedReadUrl(
+        supabase,
+        StorageBucket.PHOTOBOOTH_STRIPS,
+        strip.storage_path,
+      );
+    }),
+  );
+  const themesRepo = new ThemesRepository(supabase);
+  const theme = await themesRepo.findById(experience.theme_id);
   const initialQuiz =
     experience.experience_mode === "connection"
       ? await quizRepo.findCompleteByExperienceId(experience.id)
@@ -99,6 +118,13 @@ export default async function OrderDetailPage({
         order={order}
         experience={experience}
         photos={photos}
+        initialPhotoboothStrips={photoboothStrips}
+        photoboothStripPreviewUrls={photoboothStripPreviewUrls}
+        catalogStrips={catalogStrips.map((strip) => ({
+          id: strip.id,
+          name: strip.display_name,
+          url: strip.publicUrl,
+        }))}
         initialQuiz={initialQuiz}
         initialMatch={initialMatch}
         initialEnvelopes={initialEnvelopes}
@@ -107,6 +133,7 @@ export default async function OrderDetailPage({
         adminMemoryCodeReference={adminMemoryCodeReference}
         publishedRecipientUrl={publishedRecipientUrl}
         qrDownloadUrl={qrDownloadUrl}
+        themeSlug={theme?.slug ?? ""}
       />
     </div>
   );

@@ -16,9 +16,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createOrderAction } from "@/features/studio/actions/orders";
-import { EXPERIENCE_MODES } from "@/features/studio/config/experience-modes";
+import { getThemeMarketingLabel } from "@/features/studio/config/labels";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
-import { getThemeStudioDisplayLabel } from "@/features/themes/config/active-themes";
+import {
+  getSelectableExperienceModes,
+  isProductionMomentsTheme,
+} from "@/features/studio/config/theme-mode-matrix";
 import { resolveThemeTokens } from "@/features/themes/config/resolve-theme";
 import {
   themeAccent,
@@ -56,6 +59,14 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
   const selectedThemeVisual = selectedTheme
     ? resolveThemeTokens(selectedTheme)
     : null;
+  const selectableModes = getSelectableExperienceModes(
+    selectedTheme?.slug ?? "",
+  );
+  const modeToCreate = selectableModes.some(
+    (mode) => mode.value === experienceMode,
+  )
+    ? experienceMode
+    : (selectableModes[0]?.value ?? "moments");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -69,7 +80,7 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
 
     try {
       const result = await createOrderAction({
-        experienceMode,
+        experienceMode: modeToCreate,
         senderName,
         receiverName,
         themeId: selectedTheme.id,
@@ -109,15 +120,22 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
 
       <FieldGroup>
         <p className="text-sm font-medium text-foreground">Experience mode</p>
+        {isProductionMomentsTheme(selectedTheme?.slug ?? "") ? (
+          <p className="text-xs text-muted-foreground">
+            {getThemeMarketingLabel(selectedTheme?.slug ?? "")} is live as
+            Moments — recipients get the full ceremony at /e/[token]. Other
+            modes stay in Theme Lab.
+          </p>
+        ) : null}
         <div className="grid gap-3 sm:grid-cols-2">
-          {EXPERIENCE_MODES.map((mode) => (
+          {selectableModes.map((mode) => (
             <button
               key={mode.value}
               type="button"
               onClick={() => setExperienceMode(mode.value)}
               className={cn(
                 "rounded-xl border p-4 text-left transition-colors",
-                experienceMode === mode.value
+                modeToCreate === mode.value
                   ? "border-primary bg-primary/5"
                   : "border-border hover:bg-muted/50",
               )}
@@ -161,20 +179,32 @@ export function CreateOrderForm({ themes }: CreateOrderFormProps) {
             id="theme"
             required
             value={themeId}
-            onChange={(e) => setThemeId(e.target.value)}
+            onChange={(e) => {
+              const nextId = e.target.value;
+              setThemeId(nextId);
+              const nextTheme = themes.find((theme) => theme.id === nextId);
+              const nextModes = getSelectableExperienceModes(
+                nextTheme?.slug ?? "",
+              );
+              const onlyMode =
+                nextModes.length === 1 ? nextModes[0] : undefined;
+              if (onlyMode) {
+                setExperienceMode(onlyMode.value);
+              }
+            }}
             className={formControlClassName()}
             disabled={isLoading}
           >
             {themes.map((theme) => (
               <option key={theme.id} value={theme.id}>
-                {getThemeStudioDisplayLabel(theme.slug, theme.name)}
+                {getThemeMarketingLabel(theme.slug, theme.name)}
               </option>
             ))}
           </select>
           {selectedThemeVisual ? (
             <p
               className="flex items-center gap-2 text-xs text-muted-foreground"
-              aria-label={`Theme preview: ${getThemeStudioDisplayLabel(selectedThemeVisual.id, selectedThemeVisual.name)}`}
+              aria-label={`Theme preview: ${getThemeMarketingLabel(selectedThemeVisual.id, selectedThemeVisual.name)}`}
             >
               <span
                 className={cn(

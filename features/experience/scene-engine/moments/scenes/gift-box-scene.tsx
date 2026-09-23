@@ -248,7 +248,11 @@ export function GiftBoxScene({ payload, onComplete }: MomentsSceneProps) {
         {BOKEH.map((blob, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-full"
+            className={
+              i > 2
+                ? "absolute hidden rounded-full sm:block"
+                : "absolute rounded-full"
+            }
             style={{
               top: "top" in blob ? blob.top : undefined,
               bottom: "bottom" in blob ? blob.bottom : undefined,
@@ -297,7 +301,7 @@ export function GiftBoxScene({ payload, onComplete }: MomentsSceneProps) {
         {FALLING_PETALS.map((petal, i) => (
           <motion.div
             key={i}
-            className="absolute"
+            className={i > 3 ? "absolute hidden sm:block" : "absolute"}
             style={{
               left: petal.left,
               top: "-6%",
@@ -323,7 +327,7 @@ export function GiftBoxScene({ payload, onComplete }: MomentsSceneProps) {
       </div>
 
       {/* Content — centered as one block on the viewport */}
-      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
+      <div className="relative z-10 flex min-h-full w-full flex-col items-center justify-center px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-8">
         <motion.header
           className="mb-5 text-center sm:mb-6"
           initial={{ opacity: 0, y: -12 }}

@@ -1,61 +1,45 @@
-import { ScrollReveal } from "@/components/shared/scroll-reveal";
-import { SectionHeading } from "@/components/shared/section-heading";
-
 const STEPS = [
   {
-    step: "1",
-    title: "Order via WhatsApp",
-    description: "Tell us the occasion, choose a bouquet and a theme.",
+    step: "01",
+    title: "Pesan",
+    description:
+      "Ceritakan acaranya lewat WhatsApp — pilih buket, tema, dan kirim foto serta video yang ingin dimasukkan.",
   },
   {
-    step: "2",
-    title: "We Design It",
+    step: "02",
+    title: "Rangkai",
     description:
-      "Our team writes and designs your Greeting Experience, then sends a preview for your approval.",
+      "Tim kami merangkai bunga dan greeting digital, lalu mengirim preview untuk persetujuan Anda.",
   },
   {
-    step: "3",
-    title: "We Deliver",
+    step: "03",
+    title: "Buket Selesai",
     description:
-      "Your bouquet arrives with a QR card. Scanning it opens the finished experience.",
+      "Buket tiba bersama kartu QR. Memindainya membuka experience yang sudah jadi — khusus untuk penerima.",
   },
   {
-    step: "4",
-    title: "They Celebrate",
+    step: "04",
+    title: "Rayakan",
     description:
-      "Your recipient opens a private greeting they can revisit anytime.",
+      "Penerima membuka greeting privat yang bisa dikunjungi kembali — surat, foto, video, dan photobooth.",
   },
 ];
 
 export function HowItWorksSection() {
   return (
-    <section
-      id="how-it-works"
-      className="px-4 py-20 sm:px-6 sm:py-28"
-      aria-labelledby="how-it-works-heading"
-    >
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          id="how-it-works-heading"
-          eyebrow="Process"
-          title="How it works."
-        />
-
-        <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((item, index) => (
-            <ScrollReveal key={item.step} delay={index * 0.08}>
-              <div className="flex flex-col gap-2">
-                <span className="font-mono text-2xl font-bold text-pink-ink">
-                  {item.step.padStart(2, "0")}
-                </span>
-                <h3 className="text-base font-semibold text-foreground">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            </ScrollReveal>
+    <section id="how-it-works" className="section">
+      <div className="wrap">
+        <header className="section-head">
+          <p className="eyebrow">Proses</p>
+          <h2>Cara kerjanya.</h2>
+        </header>
+        <div className="grid-4 process-steps">
+          {STEPS.map((item) => (
+            <article key={item.step}>
+              <p className="step">{item.step}</p>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
           ))}
         </div>
       </div>

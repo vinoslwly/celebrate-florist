@@ -1,3 +1,4 @@
+import { detectPhotoSlotsFromCanvas } from "@/features/photobooth/lib/detect-photo-holes";
 import {
   paintStripBackground,
   paintStripDecoration,
@@ -28,6 +29,7 @@ export function drawImageCover(
   ctx: CanvasRenderingContext2D,
   img: CanvasImageSource & { width: number; height: number },
   dest: LayoutRect,
+  focusY = 0.34,
 ): void {
   const srcW =
     "naturalWidth" in img && typeof img.naturalWidth === "number"
@@ -43,7 +45,7 @@ export function drawImageCover(
   const cropW = dest.width / scale;
   const cropH = dest.height / scale;
   const sx = (srcW - cropW) / 2;
-  const sy = (srcH - cropH) / 2;
+  const sy = Math.max(0, Math.min(srcH - cropH, (srcH - cropH) * focusY));
 
   ctx.drawImage(
     img,
@@ -210,6 +212,26 @@ export async function composeStrip(
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
+  let frameBitmap: ImageBitmap | HTMLImageElement | null = null;
+  let slots = layout.slots;
+
+  if (preset?.frameSrc) {
+    try {
+      frameBitmap = await loadBitmap(preset.frameSrc);
+      const probe = document.createElement("canvas");
+      probe.width = layout.canvas.width;
+      probe.height = layout.canvas.height;
+      const probeCtx = probe.getContext("2d", { willReadFrequently: true });
+      if (probeCtx) {
+        probeCtx.drawImage(frameBitmap, 0, 0, probe.width, probe.height);
+        slots =
+          detectPhotoSlotsFromCanvas(probe, layout.poseCount) ?? layout.slots;
+      }
+    } catch {
+      frameBitmap = null;
+    }
+  }
+
   if (preset) {
     paintStripBackground(ctx, layout, preset);
   } else {
@@ -222,8 +244,8 @@ export async function composeStrip(
 
   try {
     ctx.filter = filter.canvasFilter;
-    for (let i = 0; i < layout.slots.length; i += 1) {
-      const slot = layout.slots[i]!;
+    for (let i = 0; i < slots.length; i += 1) {
+      const slot = slots[i]!;
       const bitmap = bitmaps[i];
       if (!bitmap) continue;
 
@@ -251,7 +273,21 @@ export async function composeStrip(
     });
   }
 
-  if (preset?.frameSrc) {
+  if (frameBitmap) {
+    try {
+      ctx.drawImage(
+        frameBitmap,
+        0,
+        0,
+        layout.canvas.width,
+        layout.canvas.height,
+      );
+    } finally {
+      if ("close" in frameBitmap && typeof frameBitmap.close === "function") {
+        frameBitmap.close();
+      }
+    }
+  } else if (preset?.frameSrc) {
     try {
       const frame = await loadBitmap(preset.frameSrc);
       try {

@@ -1,18 +1,18 @@
-const CURRENT_YEAR = new Date().getFullYear();
+import type { WebsiteContent } from "@/features/website/config/types";
 
-export function SiteFooter() {
+type SiteFooterProps = {
+  content: WebsiteContent;
+};
+
+export function SiteFooter({ content }: SiteFooterProps) {
   return (
-    <footer className="border-t border-border px-4 py-10 sm:px-6">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
-        <p className="text-sm text-muted-foreground">
-          © {CURRENT_YEAR} Celebrate Florist. Surakarta.
-        </p>
-        {/* TODO(founder): replace with the real @celebrateflorist handle URL. */}
+    <footer className="site-footer">
+      <div className="wrap footer-inner">
+        <p>{content.footer.copyright}</p>
         <a
-          href="https://instagram.com"
+          href={content.links.instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Instagram
         </a>

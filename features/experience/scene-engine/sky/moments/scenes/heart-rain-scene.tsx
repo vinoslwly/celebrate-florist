@@ -7,8 +7,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
 import type { SkyMomentsSceneProps } from "@/features/experience/scene-engine/sky/moments/types";
 
-/** Auto-advance after the love rain blankets the sky. */
-export const SKY_HEART_RAIN_DURATION_MS = 4000;
+/** Auto-advance after successive rain rows have started falling. */
+export const SKY_HEART_RAIN_DURATION_MS = 2000;
 
 /** Sky-only palette — soft light blues + white. */
 type HeartTone = "white" | "mist" | "soft" | "sky";
@@ -29,22 +29,12 @@ type HeartSpec = {
   hero: boolean;
 };
 
-const GOLDEN = 0.618033988749;
 const HEART_PATH =
   "M32 51.5C32 51.5 7.5 36.5 7.5 21.2 7.5 12.8 14 7 21.2 7c4.6 0 8 2.4 10.8 6.2C34.8 9.4 38.2 7 42.8 7 50 7 56.5 12.8 56.5 21.2 56.5 36.5 32 51.5 32 51.5Z";
 
 function mix(n: number) {
   const x = Math.sin(n * 12.9898) * 43758.5453;
   return x - Math.floor(x);
-}
-
-function scatterLeft(i: number, salt: number) {
-  const m = mix(i + salt);
-  const m2 = mix(i * 9 + salt * 3);
-  const m3 = mix(i * 17 + salt);
-  const base = ((i * GOLDEN + m * 0.37) % 1) * 122 - 14;
-  const clump = m2 > 0.72 ? (m3 - 0.5) * 6 : (m2 - 0.5) * 22;
-  return base + clump;
 }
 
 function pickTone(i: number, salt: number): HeartTone {
@@ -55,86 +45,66 @@ function pickTone(i: number, salt: number): HeartTone {
   return "sky";
 }
 
+/**
+ * Abstract rain rows — one horizontal band starts, then the next.
+ * Small icons so a row reads as a line, not one overlapping blob.
+ */
+const HEART_WAVES = 8;
+const HEARTS_PER_WAVE = 11;
+
 function buildHearts(): HeartSpec[] {
   const out: HeartSpec[] = [];
 
-  for (let i = 0; i < 12; i++) {
-    const m = mix(i + 2);
-    const m2 = mix(i + 51);
-    const m3 = mix(i * 3 + 11);
-    out.push({
-      left: `${scatterLeft(i, 11)}%`,
-      sizeVmin: 48 + m * 38 + (m3 > 0.75 ? 12 : 0),
-      delay: m * 0.18 + m2 * 0.1,
-      duration: 1.7 + m2 * 0.5 + m3 * 0.2,
-      sway: (m - 0.5) * 100 + (m3 - 0.5) * 36,
-      rotate: -42 + m * 65 + (m2 - 0.5) * 22,
-      rotateEnd: -18 + m2 * 85 + (m3 - 0.5) * 35,
-      startY: -16 - m * 20 - m3 * 12,
-      opacity: 0.88 + m * 0.1,
-      z: 44 + Math.floor(m2 * 14),
-      tone: pickTone(i, 3),
-      hero: true,
-    });
-  }
+  for (let wave = 0; wave < HEART_WAVES; wave++) {
+    for (let col = 0; col < HEARTS_PER_WAVE; col++) {
+      const i = wave * HEARTS_PER_WAVE + col;
+      const m = mix(i + 3);
+      const m2 = mix(i + 41);
+      const m3 = mix(i * 5 + 17);
+      const slot = (col + 0.5) / HEARTS_PER_WAVE;
+      const left = slot * 112 - 6 + (m - 0.5) * 6;
 
-  for (let i = 0; i < 30; i++) {
-    const m = mix(i + 120);
-    const m2 = mix(i + 220);
-    const m3 = mix(i * 5 + 33);
-    out.push({
-      left: `${scatterLeft(i + 20, 44)}%`,
-      sizeVmin: 24 + m * 32 + (m2 > 0.85 ? 8 : 0),
-      delay: 0.06 + m * 0.5 + m3 * 0.18,
-      duration: 1.45 + m2 * 0.6 + m * 0.18,
-      sway: (m2 - 0.5) * 90 + (m - 0.5) * 32,
-      rotate: -50 + m * 90 + (m3 - 0.5) * 28,
-      rotateEnd: -30 + m2 * 110,
-      startY: -10 - m2 * 26 - m * 8,
-      opacity: 0.78 + m * 0.18,
-      z: 16 + Math.floor(m * 18),
-      tone: pickTone(i, 19),
-      hero: m > 0.62,
-    });
-  }
+      out.push({
+        left: `${Number(left.toFixed(2))}%`,
+        sizeVmin: Number((6.5 + m * 5 + (wave < 2 ? 1.5 : 0)).toFixed(2)),
+        delay: Number((wave * 0.2 + col * 0.012 + m2 * 0.008).toFixed(3)),
+        duration: Number((2.12 + m * 0.14).toFixed(3)),
+        sway: Number(((m2 - 0.5) * 20 + (m - 0.5) * 8).toFixed(2)),
+        rotate: Number((-24 + m * 36 + (m2 - 0.5) * 12).toFixed(2)),
+        rotateEnd: Number((-6 + m2 * 28 + (m3 - 0.5) * 12).toFixed(2)),
+        startY: Number((-8 - wave * 12 - m * 4).toFixed(2)),
+        opacity: Number((0.7 + m * 0.22).toFixed(3)),
+        z: 34 - wave * 3 + Math.floor(m2 * 4),
+        tone: pickTone(i, 19),
+        hero: wave < 2 && m > 0.5,
+      });
+    }
 
-  for (let i = 0; i < 24; i++) {
-    const m = mix(i + 310);
-    const m2 = mix(i + 410);
-    const m3 = mix(i * 4 + 77);
-    out.push({
-      left: `${scatterLeft(i + 55, 71)}%`,
-      sizeVmin: 32 + m * 40,
-      delay: 0.35 + m * 0.48 + m2 * 0.16,
-      duration: 1.35 + m2 * 0.48 + m3 * 0.28,
-      sway: (m - 0.5) * 120 + (m3 - 0.5) * 45,
-      rotate: -55 + m * 105,
-      rotateEnd: 8 + m2 * 80,
-      startY: -18 - m * 22,
-      opacity: 0.8 + m2 * 0.16,
-      z: 30 + Math.floor(m3 * 12),
-      tone: pickTone(i, 41),
-      hero: m2 > 0.55,
-    });
-  }
+    for (let col = 0; col < HEARTS_PER_WAVE - 1; col++) {
+      const i = 800 + wave * HEARTS_PER_WAVE + col;
+      const m = mix(i + 9);
+      const m2 = mix(i + 27);
+      const m3 = mix(i * 3 + 5);
+      const slot = (col + 1) / HEARTS_PER_WAVE;
+      const left = slot * 112 - 6 + (m - 0.5) * 5;
 
-  for (let i = 0; i < 16; i++) {
-    const m = mix(i + 520);
-    const m2 = mix(i + 620);
-    out.push({
-      left: `${scatterLeft(i + 90, 99)}%`,
-      sizeVmin: 12 + m * 18,
-      delay: m * 0.65 + m2 * 0.12,
-      duration: 1.85 + m2 * 0.5,
-      sway: (m2 - 0.5) * 50,
-      rotate: -38 + m * 70,
-      rotateEnd: -12 + m2 * 65,
-      startY: -6 - m * 18,
-      opacity: 0.45 + m * 0.3,
-      z: 4 + Math.floor(m * 7),
-      tone: pickTone(i, 57),
-      hero: false,
-    });
+      out.push({
+        left: `${Number(left.toFixed(2))}%`,
+        sizeVmin: Number((5.2 + m * 4).toFixed(2)),
+        delay: Number(
+          (wave * 0.2 + 0.045 + col * 0.01 + m2 * 0.006).toFixed(3),
+        ),
+        duration: Number((2.08 + m * 0.12).toFixed(3)),
+        sway: Number(((m - 0.5) * 16).toFixed(2)),
+        rotate: Number((-20 + m2 * 32).toFixed(2)),
+        rotateEnd: Number((-4 + m3 * 24).toFixed(2)),
+        startY: Number((-14 - wave * 12 - m * 3).toFixed(2)),
+        opacity: Number((0.58 + m * 0.22).toFixed(3)),
+        z: 22 - wave * 2,
+        tone: pickTone(i, 41),
+        hero: false,
+      });
+    }
   }
 
   return out;
@@ -182,13 +152,6 @@ function HeartDefs() {
           <stop offset="0%" stopColor="rgba(30,58,95,0)" />
           <stop offset="100%" stopColor="rgba(61,122,173,0.22)" />
         </linearGradient>
-        <filter id="skyH-glow" x="-35%" y="-35%" width="170%" height="170%">
-          <feGaussianBlur stdDeviation="1.4" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
       </defs>
     </svg>
   );
@@ -228,7 +191,6 @@ function LoveHeart({
         stroke={EDGE[tone]}
         strokeWidth={hero ? 1.8 : 1.5}
         strokeLinejoin="round"
-        filter={hero ? "url(#skyH-glow)" : undefined}
       />
       {/* Depth wash */}
       <path
@@ -269,7 +231,7 @@ export function SkyHeartRainScene({ onComplete }: SkyMomentsSceneProps) {
   }, [onComplete]);
 
   useEffect(() => {
-    const ms = reduceMotion ? 2200 : SKY_HEART_RAIN_DURATION_MS;
+    const ms = reduceMotion ? 800 : SKY_HEART_RAIN_DURATION_MS;
     const t = window.setTimeout(() => onCompleteRef.current(), ms);
     return () => window.clearTimeout(t);
   }, [reduceMotion]);
@@ -288,16 +250,15 @@ export function SkyHeartRainScene({ onComplete }: SkyMomentsSceneProps) {
       <style>{`
         @keyframes sky-heart-fall {
           0% {
-            transform: translate3d(0, calc(var(--sy) * 1vh), 0) rotate(var(--hr)) scale(0.88);
+            transform: translate3d(0, calc(var(--sy) * 1vh), 0) rotate(var(--hr)) scale(0.86);
             opacity: 0;
           }
-          6% {
+          10% {
             opacity: var(--ho);
-            transform: translate3d(calc(var(--hs) * 0.08), calc(var(--sy) * 1vh + 4vh), 0) rotate(var(--hr)) scale(1);
           }
           100% {
-            transform: translate3d(var(--hs), 128vh, 0) rotate(var(--hre)) scale(1.04);
-            opacity: 0.1;
+            transform: translate3d(var(--hs), 118vh, 0) rotate(var(--hre)) scale(1);
+            opacity: var(--ho);
           }
         }
         @keyframes sky-heart-fall-reduced {
@@ -322,21 +283,6 @@ export function SkyHeartRainScene({ onComplete }: SkyMomentsSceneProps) {
             radial-gradient(ellipse 45% 40% at 18% 35%, rgba(255,255,255,0.4) 0%, transparent 55%),
             radial-gradient(ellipse 50% 45% at 82% 55%, rgba(142,191,222,0.35) 0%, transparent 60%)
           `,
-        }}
-      />
-
-      {/* Soft light bloom pulse */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[2] mix-blend-soft-light"
-        initial={{ opacity: 0.25 }}
-        animate={
-          reduceMotion ? { opacity: 0.4 } : { opacity: [0.25, 0.55, 0.75, 0.4] }
-        }
-        transition={{ duration: reduceMotion ? 0.4 : 3.4, ease: "easeInOut" }}
-        style={{
-          background:
-            "radial-gradient(circle at 50% 28%, rgba(255,255,255,0.9) 0%, transparent 52%)",
         }}
       />
 
@@ -378,7 +324,7 @@ export function SkyHeartRainScene({ onComplete }: SkyMomentsSceneProps) {
         {HEARTS.map((heart, i) => (
           <div
             key={i}
-            className="absolute top-0 will-change-transform"
+            className="absolute top-0"
             style={{
               left: heart.left,
               width: `${heart.sizeVmin}vmin`,
@@ -395,13 +341,8 @@ export function SkyHeartRainScene({ onComplete }: SkyMomentsSceneProps) {
               animationDelay: reduceMotion ? "0s" : `${heart.delay}s`,
               animationTimingFunction: reduceMotion
                 ? "linear"
-                : "cubic-bezier(0.22, 0.15, 0.28, 1)",
+                : "cubic-bezier(0.4, 0, 0.65, 0.35)",
               animationFillMode: "both",
-              filter: heart.hero
-                ? "drop-shadow(0 14px 28px rgba(107,163,201,0.35))"
-                : heart.z < 12
-                  ? "blur(1.5px) drop-shadow(0 8px 14px rgba(126,182,217,0.2))"
-                  : "drop-shadow(0 10px 18px rgba(126,182,217,0.22))",
             }}
           >
             <LoveHeart
@@ -447,7 +388,7 @@ export function SkyHeartRainScene({ onComplete }: SkyMomentsSceneProps) {
               }
         }
         transition={{
-          duration: reduceMotion ? 0.35 : 3.4,
+          duration: reduceMotion ? 0.35 : 1.9,
           ease: [0.22, 0.85, 0.28, 1],
         }}
       >

@@ -8,57 +8,40 @@ import { HeroSection } from "@/features/landing/components/hero-section";
 import { HowItWorksSection } from "@/features/landing/components/how-it-works-section";
 import { WhatIsCelebrateSection } from "@/features/landing/components/what-is-celebrate-section";
 import { WhyUsSection } from "@/features/landing/components/why-us-section";
+import { getWebsiteContent } from "@/features/website/services/get-website-content.service";
 
-import type { Metadata } from "next";
+const SITE_URL = "https://celebrateflorist.id";
 
-const SITE_URL = "https://celebrateflorist.com";
-const SITE_TITLE = "Celebrate Florist — Give Flowers. Create Memories.";
-const SITE_DESCRIPTION =
-  "Celebrate Florist pairs a real bouquet with a private digital greeting experience, delivered around Surakarta and UNS.";
-
-export const metadata: Metadata = {
-  title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
-  openGraph: {
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
+export default async function LandingPage() {
+  const content = await getWebsiteContent();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Florist",
+    name: "Celebrate Florist",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Surakarta",
+      addressCountry: "ID",
+    },
     url: SITE_URL,
-    siteName: "Celebrate Florist",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-  },
-};
+  };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FloristShop",
-  name: "Celebrate Florist",
-  areaServed: "Surakarta, Indonesia",
-  description: SITE_DESCRIPTION,
-};
-
-export default function LandingPage() {
   return (
     <>
-      {/* Static, developer-authored JSON-LD — no user input reaches this markup. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HeroSection />
+      <HeroSection content={content} />
       <BackToTopButton />
-      <WhatIsCelebrateSection />
-      <WhyUsSection />
-      <BouquetCollectionSection />
-      <ExperienceCollectionSection />
+      <WhatIsCelebrateSection content={content} />
+      <WhyUsSection content={content} />
+      <BouquetCollectionSection content={content} />
+      <ExperienceCollectionSection content={content} />
       <HowItWorksSection />
-      <DemoExperienceSection />
-      <FaqSection />
-      <FinalCtaSection />
+      <DemoExperienceSection content={content} />
+      <FaqSection content={content} />
+      <FinalCtaSection content={content} />
     </>
   );
 }

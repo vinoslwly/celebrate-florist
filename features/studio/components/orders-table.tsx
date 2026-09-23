@@ -1,71 +1,61 @@
 import Link from "next/link";
 
-import { ExperienceModeBadge } from "@/features/studio/components/experience-mode-badge";
+import {
+  formatStudioDate,
+  formatStudioStatus,
+  getThemeMarketingLabel,
+  studioStatusClassName,
+} from "@/features/studio/config/labels";
 import { STUDIO_ROUTES } from "@/features/studio/config/routes";
 import type { OrderWithExperience } from "@/features/studio/repositories/orders.repository";
 
-function formatDeliveryDate(value: string | null): string {
-  if (!value) return "—";
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
-function formatStatus(status: string): string {
-  return status.replaceAll("_", " ");
-}
-
 type OrdersTableProps = {
   orders: OrderWithExperience[];
+  themeLabels: Record<string, string>;
 };
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, themeLabels }: OrdersTableProps) {
   if (orders.length === 0) {
-    return (
-      <p className="rounded-xl border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-        No orders match your filters.
-      </p>
-    );
+    return <p className="muted">Tidak ada order yang cocok dengan saringan.</p>;
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
-      <table className="w-full min-w-[640px] text-left text-sm">
-        <thead className="border-b border-border bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
+    <div className="table-wrap">
+      <table className="table">
+        <thead>
           <tr>
-            <th className="px-4 py-3 font-medium">Order</th>
-            <th className="px-4 py-3 font-medium">Recipient</th>
-            <th className="px-4 py-3 font-medium">Mode</th>
-            <th className="px-4 py-3 font-medium">Status</th>
-            <th className="px-4 py-3 font-medium">Delivery</th>
+            <th>Order</th>
+            <th>Penerima</th>
+            <th>Pengirim</th>
+            <th>Tema</th>
+            <th>Mode</th>
+            <th>Status</th>
+            <th>Dibuat</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border bg-card">
+        <tbody>
           {orders.map((order) => (
-            <tr key={order.id} className="hover:bg-muted/30">
-              <td className="px-4 py-3">
-                <Link
-                  href={STUDIO_ROUTES.orderDetail(order.id)}
-                  className="font-mono text-xs font-medium hover:underline"
-                >
+            <tr key={order.id}>
+              <td>
+                <Link href={STUDIO_ROUTES.orderDetail(order.id)}>
                   {order.order_number}
                 </Link>
               </td>
-              <td className="px-4 py-3">
-                <p className="font-medium">{order.receiver_name}</p>
-                <p className="text-xs text-muted-foreground">
-                  From {order.sender_name}
-                </p>
+              <td>{order.receiver_name}</td>
+              <td>{order.sender_name}</td>
+              <td>
+                {getThemeMarketingLabel(themeLabels[order.theme_id] ?? "", "—")}
               </td>
-              <td className="px-4 py-3">
-                <ExperienceModeBadge mode={order.experience_mode} />
+              <td>{order.experience_mode}</td>
+              <td>
+                <span className={studioStatusClassName(order.status)}>
+                  {formatStudioStatus(order.status)}
+                </span>
               </td>
-              <td className="px-4 py-3 capitalize text-muted-foreground">
-                {formatStatus(order.status)}
-              </td>
-              <td className="px-4 py-3 text-muted-foreground">
-                {formatDeliveryDate(order.scheduled_delivery_at)}
+              <td>
+                <time dateTime={order.created_at}>
+                  {formatStudioDate(order.created_at)}
+                </time>
               </td>
             </tr>
           ))}

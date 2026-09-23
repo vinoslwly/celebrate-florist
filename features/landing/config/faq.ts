@@ -1,7 +1,3 @@
-/**
- * FAQ content — verbatim from PRD-001 §8. Do not reword without a
- * founder/copy decision; Bible Celebrate Ch.7 treats copy as brand DNA.
- */
 export type FaqItem = {
   id: string;
   question: string;
@@ -11,28 +7,32 @@ export type FaqItem = {
 export const FAQ_ITEMS: FaqItem[] = [
   {
     id: "duration",
-    question: "Berapa lama proses pembuatannya?",
-    answer: "Minimal pre-order 1 minggu sebelum tanggal yang diinginkan.",
-  },
-  {
-    id: "custom",
-    question: "Apakah bisa custom?",
-    answer: "Bisa. Setiap Celebrate Experience dibuat khusus untuk order Anda.",
+    question: "Berapa lama pre-order-nya?",
+    answer:
+      "Kami membutuhkan waktu untuk merangkai semuanya dengan baik, jadi minimal pesan 2 hari sebelum tanggal yang kamu inginkan. Jangan mepet ya, biar kami punya waktu untuk bikin experience-nya ✨",
   },
   {
     id: "theme",
-    question: "Apakah bisa pilih tema?",
-    answer: "Bisa. Anda bisa memilih salah satu dari tiga Experience Theme.",
+    question: "Bisa pilih tema?",
+    answer:
+      "Tentu. Kamu bisa pilih salah satu dari tiga Experience Theme kami: Darling, Cloudie, atau Lovey. Pilih yang paling terasa “ini dia banget.”",
   },
   {
     id: "letter-content",
-    question: "Apakah bisa request isi surat?",
+    question: "Bisa request isi surat, foto, atau video?",
     answer:
-      "Bisa. Ceritakan kisah Anda, tim Celebrate akan membantu merangkainya.",
+      "Yes! Kirim foto, video, dan cerita yang ingin kamu sampaikan lewat WhatsApp. Kami yang bantu merangkainya menjadi experience, lalu kamu bisa melihat preview-nya sebelum QR dicetak.",
   },
   {
     id: "revision",
-    question: "Apakah bisa revisi?",
-    answer: "Bisa, selama Experience belum dipublish ke penerima.",
+    question: "Kalau ada yang mau diubah, bisa revisi?",
+    answer:
+      "Bisa. ♡ Selama experience belum dipublish untuk penerima, kamu masih bisa mengajukan revisi. Jadi nggak perlu khawatir kalau ada bagian yang terasa kurang “kalian banget.”",
+  },
+  {
+    id: "recipient-view",
+    question: "Apa yang dilihat penerima setelah scan QR?",
+    answer:
+      "Di sinilah kejutannya dimulai. ♡ Penerima akan masuk ke halaman hadiah privat yang berisi interaksi digital mulai dari surat, rangkaian foto, video, hingga photobooth di bagian akhir.",
   },
 ];

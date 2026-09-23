@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
+import { SCENE_VIEWPORT_LOCK } from "@/features/experience/scene-engine/scene-viewport";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -47,7 +48,7 @@ export function GalleryEndingScene({ payload, onComplete }: MomentsSceneProps) {
   const name = payload.experience.greeting_name;
 
   return (
-    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-[#F0C8D4]">
+    <div className={`${SCENE_VIEWPORT_LOCK} bg-[#F0C8D4]`}>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -78,7 +79,7 @@ export function GalleryEndingScene({ payload, onComplete }: MomentsSceneProps) {
       <SakuraMark className="pointer-events-none absolute bottom-6 left-[12%] h-12 w-12 opacity-90" />
       <SakuraMark className="pointer-events-none absolute right-[14%] bottom-8 h-11 w-11 opacity-80" />
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 text-center">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 pb-[max(2rem,env(safe-area-inset-bottom))] text-center">
         <motion.div
           className="mb-5 flex items-center justify-center gap-3"
           initial={reduceMotion ? false : { opacity: 0 }}

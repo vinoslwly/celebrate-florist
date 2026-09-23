@@ -9,8 +9,8 @@ import { STUDIO_ROUTES } from "@/features/studio/config/routes";
 import { filterThemesForNewOrderSelection } from "@/features/themes/config/active-themes";
 
 export const metadata = {
-  title: "New Order — Celebrate Florist Studio",
-  description: "Create a new order",
+  title: "Order baru · Celebrate Studio",
+  description: "Buat order baru",
 };
 
 export default async function NewOrderPage() {
@@ -25,21 +25,19 @@ export default async function NewOrderPage() {
   return (
     <div className="space-y-6">
       <div>
-        <Link
-          href={STUDIO_ROUTES.orders}
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          ← Back to orders
+        <Link href={STUDIO_ROUTES.orders} className="muted">
+          ← Semua order
         </Link>
-        <h1 className="mt-2 font-serif text-2xl font-semibold">New order</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Create an order and bootstrap a draft experience in one step.
+        <p className="eyebrow">Order</p>
+        <h1>Order baru</h1>
+        <p className="muted">
+          Buat order dan draft experience dalam satu langkah.
         </p>
       </div>
 
       {themes.length === 0 ? (
-        <p className="rounded-xl border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
-          No active themes found. Add themes before creating orders.
+        <p className="muted">
+          Belum ada tema aktif. Tambah tema sebelum membuat order.
         </p>
       ) : (
         <CreateOrderForm themes={themes} />

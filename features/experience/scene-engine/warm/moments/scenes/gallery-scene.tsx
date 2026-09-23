@@ -4,6 +4,7 @@ import { Cormorant_Garamond, Great_Vibes, Outfit } from "next/font/google";
 
 import { motion } from "framer-motion";
 
+import { galleryCaptionCopy } from "@/features/experience/lib/photo-caption";
 import type { MomentsSceneProps } from "@/features/experience/scene-engine/moments/types";
 import { SCENE_SCROLL_PANE } from "@/features/experience/scene-engine/scene-viewport";
 import {
@@ -45,17 +46,6 @@ const ON_RED_GOLD = "#F0D878";
 
 /** Deliberate Warm album strip stagger (seconds) — slightly slower than Bloom/Sky. */
 const WARM_STRIP_STEP = 0.14;
-
-function splitCaption(caption: string | null): { title: string; body: string } {
-  if (!caption?.trim()) {
-    return { title: "A memory", body: "A moment worth keeping." };
-  }
-  const parts = caption.split(" · ");
-  if (parts.length >= 2) {
-    return { title: parts[0]!.trim(), body: parts.slice(1).join(" · ").trim() };
-  }
-  return { title: "A memory", body: caption.trim() };
-}
 
 /** Delicate botanical — code-built, not a sticker PNG. */
 function Sprig({ className }: { className?: string }) {
@@ -119,7 +109,10 @@ function MemoryStrip({
   index: number;
   reduceMotion: boolean;
 }) {
-  const { title, body } = splitCaption(photo.caption);
+  const { title, body } = galleryCaptionCopy(photo.caption, {
+    title: "A memory",
+    body: "A moment worth keeping.",
+  });
   const photoLeft = index % 2 === 0;
   const n = String(index + 1).padStart(2, "0");
   const bannerTone = index % 2 === 0 ? "#7A121C" : "#A67C3A";

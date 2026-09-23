@@ -27,13 +27,13 @@ const securityHeaders = [
 ];
 
 /**
- * `script-src`/`style-src` need `'unsafe-eval'`/`'unsafe-inline'` for Next's
- * dev-mode Fast Refresh — enforcing the production policy locally would
- * break the dev server for no security benefit, since dev never serves
- * real traffic. `'unsafe-inline'` for `style-src` in *both* modes is a
- * genuine (not lazy) requirement: Radix UI (Sheet, Accordion) sets inline
- * `style` attributes via JS for positioning/animation — there is no nonce
- * we control for that.
+ * `script-src` needs `'unsafe-inline'` in production too: App Router
+ * hydrates with inline bootstrap/RSC scripts. A `'self'`-only policy
+ * blocks those scripts and leaves client pages stuck on their Suspense
+ * fallback (Theme Lab: “Loading Theme Lab…”). Next.js documents this
+ * as the non-nonce CSP. `'unsafe-eval'` stays dev-only (Fast Refresh).
+ * `'unsafe-inline'` for `style-src` is also required: Radix UI (Sheet,
+ * Accordion) sets inline `style` attributes via JS — no nonce we control.
  *
  * `connect-src`/`img-src` allow Supabase's wildcard domain in *every*
  * environment, not just dev — Sprint 02's first draft only allowed `wss:`
@@ -53,7 +53,9 @@ function buildContentSecurityPolicy(isDev: boolean): string {
 
   const directives: Record<string, string> = {
     "default-src": "'self'",
-    "script-src": isDev ? "'self' 'unsafe-eval' 'unsafe-inline'" : "'self'",
+    "script-src": isDev
+      ? "'self' 'unsafe-eval' 'unsafe-inline'"
+      : "'self' 'unsafe-inline'",
     "style-src": "'self' 'unsafe-inline'",
     "img-src": `'self' data: blob: ${supabaseHttp}`,
     "font-src": "'self' data:",
@@ -71,6 +73,17 @@ function buildContentSecurityPolicy(isDev: boolean): string {
 const nextConfig: NextConfig = {
   // Removes the "X-Powered-By: Next.js" response header.
   poweredByHeader: false,
+
+  // Keep sharp's native libvips out of the Turbopack bundle. Next 16.2
+  // traces the .node addon but not libvips-cpp.so, so Studio photo
+  // uploads 500 on Vercel linux-x64 (ERR_DLOPEN_FAILED).
+  serverExternalPackages: ["sharp"],
+  outputFileTracingIncludes: {
+    "/*": [
+      "./node_modules/@img/sharp-linux-x64/**/*",
+      "./node_modules/@img/sharp-libvips-linux-x64/**/*",
+    ],
+  },
 
   // Photo upload sends raw files via Server Action before server-side WebP
   // compression. Default Next.js limit is 1 MB — raised to match studio schema

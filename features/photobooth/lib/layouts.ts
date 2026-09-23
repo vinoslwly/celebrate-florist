@@ -17,9 +17,11 @@ export type PhotoboothLayoutConfig = {
   label: string;
   shortLabel: string;
   poseCount: 2 | 3;
-  /** Physical print size — portrait locked. */
+  /** Physical print size — portrait strip locked. */
   physicalInches: { width: number; height: number };
-  /** Exact aspect as W:H integers (B=1:3, K=2:3). */
+  /** Print size in centimetres (width × height). Layout B is 5.5 × 15.5. */
+  physicalCm: { width: number; height: number };
+  /** Exact aspect as W:H integers (B=11:31, K=2:3). */
   aspectRatio: { w: number; h: number };
   description: string;
   /** Working digital canvas — preview/composition, not print master. */
@@ -82,11 +84,11 @@ function buildStackedSlots(opts: {
 }
 
 const layoutBGeometry = buildStackedSlots({
-  canvasW: 400,
-  canvasH: 1200,
+  canvasW: 550,
+  canvasH: 1550,
   poseCount: 3,
-  margins: { top: 24, right: 24, bottom: 24, left: 24 },
-  gap: 16,
+  margins: { top: 210, right: 42, bottom: 260, left: 42 },
+  gap: 22,
 });
 
 const layoutKGeometry = buildStackedSlots({
@@ -107,15 +109,16 @@ export const PHOTOBOOTH_LAYOUTS: Record<
 > = {
   B: {
     id: "B",
-    label: "Layout B · 2×6 strip",
-    shortLabel: "3 poses",
+    label: "Layout B · 5.5 × 15.5 cm strip",
+    shortLabel: "3 photos",
     poseCount: 3,
-    physicalInches: { width: 2, height: 6 },
-    aspectRatio: { w: 1, h: 3 },
-    description: "Classic photostrip · 3 stacked poses",
-    canvas: { width: 400, height: 1200 },
-    margins: { top: 24, right: 24, bottom: 24, left: 24 },
-    gap: 16,
+    physicalInches: { width: 2.17, height: 6.1 },
+    physicalCm: { width: 5.5, height: 15.5 },
+    aspectRatio: { w: 11, h: 31 },
+    description: "Photostrip · 3 stacked photos · 5.5 cm × 15.5 cm",
+    canvas: { width: 550, height: 1550 },
+    margins: { top: 210, right: 42, bottom: 260, left: 42 },
+    gap: 22,
     slots: layoutBGeometry.slots,
     safeFrame: layoutBGeometry.safeFrame,
     background: "#ECEFF2",
@@ -127,6 +130,7 @@ export const PHOTOBOOTH_LAYOUTS: Record<
     shortLabel: "2 poses",
     poseCount: 2,
     physicalInches: { width: 4, height: 6 },
+    physicalCm: { width: 10, height: 15 },
     aspectRatio: { w: 2, h: 3 },
     description: "Photo-card · 2 stacked poses",
     canvas: { width: 600, height: 900 },
