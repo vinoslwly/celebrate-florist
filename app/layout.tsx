@@ -1,5 +1,7 @@
 import { Fira_Code, Fraunces, Poppins } from "next/font/google";
 
+import { VisitorMetrics } from "@/components/visitor-metrics";
+
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -52,7 +54,10 @@ export default function RootLayout({
       lang="id"
       className={`${poppins.variable} ${fraunces.variable} ${firaCode.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <VisitorMetrics />
+      </body>
     </html>
   );
 }
