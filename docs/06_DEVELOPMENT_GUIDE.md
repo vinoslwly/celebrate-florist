@@ -43,9 +43,10 @@ NEXT_PUBLIC_SUPABASE_URL=https://jobknyooffpouniyqpkp.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Server-only (leave empty until Sprint 04+)
+# Server-only. Required for recipient, preview, and Studio privileged writes.
 SUPABASE_SERVICE_ROLE_KEY=
 MEMORY_KEY_PEPPER=
+IP_HASH_PEPPER=
 
 # Admin (never commit real value)
 ADMIN_EMAIL=your-admin@email.com
@@ -131,6 +132,7 @@ Format: `<type>: <description>` where type is `feat`, `fix`, `chore`, `docs`, et
 - Real `ADMIN_EMAIL` value
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `MEMORY_KEY_PEPPER`
+- `IP_HASH_PEPPER`
 
 ---
 
@@ -141,10 +143,11 @@ Format: `<type>: <description>` where type is `feat`, `fix`, `chore`, `docs`, et
 ```
 supabase/migrations/
 ├── 20260710210001_extensions.sql
-├── 20260710210002_enums.sql
 ├── ...
-└── 20260710210015_seed_admin_email.sql
+└── 20260923160000_studio_admin_rls.sql
 ```
+
+There are 26 SQL files. The newest is `studio_admin_rls`.
 
 ### Naming Convention
 
@@ -177,9 +180,9 @@ Apply via `apply_migration` tool on project `jobknyooffpouniyqpkp`.
 
 ### Current State
 
-All 15 migration files in `supabase/migrations/` are applied on remote `celebrate-florist-prod`. Schema is in sync.
+Every file in `supabase/migrations/` is applied on remote `celebrate-florist-prod`, through `studio_admin_rls` (hosted version `20260923093146`). Early Sprint 03A rows in the hosted history use different version timestamps than the repo filenames. Do not re-apply applied files. Do not edit them.
 
-> **Note:** Remote Supabase migration history shows **16 entries** because the Sprint 03A audit applied two `rls_auto_enable` revokes separately; the repo consolidates them into file 012. See [03_DATABASE.md#repo-vs-remote-migration-history](./03_DATABASE.md#repo-vs-remote-migration-history).
+`supabase db push` against production is a schema change. Do not run it unless the founder asked for that migration.
 
 ---
 
@@ -196,15 +199,15 @@ All 15 migration files in `supabase/migrations/` are applied on remote `celebrat
 
 ### Client Usage
 
-| Client  | File                     | When to use                                            |
-| ------- | ------------------------ | ------------------------------------------------------ |
-| Browser | `lib/supabase/client.ts` | Client Components (future Studio auth)                 |
-| Server  | `lib/supabase/server.ts` | Server Components, Server Actions (anon key + cookies) |
-| Admin   | `lib/supabase/admin.ts`  | **Future** — service_role for privileged operations    |
+| Client  | File                     | When to use                                           |
+| ------- | ------------------------ | ----------------------------------------------------- |
+| Browser | `lib/supabase/client.ts` | Client Components                                     |
+| Server  | `lib/supabase/server.ts` | Server Components and Server Actions (anon + cookies) |
+| Admin   | `lib/supabase/admin.ts`  | `service_role` after the access gate, and Studio sync |
 
 ### Auth Setup
 
-One admin user exists in Supabase Auth: `varrelakun@gmail.com`. Created manually during Sprint 03A setup.
+One Studio admin exists in Supabase Auth. `ADMIN_EMAIL` on Vercel and in `.env.local` must be that same address. The address is not written in this guide. Production signup is disabled. `supabase/config.toml` also sets `enable_signup = false` for local stacks. Do not turn signup back on.
 
 ---
 
@@ -218,7 +221,7 @@ npm run build       # Production build
 
 Build validates `config/env.ts` at compile time — missing `NEXT_PUBLIC_*` vars cause build failure.
 
-`config/env.server.ts` secrets are optional until Sprint 04 — build succeeds with empty values.
+`ADMIN_EMAIL` is required by `config/env.server.ts`. A production build fails without it. `SUPABASE_SERVICE_ROLE_KEY`, `MEMORY_KEY_PEPPER`, and `IP_HASH_PEPPER` are optional at build time and required at runtime for recipient, Memory Code, and IP hashing.
 
 ---
 
@@ -276,7 +279,13 @@ Add tests when Studio and Experience features are implemented. Priority: Memory 
 
 ### Platform
 
-Vercel — project linked (`.vercel/` directory present).
+Vercel project `celebrate-florist` on team `vino-project` (Hobby). Production alias: `https://celebrate-florist.vercel.app`.
+
+The project is **not** connected to GitHub. A push does not deploy. Production is published with the Vercel CLI from this working tree (`npx vercel deploy --prod`). The live deployment is still labeled `088a932` until the next CLI deploy. Web Analytics and Speed Insights are in git and were already included in that upload. See [17_CURRENT_HANDOFF.md](./17_CURRENT_HANDOFF.md).
+
+`https://celebrateflorist.id` is a separate site. It is not a domain on this Vercel project. Deploying here does not change that domain.
+
+`main` on GitHub is not the app branch. Work stays on `rebuild/foundation`.
 
 ### Environment Variables (Vercel Dashboard)
 
@@ -290,6 +299,7 @@ Set the same variables as `.env.local`. For Sprint 07 Moments E2E, **all variabl
 | `SUPABASE_SERVICE_ROLE_KEY`     | Production, Preview (recipient/preview/QR)     |
 | `MEMORY_KEY_PEPPER`             | Production, Preview (Memory Code save/verify)  |
 | `ADMIN_EMAIL`                   | Production, Preview, **Edge** (proxy.ts gate)  |
+| `IP_HASH_PEPPER`                | Production (server). Do not print the value.   |
 
 ### Sprint 07 Deployment Readiness Checklist
 

@@ -3,8 +3,11 @@
 This folder is the **single source of truth** for the Celebrate Florist project. Every AI assistant and developer working on this repository should start here.
 
 > **Repository:** [vinoslwly/celebrate-florist](https://github.com/vinoslwly/celebrate-florist)  
-> **Active branch:** `rebuild/foundation`  
-> **Supabase project:** `celebrate-florist-prod` (`jobknyooffpouniyqpkp`, `ap-southeast-1`)
+> **Active branch:** `rebuild/foundation` (`main` is not the app)  
+> **Supabase project:** `celebrate-florist-prod` (`jobknyooffpouniyqpkp`, `ap-southeast-1`)  
+> **Start here:** [17_CURRENT_HANDOFF.md](./17_CURRENT_HANDOFF.md) — current production, security rules, and deploy. Updated 2026-09-24.
+
+Sprint plans below that say Scene Engine, motion, or photobooth are “not started” or “not authorized” are **historical**. That work has since shipped. When a sprint doc disagrees with the handoff or the code, follow the code.
 
 ---
 
@@ -40,15 +43,15 @@ Founder approved **CF-R1** and **CF-R2** (CF-R2-A/B/C). **Sprint 10 is officiall
 
 Sprint 00–10 = **Phase A — Product Foundation** ✅ complete. Platform core is shipped. Official long-term roadmap:
 
-| Phase                            | Sprints | Status         | Purpose                                                                                                                                                                                              |
-| -------------------------------- | ------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Phase A — Product Foundation** | 00–10   | ✅ Complete    | Engineering, 4 modes, replayability, platform core                                                                                                                                                   |
-| **Phase B — Experience Layer**   | 11–16   | 🔄 In progress | Sprint 11 architecture ✅; Sprint 12 Core UI ✅; Sprint 12.5 Theme Lab 🔒 CLOSED; **Sprint 13 Motion entry plan ✅** · impl ⛔ · [01](./sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md); S14–16 planned |
-| **Phase C — Release Layer**      | 17–19   | 📋 Planned     | QA, production readiness (incl. landing/SEO), **V1 Launch**                                                                                                                                          |
+| Phase                            | Sprints | Status                | Purpose                                                                                                                                               |
+| -------------------------------- | ------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase A — Product Foundation** | 00–10   | ✅ Complete           | Engineering, 4 modes, replayability, platform core                                                                                                    |
+| **Phase B — Experience Layer**   | 11–16   | ✅ Shipped in the app | Scene engine, motion, and photobooth are in production. Sprint docs that say “not started” are the original plans. See [17](./17_CURRENT_HANDOFF.md). |
+| **Phase C — Release Layer**      | 17–19   | 📋 Planned            | QA, production readiness (incl. landing/SEO), **V1 Launch**                                                                                           |
 
-**Sprint 11 architecture is complete** (2026-07-16). All four modes locked; cross-mode review passed. **Scene Engine implementation has NOT started.** [16](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) · [sprint-11/](./sprint-11/README.md) · [05 — Cross-Mode Review](./sprint-11/05_CROSS_MODE_REVIEW.md).
+**Sprint 11 architecture is complete** (2026-07-16). The Scene Engine has since been implemented on `/e/[token]`. [16](./16_SPRINT_11_EXPERIENCE_ARCHITECTURE.md) remains the architecture spec. [sprint-11/](./sprint-11/README.md).
 
-**Sprint 12 Implementation Pass is CLOSED** (2026-07-19) — Core UI System **IMPLEMENTED AND APPROVED**. **Sprint 12.5 Theme Lab milestone is 🔒 CLOSED** (2026-08-04) — Bloom · Warm · Sky locked (12 mode combinations); Playful + Pure frozen; release scope **3×4**. [24 closure](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) · [sprint-12-5/](./sprint-12-5/README.md). Production Scene Engine / `/e/[token]` wiring **NOT AUTHORIZED**.
+**Sprint 12 Implementation Pass is CLOSED** (2026-07-19). **Sprint 12.5 Theme Lab milestone is 🔒 CLOSED** (2026-08-04) — Bloom, Warm, and Sky are the live themes (12 mode combinations). Playful and Pure stay frozen. [24 closure](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md). Theme Lab routes still exist in the repo and return **404 in production** via `proxy.ts`.
 
 ## ✅ Sprint 05.5 — CLOSED (Official Implementation Baseline)
 
@@ -107,6 +110,7 @@ Read these documents in order. Each file builds on the previous one.
 | 4   | [04_SECURITY.md](./04_SECURITY.md)                   | Threat model, auth, RLS strategy, headers, secrets             |
 | 5   | [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md) | Locked business rules and their rationale                      |
 | 6   | [06_DEVELOPMENT_GUIDE.md](./06_DEVELOPMENT_GUIDE.md) | Install, run, git workflow, migrations, deployment             |
+| 17  | [17_CURRENT_HANDOFF.md](./17_CURRENT_HANDOFF.md)     | **Read first.** Production, security invariants, deploy drift  |
 
 ### Product Revision V2 (Sprint 05.5) — read before Sprint 06
 
@@ -133,16 +137,16 @@ Read these documents in order. Each file builds on the previous one.
 
 ## Current Project Status
 
-| Area                        | Status                                                                                                                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Development phase**       | **Engineering freeze** — Phase A (Sprint 00–10) complete; Phase B/C planned per [Roadmap V1](./11_IMPLEMENTATION_ROADMAP_V2.md#roadmap-v1--post-sprint-10-founder-approved)          |
-| **Current sprint**          | **Sprint 13 — ENTRY PLAN** · implementation ⛔ · [01 plan](./sprint-13/01_SPRINT_13_MOTION_ENTRY_PLAN.md) · Sprint 12.5 🔒 [24](./sprint-12-5/24_SPRINT_12_5_FINAL_CLOSURE_AUDIT.md) |
-| **Latest completed sprint** | **Sprint 10** — CF-R2 replay reset (10A–10C) + CRIT-01 `service_role` DELETE hotfix                                                                                                  |
-| **Deployment**              | Vercel project linked; Studio + recipient `/e/[token]` + buyer `/preview/[token]` routes deployable                                                                                  |
-| **Database**                | **21** migrations in repo; all Sprint 09A–10 migrations applied on remote — see [03_DATABASE.md](./03_DATABASE.md)                                                                   |
-| **Security**                | Sprint 02B hardening complete; RLS and privilege hardening complete (migrations 011–015)                                                                                             |
-| **Product**                 | **V2:** All **four experience modes** production-ready — Moments, Connection, Memories, Treasures (Studio publish, preview, QR, recipient UI)                                        |
-| **Production readiness**    | **Platform core shipped** — Phase B/C transforms functional product into premium launch experience                                                                                   |
+Authoritative detail: [17_CURRENT_HANDOFF.md](./17_CURRENT_HANDOFF.md).
+
+| Area              | Status                                                                                                                                                           |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Product**       | Marketing site, Studio, four recipient modes, scene engine, client-only photobooth capture, and stored strip templates are in the repo and on Vercel Production. |
+| **Live URL**      | `https://celebrate-florist.vercel.app`. `celebrateflorist.id` is a different site and is not attached to this project.                                           |
+| **Deploy**        | CLI deploy. GitHub pushes do not auto-deploy. App branch is `rebuild/foundation`.                                                                                |
+| **Database**      | 26 migration files. All of them are applied on `celebrate-florist-prod`, including `studio_admin_rls`.                                                           |
+| **Security**      | Studio RLS is `is_studio_admin()`, not “any authenticated user”. Signup is disabled. Theme Lab is 404 in production.                                             |
+| **Git vs Vercel** | Analytics is in git. The live deployment is still labeled `088a932` until the next CLI deploy. Pushes do not auto-deploy.                                        |
 
 ### Sprint History
 
@@ -168,14 +172,14 @@ Read these documents in order. Each file builds on the previous one.
 
 ### Planned Roadmap (Phase B — Experience Layer)
 
-| Sprint        | Status                         | Summary                                                                                                                                                                        |
-| ------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Sprint 11** | ✅ **Complete (Architecture)** | Scene Engine spec, ADRs, four mode docs, cross-mode review — [sprint-11/](./sprint-11/README.md) · impl NOT authorized                                                         |
-| **Sprint 12** | ✅ **CLOSED**                  | UI System docs + **Core UI implementation approved** — [impl pass](./sprint-12-implementation/README.md) · [Bloom plan](./sprint-12-5/00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md) |
-| **Sprint 13** | 📋 Planned — **NOT STARTED**   | Motion System — cinematic transitions; reduced-motion; photobooth excluded                                                                                                     |
-| **Sprint 14** | 📋 Planned — **NOT STARTED**   | Experience Components — Photobooth redesign (Layout B, Layout K)                                                                                                               |
-| **Sprint 15** | 📋 Planned                     | **Studio UX** — operational polish; UX only; no backend changes                                                                                                                |
-| **Sprint 16** | 📋 Planned                     | Polish — micro interactions, loading states, a11y, performance                                                                                                                 |
+| Sprint        | Status                          | Summary                                                                                                                                                                        |
+| ------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Sprint 11** | ✅ **Complete (Architecture)**  | Scene Engine spec, ADRs, four mode docs, cross-mode review — [sprint-11/](./sprint-11/README.md) · impl NOT authorized                                                         |
+| **Sprint 12** | ✅ **CLOSED**                   | UI System docs + **Core UI implementation approved** — [impl pass](./sprint-12-implementation/README.md) · [Bloom plan](./sprint-12-5/00_BLOOM_THEME_VALIDATION_PILOT_PLAN.md) |
+| **Sprint 13** | ✅ Shipped after the entry plan | Motion is in the scene engine. The entry-plan doc is history.                                                                                                                  |
+| **Sprint 14** | ✅ Shipped                      | Client-only photobooth capture and strip templates. Recipient camera photos are still not stored.                                                                              |
+| **Sprint 15** | 📋 Planned                      | **Studio UX** — operational polish; UX only; no backend changes                                                                                                                |
+| **Sprint 16** | 📋 Planned                      | Polish — micro interactions, loading states, a11y, performance                                                                                                                 |
 
 ### Planned Roadmap (Phase C — Release Layer)
 
@@ -205,14 +209,14 @@ Every AI assistant working on this repository **MUST**:
 
 ### What Exists Today (Code Reality)
 
-| Layer            | Implemented                                                                                                                                                                                                                                     | Not Yet Implemented                                                             |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Routes           | `app/(public)/` landing; `app/(studio)/` login, dashboard, orders CRUD; `app/(experience)/e/[token]`; `app/(preview)/preview/[token]`                                                                                                           | —                                                                               |
-| Features (code)  | `features/landing/`, `features/themes/`, `features/studio/`, `features/experience/`, `features/access/`, `features/preview/`, `features/photobooth/`, `features/analytics/`, `features/quiz/`, **`features/match/`**, **`features/treasures/`** | Phase B — Scene Engine, UI system, motion, photobooth, Studio UX (Sprint 11–16) |
-| Supabase clients | `lib/supabase/client.ts`, `server.ts`, `admin.ts`                                                                                                                                                                                               | —                                                                               |
-| Auth             | Session helpers, Studio login/logout, `proxy.ts` gate, Memory Code grace/trusted devices, recipient access gate                                                                                                                                 | —                                                                               |
-| Database         | Full V1 schema + migrations through Sprint 10 — see [03_DATABASE.md](./03_DATABASE.md)                                                                                                                                                          | —                                                                               |
-| Product          | V2 four-mode platform — **all four modes E2E shipped**; CF-R2 replay reset (Treasures)                                                                                                                                                          | Phase B/C — premium experience + Studio UX + V1 launch (Sprint 11–19)           |
+| Layer            | Implemented                                                                                                                                | Not Yet Implemented                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------- |
+| Routes           | `app/(public)/` landing; `app/(studio)/` login, dashboard, orders CRUD; `app/(experience)/e/[token]`; `app/(preview)/preview/[token]`      | —                                            |
+| Features (code)  | Landing, themes, Studio, experience scene engine, access, preview, photobooth, quiz, match, treasures, website settings, analytics inserts | —                                            |
+| Supabase clients | `lib/supabase/client.ts`, `server.ts`, `admin.ts`                                                                                          | —                                            |
+| Auth             | Studio login with email gate and login throttle, `proxy.ts`, Memory Code, 24-hour grace, trusted devices                                   | Signup stays disabled                        |
+| Database         | Migrations through `20260923160000_studio_admin_rls.sql`, all applied on the hosted project                                                | —                                            |
+| Product          | Four modes, marketing site, strip templates, ending message                                                                                | `celebrateflorist.id` is not this deployment |
 
 ---
 
@@ -238,6 +242,7 @@ Whenever a sprint changes architecture, security, database, or business rules:
 - [Security model](./04_SECURITY.md)
 - [Founder decisions (locked)](./05_FOUNDER_DECISIONS.md)
 - [Development workflow](./06_DEVELOPMENT_GUIDE.md)
+- [Current handoff](./17_CURRENT_HANDOFF.md)
 
 ### Product Revision V2 (Sprint 05.5)
 

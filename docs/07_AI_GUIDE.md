@@ -7,7 +7,7 @@
 
 ## Before You Write Any Code
 
-1. Read [00_INDEX.md](./00_INDEX.md) — current sprint status and what exists today.
+1. Read [17_CURRENT_HANDOFF.md](./17_CURRENT_HANDOFF.md) first. Then [00_INDEX.md](./00_INDEX.md). Sprint folders are history. Where they disagree with the handoff or the code, the code wins.
 2. Read [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md) — locked constraints.
 3. For **Sprint 06 Studio work**, read [12_STUDIO_UX.md](./12_STUDIO_UX.md) and [11_IMPLEMENTATION_ROADMAP_V2.md](./11_IMPLEMENTATION_ROADMAP_V2.md#sprint-06-implementation-checklist).
 4. Read the relevant domain doc ([02_ARCHITECTURE.md](./02_ARCHITECTURE.md), [03_DATABASE.md](./03_DATABASE.md), or [04_SECURITY.md](./04_SECURITY.md)).
@@ -37,21 +37,21 @@ Celebrate Florist is a **small, focused product** built by a solo founder. Every
 
 Without **explicit founder approval**, never:
 
-| Area                       | Rule                                                                        |
-| -------------------------- | --------------------------------------------------------------------------- |
-| **Business model**         | No payment gateway, no customer accounts, no multi-tenant                   |
-| **1:1 relationship**       | One order → one experience (UNIQUE constraint)                              |
-| **Gift domain RLS**        | `anon` must have zero policies on experiences, photos, sessions, analytics  |
-| **Audit log immutability** | Never remove or bypass `prevent_audit_log_mutation()` trigger               |
-| **Photobooth storage**     | Never create a photobooth storage bucket                                    |
-| **6-photo limit**          | Never increase `sort_order` range beyond 1–6                                |
-| **Access Code hashing**    | Never store plaintext Access Code                                           |
-| **Admin email in Git**     | Never commit real `ADMIN_EMAIL` to version control                          |
-| **Env validation pattern** | Never read `process.env` outside `config/env.ts` and `config/env.server.ts` |
-| **`server-only` guard**    | Never remove from `config/env.server.ts`                                    |
-| **Applied migrations**     | Never edit SQL files that are already applied to production                 |
-| **Route group structure**  | Don't rename `(public)`, `(studio)`, `(experience)` without approval        |
-| **Proxy matcher strategy** | Keep opt-in (only `/studio/*` and `/e/*`), don't switch to opt-out          |
+| Area                       | Rule                                                                                                                                                 |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Business model**         | No payment gateway, no customer accounts, no multi-tenant                                                                                            |
+| **1:1 relationship**       | One order → one experience (UNIQUE constraint)                                                                                                       |
+| **Gift domain RLS**        | `anon` must have zero policies on experiences, photos, sessions, analytics                                                                           |
+| **Audit log immutability** | Never remove or bypass `prevent_audit_log_mutation()` trigger                                                                                        |
+| **Photobooth captures**    | Recipient camera photos stay in the browser. Do not upload them. Studio strip templates may use `photobooth-strips` and `catalog-photobooth-strips`. |
+| **6-photo limit**          | Never increase `sort_order` range beyond 1–6                                                                                                         |
+| **Access Code hashing**    | Never store plaintext Access Code                                                                                                                    |
+| **Admin email in Git**     | Never commit real `ADMIN_EMAIL` to version control                                                                                                   |
+| **Env validation pattern** | Never read `process.env` outside `config/env.ts`, `config/env.server.ts`, and `proxy.ts` (Edge cannot import the server env module)                  |
+| **`server-only` guard**    | Never remove from `config/env.server.ts`                                                                                                             |
+| **Applied migrations**     | Never edit SQL files that are already applied to production                                                                                          |
+| **Route group structure**  | Don't rename `(public)`, `(studio)`, `(experience)` without approval                                                                                 |
+| **Proxy matcher strategy** | Keep it opt-in: `/studio`, `/e/:path*`, `/theme-lab`. Do not switch to opt-out. Do not remove the production Theme Lab 404.                          |
 
 ---
 

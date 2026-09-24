@@ -6,7 +6,9 @@
 
 ## Overview
 
-Celebrate Florist uses **Supabase PostgreSQL** with 13 tables, 4 enum types, 2 private storage buckets, and 26 RLS policies. The schema was designed in Sprint 03 and implemented in Sprint 03A (15 migration files), extended through Sprint 08 (migration 017).
+> **Current as of 2026-09-24:** the hosted project has every migration in `supabase/migrations/` applied, including `20260923160000_studio_admin_rls.sql`. The table and policy narrative below stops at the Sprint 08 era. For the live file list, buckets, and RLS rule, read [17_CURRENT_HANDOFF.md](./17_CURRENT_HANDOFF.md). Do not treat “13 tables / 2 buckets” as the current schema.
+
+Celebrate Florist uses **Supabase PostgreSQL**. The schema was designed in Sprint 03 and implemented in Sprint 03A, then extended through Studio admin RLS (2026-09-23). Storage buckets in code are `experience-photos`, `experience-qr`, `photobooth-strips`, `website-assets`, and `catalog-photobooth-strips`.
 
 **Supabase project:** `celebrate-florist-prod` (`jobknyooffpouniyqpkp`, `ap-southeast-1`)
 

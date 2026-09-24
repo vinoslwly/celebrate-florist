@@ -62,7 +62,7 @@ These are non-negotiable without explicit founder approval:
 - No customer accounts
 - One Order → One Experience (1:1 enforced in database)
 - Preview Link ≠ Experience Link (separate tokens and workflows)
-- Memory Code + 24-hour grace period + trusted devices (hashed, never stored plaintext) — **Planned Sprint 07**
+- Memory Code + 24-hour grace period + trusted devices (hashed, never stored plaintext) — implemented
 - Maximum 6 memory photos per experience
 - Photobooth photos **never** stored in Supabase
 - Gifts archived after 365 days of inactivity
@@ -75,41 +75,9 @@ Full rationale: [05_FOUNDER_DECISIONS.md](./05_FOUNDER_DECISIONS.md)
 
 ## Current Implementation Status
 
-### Completed
+The status below is historical and wrong. Studio, recipient delivery, Memory Code, preview, photobooth, and the service-role client are all implemented.
 
-| Sprint     | Deliverable                                                                                                                 |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Sprint 00  | Next.js 16 App Router scaffold, TypeScript strict, Tailwind 4, shadcn/ui, Husky + lint-staged, Supabase connectivity script |
-| Sprint 01  | Full landing page — hero, bouquet catalog, theme showcase, FAQ, WhatsApp CTAs, scroll animations                            |
-| Sprint 02  | Approved folder structure, Zod env validation, feature module scaffolding                                                   |
-| Sprint 02B | `proxy.ts` session refresh, CSP, security headers, Supabase image domains                                                   |
-| Sprint 03A | 15 migration files (remote history: 16 entries), RLS, storage buckets, 5 seeded themes, privilege hardening                 |
-
-### Not Yet Built
-
-| Area                                 | Status                                                               |
-| ------------------------------------ | -------------------------------------------------------------------- |
-| Studio dashboard (`/studio/*`)       | Route group and feature folders exist; no pages or logic             |
-| Experience delivery (`/e/[token]/*`) | Route group planned; proxy matcher ready; no implementation          |
-| Admin authentication gate            | `ADMIN_EMAIL` in `.env.example`; not wired in `config/env.server.ts` |
-| Service role client                  | Referenced in comments; `lib/supabase/admin.ts` does not exist       |
-| Memory Key verification              | Schema ready (`memory_key_hash`); application logic not built        |
-| Preview link flow                    | Schema ready; no UI or server actions                                |
-| Photobooth                           | Feature folder scaffolded; no implementation                         |
-| QR generation                        | `experience-qr` bucket exists; no generation code                    |
-
----
-
-## Current Sprint
-
-**Sprint 04** is next. Expected scope (from codebase comments and env setup — not yet implemented):
-
-- Wire `ADMIN_EMAIL` into server env validation
-- Create `lib/supabase/admin.ts` (service role client)
-- Implement Studio authentication and route protection in `proxy.ts`
-- Begin Studio order management UI
-
-Confirm scope with founder before starting — this section reflects codebase signals only.
+**Read [17_CURRENT_HANDOFF.md](./17_CURRENT_HANDOFF.md).** That file is the current handoff for a new programmer. Sprint folders under `docs/sprint-*` are records of how the work was planned, not a list of unfinished work.
 
 ---
 
@@ -122,12 +90,12 @@ flowchart TB
         WA["WhatsApp Order Flow"]
     end
 
-    subgraph Studio["Admin Surface (Future)"]
+    subgraph Studio["Admin Surface"]
         SD["Studio Dashboard<br/>/studio/*"]
         AUTH["Supabase Auth<br/>Single Admin"]
     end
 
-    subgraph Experience["Recipient Surface (Future)"]
+    subgraph Experience["Recipient Surface"]
         EXP["Greeting Experience<br/>/e/[token]"]
         AC["Memory Code / Grace / Trusted Device"]
         TD["Trusted Device Cookie"]
@@ -171,9 +139,11 @@ celebrate-florist/
 ├── app/
 │   ├── layout.tsx              # Root layout, brand fonts, metadata
 │   ├── globals.css             # Tailwind 4 + design tokens
-│   └── (public)/               # ✅ Implemented — marketing site
-│       ├── layout.tsx          # Navbar, footer, MotionProvider
-│       └── page.tsx            # Landing page sections
+│   ├── (public)/               # Marketing site
+│   ├── (studio)/               # Studio
+│   ├── (experience)/           # /e/[token] and the trust route
+│   ├── (preview)/              # /preview/[token]
+│   └── (theme-lab)/            # Present in the repo; 404 in production
 │
 ├── components/
 │   ├── providers/              # MotionProvider (Framer Motion)
@@ -185,34 +155,34 @@ celebrate-florist/
 │   └── env.server.ts           # Server-only env (server-only guard)
 │
 ├── features/
-│   ├── landing/                # ✅ Landing page sections + static config
-│   ├── themes/                 # ✅ 5 theme configs (bloom, sky, pure, warm, play)
-│   ├── studio/                 # 📁 Scaffolded — actions, components, hooks, repos, services
-│   ├── experience/             # 📁 Scaffolded
-│   ├── access/                 # 📁 Scaffolded — Access Code, sessions
-│   ├── preview/                # 📁 Scaffolded
-│   ├── photobooth/             # 📁 Scaffolded
-│   └── analytics/              # 📁 Scaffolded
+│   ├── landing/                # Marketing site
+│   ├── themes/                 # Bloom, Warm, Sky are the live themes
+│   ├── studio/                 # Orders, website settings, strips, auth
+│   ├── experience/             # Recipient flow and scene engine
+│   ├── access/                 # Memory Code, grace, trusted devices
+│   ├── preview/                # Buyer preview
+│   ├── photobooth/             # Client-only capture plus stored strip templates
+│   ├── quiz/ match/ treasures/ # The other three experience modes
+│   └── analytics/              # experience_opened inserts
 │
 ├── lib/
 │   ├── supabase/
 │   │   ├── client.ts           # Browser client (anon key)
-│   │   └── server.ts           # Server client (anon key + cookies)
+│   │   ├── server.ts           # Server client (anon key + cookies)
+│   │   └── admin.ts            # service_role, server only
 │   ├── utils.ts                # cn() helper
 │   └── whatsapp.ts             # WhatsApp deep-link builder
 │
-├── proxy.ts                    # Session refresh (Next.js 16 convention)
+├── proxy.ts                    # Studio gate, gift throttle, Theme Lab 404
 ├── next.config.ts              # CSP, security headers, image domains
 ├── scripts/
 │   └── verify-supabase.ts      # Connectivity health check
 ├── supabase/
-│   └── migrations/             # 15 SQL migration files (remote history: 16 entries)
+│   └── migrations/             # 26 SQL files; all applied on celebrate-florist-prod
 ├── types/
 │   └── theme.ts                # Theme type for landing page
 └── docs/                       # This documentation
 ```
-
-**Legend:** ✅ = has implementation code · 📁 = folder structure only
 
 ---
 

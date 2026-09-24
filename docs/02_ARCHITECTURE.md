@@ -156,20 +156,15 @@ Recipient reads and game submissions use `service_role` via `lib/supabase/admin.
 
 Next.js 16 renamed `middleware.ts` to `proxy.ts`. Same runtime behavior.
 
-### Current Behavior (Sprint 05)
+### Current Behavior
 
-1. Matches only `/studio/:path*` and `/e/:path*` (opt-in, not opt-out).
-2. Creates Supabase server client with cookie read/write.
-3. Calls `supabase.auth.getUser()` to refresh session cookie.
-4. **Studio branch:** redirects unauthenticated users to `/studio/login`; rejects non-admin email; redirects authenticated admin away from login page.
-5. **`/e/*` branch:** session refresh only — Memory Code / grace logic lives in application layer (Sprint 07).
+1. Matches `/studio`, `/studio/:path*`, `/e/:path*`, `/theme-lab`, and `/theme-lab/:path*` (opt-in). `/` and `/preview` are not matched.
+2. In production, `/theme-lab` returns 404 before the page runs.
+3. Creates a Supabase server client with cookie read/write and calls `auth.getUser()` on every matched request, including anonymous gift pages.
+4. **Studio branch:** redirects unauthenticated users to `/studio/login`; rejects a non-admin email and signs them out; redirects an authenticated admin away from the login page.
+5. **`/e/*` branch:** best-effort in-memory IP throttle (120 requests per minute per isolate). Memory Code, the 24-hour grace period, and trusted devices are enforced in `features/access/`, not in the proxy.
 
-### Future Extensions
-
-| Extension                                    | When       |
-| -------------------------------------------- | ---------- |
-| Rate limiting on `/e/*` Memory Code attempts | Sprint 07  |
-| IP-based throttling                          | Sprint 07+ |
+The in-memory map is not shared across Vercel isolates. It is not the production abuse control.
 
 ```mermaid
 sequenceDiagram

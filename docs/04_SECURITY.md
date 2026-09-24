@@ -83,11 +83,11 @@ Recipients do **not** use Supabase Auth. Authentication is:
 
 ### Three-Layer Model
 
-| Layer           | Gift Domain                                               | Admin Domain                               |
-| --------------- | --------------------------------------------------------- | ------------------------------------------ |
-| **Application** | Memory Code, grace-period rules, or valid trusted session | `authenticated` + email = `ADMIN_EMAIL`    |
-| **RLS**         | `anon`: zero policies                                     | `authenticated`: full CRUD (except delete) |
-| **Privileges**  | `service_role` for all recipient reads                    | `authenticated` client for Studio writes   |
+| Layer           | Gift Domain                                               | Admin Domain                                                                                                                                         |
+| --------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Application** | Memory Code, grace-period rules, or valid trusted session | `authenticated` + email = `ADMIN_EMAIL`                                                                                                              |
+| **RLS**         | `anon`: zero policies on the Gift domain                  | `authenticated` passes only when `is_studio_admin()` is true (`app_settings.admin_email` matches the JWT email). Any other signed-in user is denied. |
+| **Privileges**  | `service_role` for all recipient reads                    | `authenticated` client for Studio writes                                                                                                             |
 
 ### Why `service_role` for Recipients
 
@@ -274,11 +274,11 @@ System-initiated actions (e.g., 365-day archival) use `actor_type = 'system'`.
 
 ### Classification
 
-| Class      | Variables                                                                          | Where defined          | Client-safe? |
-| ---------- | ---------------------------------------------------------------------------------- | ---------------------- | ------------ |
-| **Public** | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL` | `config/env.ts`        | Yes          |
-| **Server** | `SUPABASE_SERVICE_ROLE_KEY`, `MEMORY_KEY_PEPPER`                                   | `config/env.server.ts` | No           |
-| **Admin**  | `ADMIN_EMAIL`                                                                      | `.env.local` only      | No           |
+| Class      | Variables                                                                                              | Where defined               | Client-safe? |
+| ---------- | ------------------------------------------------------------------------------------------------------ | --------------------------- | ------------ |
+| **Public** | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_APP_URL`                     | `config/env.ts`             | Yes          |
+| **Server** | `SUPABASE_SERVICE_ROLE_KEY`, `MEMORY_KEY_PEPPER`, `IP_HASH_PEPPER`                                     | `config/env.server.ts`      | No           |
+| **Admin**  | `ADMIN_EMAIL` (also read by `proxy.ts` from `process.env`, because Edge cannot import `env.server.ts`) | `.env.local` and Vercel env | No           |
 
 ### Rules
 
@@ -287,12 +287,7 @@ System-initiated actions (e.g., 365-day archival) use `actor_type = 'system'`.
 3. **`ADMIN_EMAIL` never in Git** — placeholder in `.env.example`, real value in `.env.local`.
 4. **Rotate immediately** if `SUPABASE_SERVICE_ROLE_KEY` or `MEMORY_KEY_PEPPER` is leaked.
 
-### Future Work
-
-| Variable                         | Status                                                     |
-| -------------------------------- | ---------------------------------------------------------- |
-| `IP_HASH_PEPPER`                 | Referenced in security design; not in `.env.example` yet   |
-| `ADMIN_EMAIL` in `env.server.ts` | In `.env.example`; not wired in Zod schema yet (Sprint 04) |
+`IP_HASH_PEPPER` and `ADMIN_EMAIL` are both in `.env.example` and in the Zod schema in `config/env.server.ts`. `ADMIN_EMAIL` is required. The peppers stay optional in the schema and are required in Production for the features that hash with them. `IP_HASH_PEPPER` is set on Vercel Production. Do not print its value.
 
 ---
 
@@ -315,25 +310,25 @@ Configured in `next.config.ts`:
 
 Built dynamically in `next.config.ts` via `buildContentSecurityPolicy()`.
 
-| Directive         | Production                                         | Dev                                    |
-| ----------------- | -------------------------------------------------- | -------------------------------------- |
-| `default-src`     | `'self'`                                           | `'self'`                               |
-| `script-src`      | `'self'`                                           | `'self' 'unsafe-eval' 'unsafe-inline'` |
-| `style-src`       | `'self' 'unsafe-inline'`                           | `'self' 'unsafe-inline'`               |
-| `img-src`         | `'self' data: https://*.supabase.co`               | Same                                   |
-| `font-src`        | `'self' data:`                                     | Same                                   |
-| `connect-src`     | `'self' https://*.supabase.co wss://*.supabase.co` | Same                                   |
-| `frame-ancestors` | `'self'`                                           | Same                                   |
-| `base-uri`        | `'self'`                                           | Same                                   |
-| `form-action`     | `'self'`                                           | Same                                   |
+| Directive         | Production                                               | Dev                                    |
+| ----------------- | -------------------------------------------------------- | -------------------------------------- |
+| `default-src`     | `'self'`                                                 | `'self'`                               |
+| `script-src`      | `'self' 'unsafe-inline'`                                 | `'self' 'unsafe-eval' 'unsafe-inline'` |
+| `style-src`       | `'self' 'unsafe-inline'`                                 | `'self' 'unsafe-inline'`               |
+| `img-src`         | `'self' data: blob: https://*.supabase.co`               | Same                                   |
+| `font-src`        | `'self' data:`                                           | Same                                   |
+| `connect-src`     | `'self' blob: https://*.supabase.co wss://*.supabase.co` | Same                                   |
+| `frame-ancestors` | `'self'`                                                 | Same                                   |
+| `base-uri`        | `'self'`                                                 | Same                                   |
+| `form-action`     | `'self'`                                                 | Same                                   |
 
 ### Accepted CSP Trade-offs
 
-| Trade-off                         | Rationale                                                                |
-| --------------------------------- | ------------------------------------------------------------------------ |
-| `'unsafe-inline'` for `style-src` | Radix UI (Sheet, Accordion) sets inline styles via JS — no nonce control |
-| `'unsafe-eval'` in dev only       | Next.js Fast Refresh requires it; production policy is stricter          |
-| `https://*.supabase.co` wildcard  | Required for Storage and Realtime across all environments                |
+| Trade-off                                    | Rationale                                                                       |
+| -------------------------------------------- | ------------------------------------------------------------------------------- |
+| `'unsafe-inline'` for `style-src`            | Radix UI (Sheet, Accordion) sets inline styles via JS — no nonce control        |
+| `'unsafe-inline'` on production `script-src` | App Router hydration scripts. A `'self'`-only policy leaves client pages stuck. |
+| `https://*.supabase.co` wildcard             | Required for Storage and Realtime across all environments                       |
 
 ---
 
@@ -341,11 +336,11 @@ Built dynamically in `next.config.ts` via `buildContentSecurityPolicy()`.
 
 `proxy.ts` (Next.js 16 middleware convention):
 
-| Aspect              | Current                                     | Future                                |
-| ------------------- | ------------------------------------------- | ------------------------------------- |
-| Matcher             | `/studio/:path*`, `/e/:path*` only          | Add new route groups as needed        |
-| Behavior            | Session cookie refresh via `auth.getUser()` | Admin auth redirect, rate limiting    |
-| `(public)` excluded | Marketing pages stay cacheable              | Intentional — never add public routes |
+| Aspect                             | Current                                                                        | Future                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------ |
+| Matcher                            | `/studio`, `/studio/:path*`, `/e/:path*`, `/theme-lab`, `/theme-lab/:path*`    | Do not switch to an opt-out matcher        |
+| Behavior                           | Session refresh, Studio admin gate, `/e` IP throttle, production Theme Lab 404 | Memory Code stays in the application layer |
+| `(public)` and `/preview` excluded | Marketing pages stay cacheable. Preview is still a dynamic server route.       | Intentional                                |
 
 **Why `getUser()` not `getSession()`:** `getUser()` revalidates against Supabase Auth server instead of trusting an unverified local cookie.
 
@@ -384,17 +379,17 @@ Built dynamically in `next.config.ts` via `buildContentSecurityPolicy()`.
 
 ## Future Security Improvements
 
-| Item                                                             | Priority                                           |
-| ---------------------------------------------------------------- | -------------------------------------------------- |
-| Wire `ADMIN_EMAIL` into `env.server.ts` with required validation | Sprint 04                                          |
-| Implement Access Code rate limiting in Server Actions            | ✅ Sprint 07 — `memory-code-rate-limit.service.ts` |
-| Add `IP_HASH_PEPPER` to env schema                               | Post-V2 backlog                                    |
-| proxy.ts rate limiting on `/e/*`                                 | ✅ Sprint 07 — basic IP throttle in `proxy.ts`     |
-| 90-day `security_events` cleanup job                             | Post-launch                                        |
-| Supabase Auth MFA for admin                                      | Post-launch                                        |
-| CI security scanning (dependency audit)                          | Post-launch                                        |
-| CSP nonce for inline scripts (if Radix allows)                   | Investigate                                        |
-| Signed URL expiry tuning for memory photos                       | Experience sprint                                  |
+| Item                                                             | Priority                                                                                                                  |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Wire `ADMIN_EMAIL` into `env.server.ts` with required validation | ✅ Done — required in `config/env.server.ts`                                                                              |
+| Implement Access Code rate limiting in Server Actions            | ✅ Sprint 07 — `memory-code-rate-limit.service.ts`. An experience also locks after 20 failed attempts, independent of IP. |
+| Add `IP_HASH_PEPPER` to env schema                               | ✅ In `config/env.server.ts` and `.env.example`. Set on Vercel Production.                                                |
+| proxy.ts rate limiting on `/e/*`                                 | ✅ Sprint 07 — basic IP throttle in `proxy.ts`                                                                            |
+| 90-day `security_events` cleanup job                             | Post-launch                                                                                                               |
+| Supabase Auth MFA for admin                                      | Post-launch                                                                                                               |
+| CI security scanning (dependency audit)                          | Post-launch                                                                                                               |
+| CSP nonce for inline scripts (if Radix allows)                   | Investigate                                                                                                               |
+| Signed URL expiry tuning for memory photos                       | Experience sprint                                                                                                         |
 
 ---
 
